@@ -6,6 +6,11 @@ package lzm.starling.gestures
 	import starling.events.Touch;
 	import starling.events.TouchPhase;
 	
+	/**
+	 * 双击收拾 
+	 * @author lzm
+	 * 
+	 */	
 	public class DoubleTapGestures extends Gestures
 	{
 		public function DoubleTapGestures(target:DisplayObject, callBack:Function=null)

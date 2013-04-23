@@ -4,6 +4,11 @@ package lzm.starling.gestures
 	import starling.events.Touch;
 	import starling.events.TouchPhase;
 	
+	/**
+	 * 移动手势 
+	 * @author lzm
+	 * 
+	 */	
 	public class MovedGestures extends Gestures
 	{
 		public function MovedGestures(target:DisplayObject, callBack:Function=null)

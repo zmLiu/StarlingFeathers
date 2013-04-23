@@ -4,6 +4,11 @@ package lzm.starling.gestures
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
 
+	/**
+	 * 手势基类 
+	 * @author lzm
+	 * 
+	 */	
 	public class Gestures
 	{
 		protected var _target:DisplayObject;//目标

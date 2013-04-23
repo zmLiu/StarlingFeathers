@@ -4,6 +4,11 @@ package lzm.starling.gestures
 	import starling.events.Touch;
 	import starling.events.TouchPhase;
 	
+	/**
+	 * 悬停手势 
+	 * @author lzm
+	 * 
+	 */	
 	public class HoverGestures extends Gestures
 	{
 		public function HoverGestures(target:DisplayObject, callBack:Function=null)

@@ -6,6 +6,11 @@ package lzm.starling.gestures
 	import starling.events.Touch;
 	import starling.events.TouchPhase;
 
+	/**
+	 * 单机手势 
+	 * @author lzm
+	 * 
+	 */	
 	public class TapGestures extends Gestures
 	{
 		private var isMoved:Boolean = false;
