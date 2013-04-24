@@ -31,8 +31,7 @@ package lzm.starling.display
 		private static var sceneParamsQueue:Array = [];
 		private static var sceneNumberQueue:int = 0;
 		
-		private var _backButton:Button;
-		private var _backFun:Function;
+		protected var _backButton:Button;
 		private var _sceneNumber:int = 0;//在列表里面的第几个
 		
 		protected var _params:Array;
