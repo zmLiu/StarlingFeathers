@@ -32,7 +32,10 @@ package lzm.starling.display
 		private static var sceneNumberQueue:int = 0;
 		
 		protected var _backButton:Button;
-		private var _sceneNumber:int = 0;//在列表里面的第几个
+		private var _sceneNumber:int = 0;//在场景列表列表里面的第几个
+		private var _addToStageType:int;//被显示时候的类型。 0 - 作为一个新的场景替换调之前的场景，1 - 作为另外一个场景的子场景
+		private var _parentScene:BaseScene;//父场景
+		private var _childScene:BaseScene;//子场景---目前只支持一个
 		
 		protected var _params:Array;
 		
@@ -61,16 +64,58 @@ package lzm.starling.display
 				_backButton = new Button(new Image(_backBtnTexture));
 				_backButton.x = 14;
 				_backButton.y = 7.5;
-				_backButton.addEventListener(Event.TRIGGERED,backFunction);
 				addChild(_backButton);
+			}
+			_backButton.removeEventListeners(Event.TRIGGERED);
+			if(_addToStageType == 0){
+				_backButton.addEventListener(Event.TRIGGERED,backFunction);
+			}else if(_addToStageType == 1){
+				_backButton.addEventListener(Event.TRIGGERED,backToParentScene);
 			}
 		}
 		
+		/**
+		 * 回到上一层
+		 * */
 		protected function backFunction(e:Event):void{
 			sceneNumberQueue--;
 			
 			var clazz:Class = sceneClassNameQueue.pop();
 			replaceClass(clazz,sceneParamsQueue.pop() as Array);
+		}
+		
+		/**
+		 * 返回到父级场景
+		 */		
+		protected function backToParentScene(e:Event):void{
+			_parentScene.popScene();
+		}
+		
+		/**
+		 * 添加子场景，目前只支持一个子场景
+		 * @param	hideSelf	是否隐藏本身
+		 * */
+		public function pushScene(scene:BaseScene,hideSelf:Boolean = true):void{
+			if(_childScene) return;
+			
+			scene._parentScene = this;
+			_childScene = scene;
+			_childScene._addToStageType = 1;
+			_childScene.addBackFunction();
+			parent.addChild(_childScene);
+			if(hideSelf) this.visible = false;
+		}
+		
+		/**
+		 * 删除子场景
+		 */		
+		public function popScene():void{
+			if(_childScene == null) return;
+			
+			_childScene._parentScene = null;
+			_childScene.removeFromParent(true);
+			this._childScene = null;
+			this.visible = true;
 		}
 		
 		/**
@@ -97,6 +142,7 @@ package lzm.starling.display
 				var scene:BaseScene = new sceneClass(params);
 				_sceneLoading.targetScene = scene;
 				scene._sceneNumber = sceneNumberQueue;
+				scene._addToStageType = 0;
 				scene.addEventListener(EVENT_BULIDERCOMPLETE,buliderCompleteFunc);
 				
 				function buliderCompleteFunc(e:Event):void{
@@ -140,6 +186,7 @@ package lzm.starling.display
 				var scene:BaseScene = new sceneClass(params);
 				_sceneLoading.targetScene = scene;
 				scene._sceneNumber = sceneNumberQueue;
+				scene._addToStageType = 0;
 				scene.addEventListener(EVENT_BULIDERCOMPLETE,buliderCompleteFunc);
 				
 				

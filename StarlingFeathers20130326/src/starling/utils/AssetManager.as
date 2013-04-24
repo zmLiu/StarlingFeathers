@@ -572,7 +572,7 @@ package starling.utils
 						onComplete();
 						break;
 					default:
-						if(extension == "info"){
+						if(extension == "info" || extension == "json"){
 							var string:String = new String(urlLoader.data as ByteArray);
 							addOther(name,JSON.parse(string));
 						}else{
