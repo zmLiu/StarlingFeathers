@@ -238,6 +238,24 @@ package lzm.starling.display
 			}
 		}
 		
+		/**
+		 *  
+		 * @return 父级场景，没有返回null 
+		 * 
+		 */		
+		public function get parentScene():BaseScene{
+			return _parentScene;
+		}
+		
+		/**
+		 * 
+		 * @return 子场景，没有返回null 
+		 * 
+		 */		
+		public function get childScene():BaseScene{
+			return _childScene;
+		}
+		
 		public override function dispose():void{
 			if(_backButton){
 				_backButton.removeFromParent();
