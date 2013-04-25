@@ -26,6 +26,8 @@ package lzm.starling.display
 			var filter:MosaicFilter = new MosaicFilter(0.1,0.1);
 			_replaceScene.filter = filter;
 			Starling.juggler.tween(filter,0.3,{thresholdX:12,thresholdY:12,onComplete:function():void{
+				_replaceScene.filter = null;
+				filter.dispose();
 				callBack();
 			}});
 		}

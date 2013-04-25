@@ -154,10 +154,10 @@ package lzm.starling.display
 					
 					currentScene = scene;
 					tempParent.addChild(scene);
-					replaceTweenOver(tempParent);
 					
 					if(callBack) callBack(scene);
 					_sceneLoading.hide(function():void{
+						replaceTweenOver(tempParent);
 						_sceneLoading.targetScene = null;
 					});
 				}
@@ -196,11 +196,11 @@ package lzm.starling.display
 					
 					currentScene = scene;
 					tempParent.addChild(scene);
-					replaceTweenOver(tempParent);
 					
 					if(callBack) callBack(scene);
 					
 					_sceneLoading.hide(function():void{
+						replaceTweenOver(tempParent);
 						_sceneLoading.targetScene = null;
 					});
 				}
