@@ -93,6 +93,7 @@ package lzm.starling.display
 		
 		/**
 		 * 添加子场景，目前只支持一个子场景
+		 * @param	scene		需要添加的场景
 		 * @param	hideSelf	是否隐藏本身
 		 * */
 		public function pushScene(scene:BaseScene,hideSelf:Boolean = true):void{
