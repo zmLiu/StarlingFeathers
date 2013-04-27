@@ -7,7 +7,7 @@ package lzm.starling.display
 	import lzm.util.DoScale;
 	
 	import starling.core.Starling;
-	import starling.display.Image;
+	import starling.display.DisplayObject;
 
 	public class ImageViewer extends ScrollContainer
 	{
@@ -45,7 +45,7 @@ package lzm.starling.display
 			Starling.juggler.tween(this,0.1,{horizontalScrollPosition:_tempHorizontalPosition});
 		}
 		
-		public function addImage(image:Image):void{
+		public function addImage(image:DisplayObject):void{
 			var scObject:Object = DoScale.doScale(image.width,image.height,width,height);
 			image.scaleX = scObject.sx;
 			image.scaleY = scObject.sy;
