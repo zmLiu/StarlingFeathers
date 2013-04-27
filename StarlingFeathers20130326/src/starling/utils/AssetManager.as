@@ -555,6 +555,7 @@ package starling.utils
 					case "db"://dragonbones
 						var factory:StarlingFactory = new StarlingFactory();
 						factory.scaleForTexture = mScaleFactor;
+						factory.generateMipMaps = mGenerateMipmaps;
 						factory.addEventListener(Event.COMPLETE,onDBFactoryBuilderComplete);
 						factory.parseData(urlLoader.data as ByteArray,null,mScaleFactor);
 						break;
