@@ -100,7 +100,6 @@ public class MaxRectsBinPack
 			return newNode;
 		
 		placeRectangle(newNode);
-		trace(newNode);
 		return newNode;
 	}
 	
@@ -328,7 +327,6 @@ public class MaxRectsBinPack
 				}
 			}
 		}
-		trace(bestNode);
 		return bestNode;
 	}
 	
