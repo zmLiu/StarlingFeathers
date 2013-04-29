@@ -633,6 +633,10 @@ package starling.utils
 		private var _loadTextureList:Vector.<Array> = new Vector.<Array>();
 		private var _isLoading:Boolean = false;
 		
+		/**
+		 * <p>加载运行时纹理</p>
+		 * <p>可通过clearRuntimeLoadTexture一键清理运行时动态加载的纹理</>
+		 * */
 		public function loadTexture(path:String,callBack:Function,isCache:Boolean=true):void{
 			if(_isLoading){
 				_loadTextureList.push([path,callBack,isCache]);
@@ -713,6 +717,18 @@ package starling.utils
 					var arr:Array = _loadTextureList.shift();
 					loadTexture(arr[0],arr[1],arr[2]);
 				}
+			}
+		}
+		
+		/**
+		 * 一键清理运行时动态加载的纹理
+		 */		
+		public function clearRuntimeLoadTexture():void{
+			var k:String;
+			var texture:Texture;
+			for(k in runtimeLoadTexture){
+				texture = runtimeLoadTexture[k];
+				texture.dispose();
 			}
 		}
         
