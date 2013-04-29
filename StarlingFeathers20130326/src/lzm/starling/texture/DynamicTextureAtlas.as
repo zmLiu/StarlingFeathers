@@ -20,13 +20,15 @@ package lzm.starling.texture
 		
 		private var _maxRect:MaxRectsBinPack;
 		
-		private var _textureRegion:Dictionary;//纹理的位置以及大小
+		private var _textureRegionArray:Array;//纹理的位置以及大小
+		private var _testureRegionDictionary:Dictionary;
 		
 		public function DynamicTextureAtlas(width:int, height:int)
 		{
 			super(width, height, true, STLConstant.scale);
 			_maxRect = new MaxRectsBinPack(512,512);
-			_textureRegion = new Dictionary();
+			_textureRegionArray = [];
+			_testureRegionDictionary = new Dictionary();
 		}
 		
 		/**
@@ -46,7 +48,8 @@ package lzm.starling.texture
 			image.x = rect.x;
 			image.y = rect.y;
 			
-			_textureRegion[name] = rect;
+			_testureRegionDictionary[name] = rect;
+			_textureRegionArray.push(name);
 			draw(image);
 			
 			return rect;
@@ -56,7 +59,7 @@ package lzm.starling.texture
 		 * 获取一个纹理
 		 * */
 		public function getTexture(name:String):Texture{
-			var frame:Rectangle = _textureRegion[name];
+			var frame:Rectangle = _testureRegionDictionary[name];
 			if(frame == null) return null;
 			return Texture.fromTexture(this,frame);
 		}
@@ -66,10 +69,12 @@ package lzm.starling.texture
 		 */		
 		public function getTextures(prefix:String):Vector.<Texture>{
 			var textures:Vector.<Texture> = new Vector.<Texture>();
-			var k:String;
-			for(k in _textureRegion){
-				if(k.indexOf(prefix) == 0){
-					textures.push(getTexture(k));
+			var length:int = _textureRegionArray.length;
+			var name:String;
+			for (var i:int = 0; i < length; i++) {
+				name = _textureRegionArray[i];
+				if(name.indexOf(prefix) == 0){
+					textures.push(getTexture(name));
 				}
 			}
 			return textures;
