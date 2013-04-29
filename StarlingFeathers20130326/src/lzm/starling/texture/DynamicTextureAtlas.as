@@ -83,9 +83,9 @@ package lzm.starling.texture
 		 * 获取一个纹理
 		 * */
 		public function getTexture(name:String):Texture{
-			var frame:Rectangle = _testureRegionDictionary[name];
-			if(frame == null) return null;
-			return Texture.fromTexture(this,frame);
+			var region:Rectangle = _testureRegionDictionary[name];
+			if(region == null) return null;
+			return Texture.fromTexture(this,region);
 		}
 		
 		/**
