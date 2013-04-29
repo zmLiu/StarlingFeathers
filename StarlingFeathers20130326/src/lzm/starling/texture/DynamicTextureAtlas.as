@@ -6,6 +6,7 @@ package lzm.starling.texture
 	import lzm.starling.STLConstant;
 	import lzm.util.MaxRectsBinPack;
 	
+	import starling.display.DisplayObject;
 	import starling.display.Image;
 	import starling.textures.RenderTexture;
 	import starling.textures.Texture;
@@ -51,6 +52,29 @@ package lzm.starling.texture
 			_testureRegionDictionary[name] = rect;
 			_textureRegionArray.push(name);
 			draw(image);
+			
+			return rect;
+		}
+		
+		/**
+		 * 添加一个纹理 
+		 * @param name
+		 * @param displayObject
+		 * @return 
+		 * 
+		 */		
+		public function addTextureFromDisplayobject(name:String,displayObject:DisplayObject):Rectangle{
+			var rect:Rectangle = _maxRect.insert(displayObject.width,displayObject.height,MaxRectsBinPack.BESTSHORTSIDEFIT);
+			if(rect.width == 0 || rect.height == 0){//已经无法插入纹理了
+				return null;
+			}
+			
+			displayObject.x = rect.x;
+			displayObject.y = rect.y;
+			
+			_testureRegionDictionary[name] = rect;
+			_textureRegionArray.push(name);
+			draw(displayObject);
 			
 			return rect;
 		}
