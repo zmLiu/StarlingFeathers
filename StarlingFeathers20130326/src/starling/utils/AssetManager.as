@@ -729,6 +729,7 @@ package starling.utils
 			for(k in runtimeLoadTexture){
 				texture = runtimeLoadTexture[k];
 				texture.dispose();
+				delete runtimeLoadTexture[k];
 			}
 		}
         
