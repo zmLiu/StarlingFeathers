@@ -5,6 +5,8 @@
     <classEntry path="lzm.starling.gestures.HoverGestures"/>
     <classEntry path="lzm.starling.display.ImageViewer"/>
     <classEntry path="lzm.starling.gestures.MoveOverGestures"/>
+    <classEntry path="lzm.starling.display.ContentList"/>
+    <classEntry path="lzm.starling.display.ContentListItem"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
