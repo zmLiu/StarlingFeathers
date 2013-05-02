@@ -24,12 +24,22 @@ package lzm.starling.texture
 		private var _textureRegionArray:Array;//纹理的位置以及大小
 		private var _testureRegionDictionary:Dictionary;
 		
-		public function DynamicTextureAtlas(width:int, height:int)
+		private var _padding:int = 1;
+		
+		/**
+		 * 创建动态纹理 
+		 * @param width		纹理宽
+		 * @param height	纹理高
+		 * @param padding	纹理间距
+		 * 
+		 */		
+		public function DynamicTextureAtlas(width:int, height:int,padding:int = 1)
 		{
 			super(width, height, true, STLConstant.scale);
 			_maxRect = new MaxRectsBinPack(512,512);
 			_textureRegionArray = [];
 			_testureRegionDictionary = new Dictionary();
+			_padding = padding;
 		}
 		
 		/**
@@ -40,7 +50,7 @@ package lzm.starling.texture
 		 * 
 		 */		
 		public function addTexture(name:String,texture:Texture):Rectangle{
-			var rect:Rectangle = _maxRect.insert(texture.width,texture.height,MaxRectsBinPack.BESTSHORTSIDEFIT);
+			var rect:Rectangle = _maxRect.insert(texture.width + _padding,texture.height + _padding,MaxRectsBinPack.BESTSHORTSIDEFIT);
 			if(rect.width == 0 || rect.height == 0){//已经无法插入纹理了
 				return null;
 			}
@@ -48,6 +58,9 @@ package lzm.starling.texture
 			var image:Image = new Image(texture);
 			image.x = rect.x;
 			image.y = rect.y;
+			
+			rect.width -= _padding;
+			rect.height -= _padding;
 			
 			_testureRegionDictionary[name] = rect;
 			_textureRegionArray.push(name);
@@ -64,13 +77,16 @@ package lzm.starling.texture
 		 * 
 		 */		
 		public function addTextureFromDisplayobject(name:String,displayObject:DisplayObject):Rectangle{
-			var rect:Rectangle = _maxRect.insert(displayObject.width,displayObject.height,MaxRectsBinPack.BESTSHORTSIDEFIT);
+			var rect:Rectangle = _maxRect.insert(displayObject.width + _padding,displayObject.height + _padding,MaxRectsBinPack.BESTSHORTSIDEFIT);
 			if(rect.width == 0 || rect.height == 0){//已经无法插入纹理了
 				return null;
 			}
 			
 			displayObject.x = rect.x;
 			displayObject.y = rect.y;
+			
+			rect.width -= _padding;
+			rect.height -= _padding;
 			
 			_testureRegionDictionary[name] = rect;
 			_textureRegionArray.push(name);
