@@ -93,6 +93,10 @@ package lzm.starling.display.ainmation
 				currentFrame = _currentFrame;
 		}
 		
+		/**
+		 * 跳到某个动画 
+		 * @param key	动画标签
+		 */		
 		public function goToMovie(key:String):void{
 			if(_currentLabel == key) return;
 			

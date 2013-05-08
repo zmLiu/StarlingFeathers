@@ -7,6 +7,8 @@
     <classEntry path="lzm.starling.gestures.MoveOverGestures"/>
     <classEntry path="lzm.starling.display.ContentList"/>
     <classEntry path="lzm.starling.display.ContentListItem"/>
+    <classEntry path="lzm.starling.display.ainmation.bone.BoneAnimation"/>
+    <classEntry path="lzm.starling.display.ainmation.bone.BoneAnimationFactory"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
