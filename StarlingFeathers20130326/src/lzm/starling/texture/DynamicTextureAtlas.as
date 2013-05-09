@@ -120,5 +120,19 @@ package lzm.starling.texture
 			return textures;
 		}
 		
+		/**
+		 * 获取一个名字集合 
+		 */		
+		public function getNames(prefix:String="", result:Vector.<String>=null):Vector.<String>
+		{
+			if (result == null) result = new <String>[];
+			for each (var name:String in _textureRegionArray)
+				if (name.indexOf(prefix) == 0)
+					result.push(name);
+			
+			result.sort(Array.CASEINSENSITIVE);
+			return result;
+		}
+		
 	}
 }
