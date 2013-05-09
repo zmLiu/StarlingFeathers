@@ -26,6 +26,8 @@ package starling.utils
     import dragonBones.objects.XMLDataParser;
     import dragonBones.textures.StarlingTextureAtlas;
     
+    import lzm.starling.texture.DynamicTextureAtlas;
+    
     import starling.core.Starling;
     import starling.text.BitmapFont;
     import starling.text.TextField;
@@ -48,6 +50,7 @@ package starling.utils
         private var mSounds:Dictionary;
 		private var mDBFactorys:Dictionary;//dragonbones
 		private var mOthers:Dictionary;//其他资源
+		private var mDynamicTextureAtlas:Dictionary;//动态纹理
 		
 		private var runtimeLoadTexture:Dictionary;//运行时临时加载的纹理，单独缓存起来以便清理
         
@@ -67,17 +70,14 @@ package starling.utils
             mSounds = new Dictionary();
 			mDBFactorys = new Dictionary();
 			mOthers = new Dictionary();
+			mDynamicTextureAtlas = new Dictionary();
 			runtimeLoadTexture = new Dictionary();
         }
         
         /** Disposes all contained textures. */
         public function dispose():void
         {
-            for each (var texture:Texture in mTextures)
-                texture.dispose();
-            
-            for each (var atlas:TextureAtlas in mAtlases)
-                atlas.dispose();
+           purge();
         }
         
         // retrieving
@@ -87,12 +87,18 @@ package starling.utils
          *  texture atlases. */
         public function getTexture(name:String):Texture
         {
+			var texture:Texture;
+			for each (var dynmaicAtlas:DynamicTextureAtlas in mDynamicTextureAtlas) {
+				texture = dynmaicAtlas.getTexture(name);
+				if(texture) return texture;
+			}
+			
             if (name in mTextures) return mTextures[name];
             else
             {
                 for each (var atlas:TextureAtlas in mAtlases)
                 {
-                    var texture:Texture = atlas.getTexture(name);
+                    texture = atlas.getTexture(name);
                     if (texture) return texture;
                 }
                 return null;
@@ -116,10 +122,13 @@ package starling.utils
         public function getTextureNames(prefix:String="", result:Vector.<String>=null):Vector.<String>
         {
             if (result == null) result = new <String>[];
+			
+			for each (var dynmaicAtlas:DynamicTextureAtlas in mDynamicTextureAtlas)
+				dynmaicAtlas.getNames(prefix, result);
             
             for (var name:String in mTextures)
                 if (name.indexOf(prefix) == 0)
-                    result.push(name);                
+                    result.push(name);
             
             for each (var atlas:TextureAtlas in mAtlases)
                 atlas.getNames(prefix, result);
@@ -276,6 +285,34 @@ package starling.utils
 		}
 		
 		/**
+		 * 添加一个动态纹理 
+		 */		
+		public function addDynamicTextureAtlas(name:String,dynamicTextureAtlas:DynamicTextureAtlas):void{
+			if(getDynamicTextureAtlas(name)){
+				throw new Error("已经有一个叫"+name+"动态纹理叫这个名字了");
+			}
+			mDynamicTextureAtlas[name] = dynamicTextureAtlas;
+		}
+		
+		/**
+		 * 获取一个动态纹理
+		 */		
+		public function getDynamicTextureAtlas(name:String):DynamicTextureAtlas{
+			return mDynamicTextureAtlas[name];
+		}
+		
+		/**
+		 * 移除动态纹理 
+		 */		
+		public function removeDynamicTextureAtlas(name:String,dispose:Boolean=true):void{
+			var dynamicTextureAtlas:DynamicTextureAtlas = getDynamicTextureAtlas(name);
+			if(dynamicTextureAtlas && dispose)
+				dynamicTextureAtlas.dispose();
+			
+			delete mDynamicTextureAtlas[name];
+		}
+		
+		/**
 		 * 获取所有其他资源
 		 * */
 		public function getAllOthers():Dictionary{
@@ -301,10 +338,15 @@ package starling.utils
             
             for each (var atlas:TextureAtlas in mAtlases)
                 atlas.dispose();
+				
+			for each (var dynamicAtlas:DynamicTextureAtlas in mDynamicTextureAtlas) 
+				dynamicAtlas.dispose();
 			
 			for(var k:String in mDBFactorys){
 				removeDrangonBonesFactory(k,true);
 			}
+			
+			clearRuntimeLoadTexture();
             
             mRawAssets.length = 0;
             mTextures = new Dictionary();
@@ -312,6 +354,7 @@ package starling.utils
             mSounds = new Dictionary();
 			mDBFactorys = new Dictionary();
 			mOthers = new Dictionary();
+			mDynamicTextureAtlas = new Dictionary();
         }
         
         // queued adding
@@ -724,13 +767,9 @@ package starling.utils
 		 * 一键清理运行时动态加载的纹理
 		 */		
 		public function clearRuntimeLoadTexture():void{
-			var k:String;
-			var texture:Texture;
-			for(k in runtimeLoadTexture){
-				texture = runtimeLoadTexture[k];
+			for each (var texture:Texture in runtimeLoadTexture) 
 				texture.dispose();
-				delete runtimeLoadTexture[k];
-			}
+			runtimeLoadTexture = new Dictionary();
 		}
         
         // helpers
