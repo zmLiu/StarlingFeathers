@@ -1,32 +1,27 @@
 package lzm.starling.display.ainmation.bone
 {
-	import lzm.starling.texture.DynamicTextureAtlas;
-	
 	import starling.display.Image;
 	import starling.textures.Texture;
-	import starling.textures.TextureAtlas;
+	import starling.utils.AssetManager;
 
 	public class BoneAnimationFactory
 	{
 		private var _imagesData:Object;
 		private var _moviesData:Object;
 		
-		private var _textureAtals:TextureAtlas;
-		private var _dynamicTextureAtals:DynamicTextureAtlas;
+		private var _assetManager:AssetManager;
 		
 		/**
-		 * 动画工程(textureAtals,dynamicTextureAtlas 任选其一即可)
-		 * @param movies					动画数据
-		 * @param textureAtals				纹理集
-		 * @param dynamicTextureAtlas		动态纹理集
+		 * 动画工厂
+		 * @param movies		动画数据
+		 * @assetManager		资源库
 		 */		
-		public function BoneAnimationFactory(movies:Object,textureAtals:TextureAtlas,dynamicTextureAtlas:DynamicTextureAtlas)
+		public function BoneAnimationFactory(movies:Object,assetManager:AssetManager)
 		{
 			_imagesData = movies["images"];
 			_moviesData = movies["movies"];
 			
-			_textureAtals = textureAtals;
-			_dynamicTextureAtals = dynamicTextureAtlas;
+			_assetManager = assetManager;
 		}
 		
 		/**
@@ -57,7 +52,7 @@ package lzm.starling.display.ainmation.bone
 		public function createImage(imageName:String):Image{
 			var imageData:Object = _imagesData[imageName];
 			
-			var texture:Texture = _textureAtals == null ? _dynamicTextureAtals.getTexture(imageName) : _textureAtals.getTexture(imageName);
+			var texture:Texture = _assetManager.getTexture(imageName);
 			
 			var image:Image = new Image(texture);
 			image.pivotX = -imageData.pivotX;
