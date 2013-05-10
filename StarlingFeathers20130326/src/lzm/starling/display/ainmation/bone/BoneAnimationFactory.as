@@ -60,5 +60,16 @@ package lzm.starling.display.ainmation.bone
 			
 			return image;
 		}
+		
+		/**
+		 * @return 所有动画的名字
+		 */		
+		public function get movieNames():Array{
+			var names:Array = [];
+			for(var k:String in _moviesData){
+				names.push(k);
+			}
+			return names;
+		}
 	}
 }
