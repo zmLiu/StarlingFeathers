@@ -14,8 +14,9 @@ package lzm.starling.display.ainmation.bone
 		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
 		
 		private var _images:Object;
-		private var _movieData:Object;
+		private var _frameInfos:Object;
 		
+		protected var _labels:Array;//所有的标签
 		protected var _currentLabel:String;//当前标签
 		protected var _currentFrame:int;//当前在第几帧
 		protected var _currentData:Array;
@@ -30,8 +31,13 @@ package lzm.starling.display.ainmation.bone
 		protected var _completeFunction:Function = null;//播放完毕的回调
 		
 		public function BoneAnimation(movieData:Object,images:Object,fps:int = 12){
-			_movieData = movieData;
 			_images = images;
+			
+			_labels = [];
+			_frameInfos = movieData["frameInfos"]
+			for(var k:String in _frameInfos){
+				_labels.push(k);
+			}
 			
 			_fps = 1.0/fps;
 		}
@@ -46,11 +52,11 @@ package lzm.starling.display.ainmation.bone
 			_currentTime += passedTime;
 			_currentFrame = int(_currentTime/_fps);
 			
-			if(_currentFrame > finalFrame && _completeFunction != null){
-				_completeFunction(this);
+			if(_currentFrame > finalFrame){
+				if(!_loop) stop();
+				if(_completeFunction) _completeFunction(this);
+				_currentTime = _currentFrame = 0;
 			}
-			
-			if (_loop && _currentFrame > finalFrame) {_currentTime = _currentFrame = 0; }
 			
 			if (_currentFrame != previousFrame)
 				currentFrame = _currentFrame;
@@ -63,7 +69,7 @@ package lzm.starling.display.ainmation.bone
 		public function goToMovie(key:String):void{
 			if(_currentLabel == key) return;
 			
-			_currentData =  _movieData["frameInfos"][key];
+			_currentData =  _frameInfos[key];
 			_numFrames = _currentData.length;
 			_currentFrame = -1;
 			_currentTime = 0;
@@ -75,9 +81,15 @@ package lzm.starling.display.ainmation.bone
 		/**
 		 * 播放
 		 */		
-		public function play():void{
+		public function play(loop:Boolean = true):void{
 			if(_playing){return;}
 			_playing = true;
+			_loop = loop;
+			
+			if(_currentLabel == null){
+				goToMovie(_labels[0]);
+			}
+			
 			Starling.juggler.add(this);
 		}
 		
@@ -123,6 +135,15 @@ package lzm.starling.display.ainmation.bone
 				image.skewY = imageData[6] * ANGLE_TO_RADIAN;
 				addQuiackChild(image);
 			}
+		}
+		
+		/**
+		 * 获取动画lables 
+		 * @return 
+		 * 
+		 */		
+		public function get labels():Array{
+			return _labels;
 		}
 		
 		
