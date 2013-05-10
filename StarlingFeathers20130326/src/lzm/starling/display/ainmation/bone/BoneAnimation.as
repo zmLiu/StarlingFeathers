@@ -1,7 +1,6 @@
 package lzm.starling.display.ainmation.bone
 {
 	import starling.animation.IAnimatable;
-	import starling.core.Starling;
 	import starling.display.Image;
 	import starling.display.Sprite;
 	
@@ -89,8 +88,6 @@ package lzm.starling.display.ainmation.bone
 			if(_currentLabel == null){
 				goToMovie(_labels[0]);
 			}
-			
-			Starling.juggler.add(this);
 		}
 		
 		/**
@@ -98,7 +95,6 @@ package lzm.starling.display.ainmation.bone
 		 */
 		public function stop():void{
 			_playing = false;
-			Starling.juggler.remove(this);
 		}
 		
 		
@@ -144,6 +140,13 @@ package lzm.starling.display.ainmation.bone
 		 */		
 		public function get labels():Array{
 			return _labels;
+		}
+		
+		/**
+		 * 返回当前状态
+		 */		
+		public function get currentLabel():String{
+			return _currentLabel;
 		}
 		
 		
