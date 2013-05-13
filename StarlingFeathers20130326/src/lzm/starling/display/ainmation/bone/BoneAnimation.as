@@ -1,6 +1,5 @@
 package lzm.starling.display.ainmation.bone
 {
-	import starling.animation.IAnimatable;
 	import starling.display.Image;
 	import starling.display.Sprite;
 	
@@ -8,7 +7,7 @@ package lzm.starling.display.ainmation.bone
 	 * 简易骨骼动画 
 	 * @author lzm
 	 */	
-	public class BoneAnimation extends Sprite implements IAnimatable
+	public class BoneAnimation extends Sprite
 	{
 		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
 		
@@ -23,8 +22,6 @@ package lzm.starling.display.ainmation.bone
 		protected var _numFrames:int;//总共有多少帧
 		protected var _fps:Number;//帧频
 		protected var _loop:Boolean = true;//是否循环
-		protected var _totalTime:Number;//总时间
-		protected var _currentTime:Number;//播放了多长时间
 		protected var _playing:Boolean = false;
 		
 		protected var _completeFunction:Function = null;//播放完毕的回调
@@ -33,7 +30,7 @@ package lzm.starling.display.ainmation.bone
 			_images = images;
 			
 			_labels = [];
-			_frameInfos = movieData["frameInfos"]
+			_frameInfos = movieData["frameInfos"];
 			for(var k:String in _frameInfos){
 				_labels.push(k);
 			}
@@ -41,24 +38,20 @@ package lzm.starling.display.ainmation.bone
 			_fps = 1.0/fps;
 		}
 		
-		
-		public function advanceTime(passedTime:Number):void{
+		public function update():void{
 			var finalFrame:int = _numFrames - 1;
-			var previousFrame:int = _currentFrame;
 			
-			if (!_playing || passedTime == 0.0 || _currentTime >= _totalTime) return;
+			if (!_playing) return;
 			
-			_currentTime += passedTime;
-			_currentFrame = int(_currentTime/_fps);
+			_currentFrame += 1;
 			
 			if(_currentFrame > finalFrame){
 				if(!_loop) stop();
 				if(_completeFunction) _completeFunction(this);
-				_currentTime = _currentFrame = 0;
+				_currentFrame = 0;
 			}
 			
-			if (_currentFrame != previousFrame)
-				currentFrame = _currentFrame;
+			currentFrame = _currentFrame;
 		}
 		
 		/**
@@ -72,8 +65,6 @@ package lzm.starling.display.ainmation.bone
 			_currentData =  _frameInfos[key];
 			_numFrames = _currentData.length;
 			_currentFrame = -1;
-			_currentTime = 0;
-			_totalTime = _fps * _numFrames;
 			
 			currentFrame = 0;
 		}
@@ -150,6 +141,20 @@ package lzm.starling.display.ainmation.bone
 			return _currentLabel;
 		}
 		
+		public override function dispose():void{
+			stop();
+			removeFromParent();
+			
+			for each (var image:Image in _images) {
+				image.removeFromParent();
+				image.dispose();
+			}
+			
+			_images = null;
+			_frameInfos = null;
+			
+			super.dispose();
+		}
 		
 		
 	}
