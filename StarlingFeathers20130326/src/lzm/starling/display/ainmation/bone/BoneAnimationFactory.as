@@ -31,7 +31,7 @@ package lzm.starling.display.ainmation.bone
 		 * @return 
 		 * 
 		 */		
-		public function createAnimation(movieName:String,fps:int = 12):BoneAnimation{
+		public function createAnimation(movieName:String,fps:int = 24):BoneAnimation{
 			var movieData:Object = _moviesData[movieName];
 			
 			var movieImageNames:Array = movieData["images"];

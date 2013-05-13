@@ -68,6 +68,7 @@ package lzm.starling.display.ainmation.bone
 		public function goToMovie(key:String):void{
 			if(_currentLabel == key) return;
 			
+			_currentLabel = key;
 			_currentData =  _frameInfos[key];
 			_numFrames = _currentData.length;
 			_currentFrame = -1;
