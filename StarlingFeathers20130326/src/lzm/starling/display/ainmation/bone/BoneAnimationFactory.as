@@ -18,10 +18,29 @@ package lzm.starling.display.ainmation.bone
 		 */		
 		public function BoneAnimationFactory(movies:Object,assetManager:AssetManager)
 		{
-			_imagesData = movies["images"];
-			_moviesData = movies["movies"];
+			if(movies){
+				_imagesData = movies["images"];
+				_moviesData = movies["movies"];
+			}
 			
 			_assetManager = assetManager;
+		}
+		
+		/**设置/获取 数据*/		
+		public function get movies():Object{
+			return {images:_imagesData,movies:_moviesData};
+		}
+		public function set movies(value:Object):void{
+			_imagesData = value["images"];
+			_moviesData = value["movies"];
+		}
+		
+		/**设置/获取 资源*/		
+		public function get assetManager():AssetManager{
+			return _assetManager;
+		}
+		public function set assetManager(value:AssetManager):void{
+			_assetManager = value;
 		}
 		
 		/**
