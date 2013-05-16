@@ -55,6 +55,16 @@ package lzm.starling.display.ainmation.bone
 		}
 		
 		/**
+		 * 是否包含某个标签 
+		 * @param key
+		 * @return 
+		 * 
+		 */		
+		public function hasLabel(key:String):Boolean{
+			return !(_frameInfos[key] == null);
+		}
+		
+		/**
 		 * 跳到某个动画 
 		 * @param key	动画标签
 		 */
