@@ -141,6 +141,15 @@ package lzm.starling.display.ainmation.bone
 			return _currentLabel;
 		}
 		
+		/**
+		 *  
+		 * @return 是否在播放 
+		 * 
+		 */		
+		public function get playing():Boolean{
+			return _playing;
+		}
+		
 		public override function dispose():void{
 			stop();
 			removeFromParent();
