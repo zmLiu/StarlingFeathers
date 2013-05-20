@@ -33,8 +33,8 @@ Starling源码的优化
 			Starling入口类继承STLMainClass
 			主类中调用
 ```actionscript
-initStarlingWithWH
-initStarling	
+			initStarlingWithWH
+			initStarling	
 ```
 			进行初一键初始化自动适应屏幕大小。具体效果请运行查看
 
