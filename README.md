@@ -32,12 +32,10 @@ Starling源码的优化
 			程序主类继承STLStarup
 			Starling入口类继承STLMainClass
 			主类中调用
-			```actionscript
-	
-			initStarlingWithWH
-			initStarling
-	
-			```
+```actionscript
+initStarlingWithWH
+initStarling	
+```
 			进行初一键初始化自动适应屏幕大小。具体效果请运行查看
 
 2.封装了一部分手势
