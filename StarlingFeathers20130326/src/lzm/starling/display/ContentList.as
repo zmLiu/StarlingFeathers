@@ -11,7 +11,7 @@ package lzm.starling.display
 	{
 		
 		private var _items:Vector.<ContentListItem>;
-		private var _itemCount:int = 0;
+		private var __itemCount:int = 0;
 		
 		private var _contentTitleHeight:int;//每个标题的高度
 		private var _contentHeight:int;//每个标题内容的高度
@@ -36,20 +36,20 @@ package lzm.starling.display
 		}
 		
 		public function addContentListItem(item:ContentListItem):void{
-			item.index = _itemCount;
-			item.normalY = _itemCount * (_contentTitleHeight + 3);
+			item.index = __itemCount;
+			item.normalY = __itemCount * (_contentTitleHeight + 3);
 			item.otherOpenY = item.normalY + this._contentHeight;
 			item.content.width = this.width;
 			item.content.height = this._contentHeight;
 			new TapGestures(item,change(item.index));
-			if(_currentIndex != -1 && _currentIndex > _itemCount){
+			if(_currentIndex != -1 && _currentIndex > __itemCount){
 				item.y = item.otherOpenY;
 			}else{
 				item.y = item.normalY;
 			}
 			addChild(item);
 			_items.push(item);
-			_itemCount++;
+			__itemCount++;
 		}
 		
 		public function set currentIndex(value:int):void{
@@ -59,7 +59,7 @@ package lzm.starling.display
 			_currentIndex = value == _currentIndex ? -1 : value;
 			var count:int = _items.length;
 			var item:ContentListItem;
-			for (var i:int = 0; i < _itemCount; i++) {
+			for (var i:int = 0; i < __itemCount; i++) {
 				item = _items[i];
 				if(_currentIndex == -1){
 					item.y = item.normalY;

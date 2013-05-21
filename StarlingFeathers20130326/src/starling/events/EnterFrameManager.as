@@ -35,7 +35,7 @@ package starling.events
 		}
 		
 		public static function advanceTime(e:Event):void{
-			var target:EventDispatcher;
+			var target:*;
 			var listeners:Vector.<Function>;
 			var listener:Function;
 			for (target in _listenersDictionary) {
