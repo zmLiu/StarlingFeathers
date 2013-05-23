@@ -54,6 +54,17 @@ package lzm.util {
 				return false;
 		}
 		
+		/**
+		 * <p>指定舞台的有效像素缩放系数。</p>
+		 * <p>此值在标准屏幕上通常为 1，在 HiDPI（又称 Retina）屏幕上通常为 2。</p>
+		 * <p>当舞台呈现在 HiDPI 屏幕上时，像素分辨率会增大一倍；</p>
+		 * <p>即使舞台缩放模式设置为 StageScaleMode.NO_SCALE 也是如此。Stage.stageWidth 和 Stage.stageHeight 将继续以传统像素单位进行报告。</p>
+		 * <p>注意：此值会根据舞台是在 HiDPI 屏幕上还是标准屏幕上而动态变化。</p>
+		 */		
+		static public function mobileContentsScaleFactor():int{
+			return _STAGE.contentsScaleFactor;
+		}
+		
 		static public function isIpad():Boolean {
 			
 			if (Mobile.isIOS()) {
