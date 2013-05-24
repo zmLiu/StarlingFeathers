@@ -407,6 +407,37 @@ package starling.display
 			child.mParent = this;
 		}
 		
+		/**
+		 * 快速添加子集 
+		 * @param child
+		 * @param index
+		 * @return 
+		 * 
+		 */		
+		public function addQuiackChildAt(child:DisplayObject, index:int):DisplayObject
+		{
+			var numChildren:int = mChildren.length; 
+			
+			if (index >= 0 && index <= numChildren)
+			{
+				if(child.mParent){
+					child.mParent.removeQuickChild(child);
+				}
+				
+				if (index == numChildren) mChildren.push(child);
+				else                      mChildren.splice(index, 0, child);
+				
+				child.setParent(this);
+				child.mParent = this;
+				
+				return child;
+			}
+			else
+			{
+				throw new RangeError("Invalid child index");
+			}
+		}
+		
 		public function removeQuickChild(child:DisplayObject):void{
 			var index:int = mChildren.indexOf(child);
 			if(index != -1){
