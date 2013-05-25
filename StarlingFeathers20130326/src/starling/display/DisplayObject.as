@@ -407,7 +407,7 @@ package starling.display
                     }
                 }
             }
-            
+			
             return mTransformationMatrix; 
         }
         
