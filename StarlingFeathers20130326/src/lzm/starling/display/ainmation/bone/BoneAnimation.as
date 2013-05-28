@@ -43,6 +43,8 @@ package lzm.starling.display.ainmation.bone
 			
 			if (!_playing) return;
 			
+			var previousFrame:int = _currentFrame;
+			
 			_currentFrame += 1;
 			
 			if(_currentFrame > finalFrame){
@@ -51,7 +53,8 @@ package lzm.starling.display.ainmation.bone
 				_currentFrame = 0;
 			}
 			
-			currentFrame = _currentFrame;
+			if(_currentFrame != previousFrame)
+				currentFrame = _currentFrame;
 		}
 		
 		/**
