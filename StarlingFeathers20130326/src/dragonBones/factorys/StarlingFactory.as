@@ -125,7 +125,7 @@
 			if (content is BitmapData)
 			{
 				bitmapData = content as BitmapData;
-				texture = Texture.fromBitmapData(bitmapData, generateMipMaps, optimizeForRenderToTexture);
+				texture = Texture.fromBitmapData(bitmapData, generateMipMaps, optimizeForRenderToTexture,scaleForTexture);
 			}
 			else if (content is MovieClip)
 			{
@@ -149,7 +149,7 @@
 			{
 				//
 			}			
-			var textureAtlas:StarlingTextureAtlas = new StarlingTextureAtlas(texture, textureAtlasXML);			
+			var textureAtlas:StarlingTextureAtlas = new StarlingTextureAtlas(texture, textureAtlasXML,true);			
 			if (Starling.handleLostContext)
 			{
 				textureAtlas._bitmapData = bitmapData;
