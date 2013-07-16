@@ -5,9 +5,9 @@
 	import dragonBones.events.FrameEvent;
 	import dragonBones.events.SoundEvent;
 	import dragonBones.events.SoundEventManager;
+	import dragonBones.objects.BoneTransform;
 	import dragonBones.objects.FrameData;
 	import dragonBones.objects.MovementBoneData;
-	import dragonBones.objects.Node;
 	import dragonBones.utils.TransformUtils;
 	import dragonBones.utils.dragonBones_internal;
 	
@@ -51,13 +51,13 @@
 		
 		private var _movementBoneData:MovementBoneData;
 		
-		private var _node:Node;
+		private var _node:BoneTransform;
 		private var _colorTransform:ColorTransform;
 		
-		private var _currentNode:Node;
+		private var _currentNode:BoneTransform;
 		private var _currentColorTransform:ColorTransform;
 		
-		private var _offSetNode:Node;
+		private var _offSetNode:BoneTransform;
 		private var _offSetColorTransform:ColorTransform;
 		
 		private var _currentFrameData:FrameData;
@@ -85,10 +85,10 @@
 			_node = _bone._tweenNode;
 			_colorTransform = _bone._tweenColorTransform;
 			
-			_currentNode = new Node();
+			_currentNode = new BoneTransform();
 			_currentColorTransform = new ColorTransform();
 			
-			_offSetNode = new Node();
+			_offSetNode = new BoneTransform();
 			_offSetColorTransform = new ColorTransform();
 		}
 		
@@ -108,8 +108,8 @@
 				return;
 			}
 			
-			_node.skewX %= 360;
-			_node.skewY %= 360;
+			_node.skewX %= Math.PI * 2;
+			_node.skewY %= Math.PI * 2;
 			_isPause = false;
 			_currentFrameData = null;
 			_loop = loop?0:-1;
@@ -125,17 +125,19 @@
 				_frameTweenEasing = 1;
 				_rawDuration = 0;
 				nextFrameData = _movementBoneData._frameList[0];
-				setOffset(_node, _colorTransform, nextFrameData.node, nextFrameData.colorTransform);
+				setOffset(_bone._isOnStage?_node:nextFrameData.node, _colorTransform, nextFrameData.node, nextFrameData.colorTransform);
 			}
 			else if (loop && _movementBoneData.delay != 0)
 			{
 				getLoopListNode();
-				setOffset(_node, _colorTransform, _offSetNode, _offSetColorTransform);
+				setOffset(_bone._isOnStage?_node:_offSetNode, _colorTransform, _offSetNode, _offSetColorTransform);
+				//nextFrameData = _movementBoneData._frameList[0];
 			}
 			else
 			{
+				_frameTweenEasing = 1;
 				nextFrameData = _movementBoneData._frameList[0];
-				setOffset(_node, _colorTransform, nextFrameData.node, nextFrameData.colorTransform);
+				setOffset(_bone._isOnStage?_node:nextFrameData.node, _colorTransform, nextFrameData.node, nextFrameData.colorTransform);
 			}
 			
 			if(nextFrameData)
@@ -165,6 +167,16 @@
 			var currentFrameData:FrameData = _movementBoneData._frameList[currentFrameDataID];
 			var nextFrameData:FrameData = _movementBoneData._frameList[nextFrameDataID];
 			
+			
+			if(nextFrameData.displayIndex >= 0 && _bone.armature.animation.tweenEnabled)
+			{
+				_frameTweenEasing = currentFrameData.tweenEasing;
+			}
+			else
+			{
+				_frameTweenEasing = NaN;
+			}
+			
 			setOffset(currentFrameData.node, currentFrameData.colorTransform, nextFrameData.node, nextFrameData.colorTransform);
 		
 			var progress:Number = 1 - (nextFrameDataTimeEdge - playedTime) / frameDuration;
@@ -192,7 +204,7 @@
 		/** @private */
 		internal function advanceTime(progress:Number, playType:int):void
 		{
-			if(_isPause)
+			if(_isPause || !_movementBoneData)
 			{
 				return;
 			}
@@ -218,11 +230,11 @@
 					_loop = loop;
 				}
 				progress -= loop;
-				progress = updateFrameData(progress, true);
+				progress = updateFrameData(progress);
 			}
 			else if (playType == Animation.LIST)
 			{
-				progress = updateFrameData(progress, true, true);
+				progress = updateFrameData(progress, true);
 			}
 			else if (playType == Animation.SINGLE && progress == 1)
 			{
@@ -252,7 +264,7 @@
 			}
 		}
 		
-		private function setOffset(currentNode:Node, currentColorTransform:ColorTransform, nextNode:Node, nextColorTransform:ColorTransform, tweenRotate:int = 0):void
+		private function setOffset(currentNode:BoneTransform, currentColorTransform:ColorTransform, nextNode:BoneTransform, nextColorTransform:ColorTransform, tweenRotate:int = 0):void
 		{
 			_currentNode.copy(currentNode);
 			TransformUtils.setOffSetNode(_currentNode, nextNode, _offSetNode, tweenRotate);
@@ -335,7 +347,7 @@
 			}
 		}
 		
-		private function updateFrameData(progress:Number, activeFrame:Boolean = false, isList:Boolean= false):Number
+		private function updateFrameData(progress:Number, isList:Boolean= false):Number
 		{
 			var playedTime:Number = _rawDuration * progress;
 			if (playedTime >= _nextFrameDataTimeEdge)
@@ -367,10 +379,7 @@
 				
 				setOffset(currentFrameData.node, currentFrameData.colorTransform, nextFrameData.node, nextFrameData.colorTransform, nextFrameData.tweenRotate);
 				
-				if (activeFrame)
-				{
-					_currentFrameData = currentFrameData;
-				}
+				_currentFrameData = currentFrameData;
 				
 				if(isList && _nextFrameDataID == 0)
 				{
@@ -381,15 +390,16 @@
 			
 			progress = 1 - (_nextFrameDataTimeEdge - playedTime) / _frameDuration;
 			
-			if (!isNaN(_frameTweenEasing))
+			var tweenEasing:Number = isNaN(_tweenEasing)?_frameTweenEasing:_tweenEasing;
+			if (isNaN(tweenEasing))
 			{
-				var tweenEasing:Number = isNaN(_tweenEasing)?_frameTweenEasing:_tweenEasing;
-				if (tweenEasing)
-				{
-					progress = getEaseValue(progress, tweenEasing);
-				}
+				return 0;
 			}
-			progress = getEaseValue(progress, _frameTweenEasing);
+			else if(tweenEasing)
+			{
+				return getEaseValue(progress, tweenEasing);
+			}
+			
 			return progress;
 		}
 	}
