@@ -435,6 +435,11 @@ package extend.particlesystem
 			if(!isNaN(timeoutId)) clearTimeout(timeoutId);
 		}
 		
+		public override function dispose():void{
+			super.dispose();
+			stop();
+		}
+		
 		
     }
 }

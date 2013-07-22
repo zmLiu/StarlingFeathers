@@ -10,6 +10,7 @@ package lzm.starling.display
 	import starling.display.DisplayObject;
 	import starling.display.DisplayObjectContainer;
 	import starling.display.Image;
+	import starling.display.Quad;
 	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.textures.Texture;
@@ -61,7 +62,11 @@ package lzm.starling.display
 		
 		protected function addBackFunction():void{
 			if(_backButton == null){
-				_backButton = new Button(new Image(_backBtnTexture));
+				if(_backBtnTexture){
+					_backButton = new Button(new Image(_backBtnTexture));
+				}else{
+					_backButton = new Button(new Quad(20,20,0x000000),"<-");
+				}
 				_backButton.x = 14;
 				_backButton.y = 7.5;
 				addChild(_backButton);
