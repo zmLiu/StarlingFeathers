@@ -8,11 +8,13 @@ Starling源码的优化
 
 1.关闭Enterframe事件。
 -------------------
+            (1.3的包 1.4引擎自己已经优化)
 			starling本身会每一帧遍历所有对象派发enterframe事件。如果对象很多效率自然下降。
 			改用starling.events.EnterFrameManager统一管理无需每帧遍历所有对象。
 			注册enterframe事件的方式不变。
 2.VertexData优化。
 ----------------
+            (1.3的包 1.4引擎自己已经优化)
 			mRawData改为bytearray上传数据速度提升.
 3.为DisplayObjectContainer添加了3个方法
 -------------------------------------
