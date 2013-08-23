@@ -33,11 +33,10 @@ Starling源码的优化
 ---------------------
 	程序主类继承STLStarup
 	Starling入口类继承STLMainClass
-	主类中调用
-    
-	initStarlingWithWH
-	initStarling
-    
+	STLStarup主类中调用
+	initStarlingWithWH->根据宽高初始化starling
+    或
+	initStarling->初始化的starling将会充满屏幕
 	进行初一键初始化自动适应屏幕大小。具体效果请运行查看
 
 2.封装了一部分手势
