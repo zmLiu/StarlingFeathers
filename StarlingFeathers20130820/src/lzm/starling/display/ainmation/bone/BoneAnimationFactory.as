@@ -80,6 +80,10 @@ package lzm.starling.display.ainmation.bone
 			return image;
 		}
 		
+		public function hasMovie(name:String):Boolean{
+			return _moviesData[name];
+		}
+		
 		/**
 		 * @return 所有动画的名字
 		 */		
