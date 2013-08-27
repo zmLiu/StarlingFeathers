@@ -516,7 +516,7 @@ package starling.display
 			for (var i:int = 0; i < length; i++) {
 				mChildren[i].mParent = null;
 			}
-			mChildren = new <DisplayObject>[];
+			mChildren.splice(0,length);
 		}
 		
     }
