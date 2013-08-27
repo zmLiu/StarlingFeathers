@@ -51,6 +51,7 @@ package lzm.starling.display.ainmation.bone
 				if(!_loop) stop();
 				if(_completeFunction) _completeFunction(this);
 				_currentFrame = 0;
+				return;
 			}
 			
 			if(_currentFrame != previousFrame)
