@@ -764,14 +764,14 @@ package starling.utils
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR,urlLoadError);
 			urlLoader.load(new URLRequest(path));
 			
-			function urlLoadError(e:Event):void{
+			function urlLoadError(e:Object):void{
 				urlLoader.removeEventListener(Event.COMPLETE,urlLoaderComplete);
 				urlLoader.removeEventListener(IOErrorEvent.IO_ERROR,urlLoadError);
 				if(callBack) callBack(null);
 				completeLoadIist();
 			}
 			
-			function urlLoaderComplete(e:Event):void{
+			function urlLoaderComplete(e:Object):void{
 				urlLoader.removeEventListener(Event.COMPLETE,urlLoaderComplete);
 				urlLoader.removeEventListener(IOErrorEvent.IO_ERROR,urlLoadError);
 				bytes = urlLoader.data;
@@ -787,7 +787,8 @@ package starling.utils
 						break;
 					case "png":
 					case "jpg":
-						var loaderContext:LoaderContext = new LoaderContext();
+						
+						var loaderContext:LoaderContext = new LoaderContext(mCheckPolicyFile);
 						var loader:Loader = new Loader();
 						loaderContext.imageDecodingPolicy = ImageDecodingPolicy.ON_LOAD;
 						loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderComplete);
