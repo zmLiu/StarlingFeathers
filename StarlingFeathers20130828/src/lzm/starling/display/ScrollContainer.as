@@ -125,5 +125,20 @@ package lzm.starling.display
 			return _scrolling;
 		}
 		
+		/**
+		 * 获取在显示的对象 
+		 * @return 
+		 * 
+		 */		
+		public function get inViewItem():Vector.<ScrollContainerItem>{
+			var items:Vector.<ScrollContainerItem> = new Vector.<ScrollContainerItem>();
+			for each (var item:ScrollContainerItem in _itemList) {
+				if(item.visible){
+					items.push(item);
+				}
+			}
+			return items;
+		}
+		
 	}
 }
