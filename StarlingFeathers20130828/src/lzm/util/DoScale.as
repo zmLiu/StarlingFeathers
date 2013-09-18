@@ -47,5 +47,19 @@ package lzm.util
 			var sy:Number = limitHeight/oldHeight;
 			return sx > sy ? sx : sy;
 		}
+		
+		/**
+		 * @param img         显示对象
+		 * @param oldWidth    原始宽度
+		 * @param oldHeight   原始高度
+		 * @param toWidth     目标宽度
+		 * @param toHeight    目标高度
+		 * @return 按比例缩放的最小值
+		 */
+		public static function doMinScale(oldWidth:Number, oldHeight:Number, limitWidth:Number, limitHeight:Number):Number{
+			var sx:Number = limitWidth/oldWidth;
+			var sy:Number = limitHeight/oldHeight;
+			return sx < sy ? sx : sy;
+		}
 	}
 }
