@@ -32,7 +32,7 @@ package lzm.starling.gestures
 				}else if(touch.phase == TouchPhase.ENDED){
 					
 					var endPoint:Point = new Point(touch.globalX,touch.globalY);
-					if(Point.distance(startPoint,endPoint) > 5){
+					if(Point.distance(startPoint,endPoint) > 20){
 						return;
 					}
 					
