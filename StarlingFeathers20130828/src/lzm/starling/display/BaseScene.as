@@ -65,7 +65,7 @@ package lzm.starling.display
 				if(_backBtnTexture){
 					_backButton = new Button(new Image(_backBtnTexture));
 				}else{
-					_backButton = new Button(new Quad(20,20,0x000000),"<-");
+					_backButton = new Button(new Quad(40,40,0x000000),"<-");
 				}
 				_backButton.x = 14;
 				_backButton.y = 7.5;
