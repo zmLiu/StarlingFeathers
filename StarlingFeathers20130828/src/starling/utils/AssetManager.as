@@ -54,7 +54,7 @@ package starling.utils
     public class AssetManager extends EventDispatcher
     {
         private const SUPPORTED_EXTENSIONS:Vector.<String> = 
-            new <String>["png", "jpg", "jpeg", "gif", "atf", "mp3", "xml", "fnt", "pex", "json"]; 
+            new <String>["png", "jpg", "jpeg", "gif", "atf", "mp3", "xml", "fnt", "pex", "json","info"]; 
         
         private var mScaleFactor:Number;
         private var mUseMipMaps:Boolean;
@@ -705,6 +705,7 @@ package starling.utils
                     case "json":
                     case "pex":
                     case "xml":
+					case "info":
                         onComplete(bytes);
                         break;
                     case "mp3":
