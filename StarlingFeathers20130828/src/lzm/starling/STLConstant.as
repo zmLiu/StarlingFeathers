@@ -12,6 +12,6 @@ package lzm.starling
 		public static var StageHeight:int = 320;//舞台高
 		
 		public static var scale:int = 1;//比例
-		public static var useMipMaps:Boolean = true;
+		public static var useMipMaps:Boolean = false;
 	}
 }
