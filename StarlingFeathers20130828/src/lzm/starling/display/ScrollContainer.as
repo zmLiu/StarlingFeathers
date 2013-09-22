@@ -8,6 +8,7 @@ package lzm.starling.display
 	
 	import lzm.util.CollisionUtils;
 	
+	import starling.display.DisplayObject;
 	import starling.events.Event;
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
@@ -138,6 +139,15 @@ package lzm.starling.display
 				}
 			}
 			return items;
+		}
+		
+		public function get items():Vector.<DisplayObject>{
+			var list:Vector.<DisplayObject> = new Vector.<DisplayObject>();
+			for (var i:int = 0; i < _itemCount; i++) {
+				list.push(_itemList[i]);
+			}
+			
+			return list;
 		}
 		
 	}
