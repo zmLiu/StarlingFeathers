@@ -5,6 +5,7 @@ StarlingFeathers
 #####StarlingFeathers20130326-->1.3
 #####StarlingFeathers20130820-->1.3RC1
 #####StarlingFeathers20130828-->1.4RC2
+#####StarlingFeathers20130924-->1.4
 
 Starling源码的优化
 ================
