@@ -79,6 +79,8 @@ package starling.utils
         private var mXmls:Dictionary;
         private var mObjects:Dictionary;
         private var mByteArrays:Dictionary;
+		
+		private var runtimeLoadTexture:Dictionary;//运行时临时加载的纹理，单独缓存起来以便清理
         
         /** helper objects */
         private static var sNames:Vector.<String> = new <String>[];
@@ -97,6 +99,8 @@ package starling.utils
             mXmls = new Dictionary();
             mObjects = new Dictionary();
             mByteArrays = new Dictionary();
+			
+			runtimeLoadTexture = new Dictionary();
         }
         
         /** Disposes all contained textures. */
@@ -745,6 +749,118 @@ package starling.utils
                 onComplete(event.target.content);
             }
         }
+		
+		private var _loadTextureList:Vector.<Array> = new Vector.<Array>();
+		private var _isLoading:Boolean = false;
+		/**
+		 * <p>加载运行时纹理</p>
+		 * <p>可通过clearRuntimeLoadTexture一键清理运行时动态加载的纹理</>
+		 * */
+		public function loadTexture(path:String,callBack:Function,isCache:Boolean=true):void{
+			if(_isLoading){
+				_loadTextureList.push([path,callBack,isCache]);
+				return;
+			}
+			
+			var name:String = getName(path);
+			var texture:Texture = runtimeLoadTexture[name];
+			if(texture){
+				if(callBack) callBack(texture);
+				completeLoadIist();
+				return;
+			}
+			
+			_isLoading = true;
+			
+			log("run time load:" + path);
+			
+			var extesion:String = path.split(".").pop().toLowerCase();
+			var bytes:ByteArray;
+			
+			var urlLoader:URLLoader = new URLLoader();
+			urlLoader.dataFormat = URLLoaderDataFormat.BINARY;
+			urlLoader.addEventListener(Event.COMPLETE,urlLoaderComplete);
+			urlLoader.addEventListener(IOErrorEvent.IO_ERROR,urlLoadError);
+			urlLoader.load(new URLRequest(path));
+			
+			function urlLoadError(e:Object):void{
+				urlLoader.removeEventListener(Event.COMPLETE,urlLoaderComplete);
+				urlLoader.removeEventListener(IOErrorEvent.IO_ERROR,urlLoadError);
+				if(callBack) callBack(null);
+				completeLoadIist();
+			}
+			
+			function urlLoaderComplete(e:Object):void{
+				urlLoader.removeEventListener(Event.COMPLETE,urlLoaderComplete);
+				urlLoader.removeEventListener(IOErrorEvent.IO_ERROR,urlLoadError);
+				bytes = urlLoader.data;
+				switch(extesion)
+				{
+					case "atf":
+						texture = Texture.fromAtfData(bytes,mScaleFactor,mUseMipMaps);
+						if(isCache) {
+							runtimeLoadTexture[name] = texture;
+						}
+						if(callBack) callBack(texture);
+						completeLoadIist();
+						break;
+					case "png":
+					case "jpg":
+						
+						var loaderContext:LoaderContext = new LoaderContext(mCheckPolicyFile);
+						var loader:Loader = new Loader();
+						loaderContext.imageDecodingPolicy = ImageDecodingPolicy.ON_LOAD;
+						loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderComplete);
+						loader.loadBytes(bytes, loaderContext);
+						break;
+				}
+				bytes = null;
+			}
+			
+			function onLoaderComplete(event:Object):void{
+				event.target.removeEventListener(Event.COMPLETE, onLoaderComplete);
+				var content:Object = event.target.content;
+				texture = Texture.fromBitmap(content as Bitmap,mUseMipMaps,false,mScaleFactor);
+				if(isCache) {
+					runtimeLoadTexture[name] = texture;
+				}
+				if(callBack) callBack(texture);
+				completeLoadIist();
+				(content as Bitmap).bitmapData.dispose();
+				
+				texture.root.onRestore = function():void{
+					mNumLostTextures++;
+					loadRawAsset(name, path, null, function(asset:Object):void
+					{
+						try { texture.root.uploadBitmap(asset as Bitmap); }
+						catch (e:Error) { log("Texture restoration failed: " + e.message); }
+						
+						asset.bitmapData.dispose();
+						mRestoredTextures++;
+						
+						if (mNumLostTextures == mRestoredTextures)
+							dispatchEventWith(Event.TEXTURES_RESTORED);
+					});
+				}
+			}
+			
+			function completeLoadIist():void{
+				_isLoading = false;
+				if(_loadTextureList.length > 0){
+					var arr:Array = _loadTextureList.shift();
+					loadTexture(arr[0],arr[1],arr[2]);
+				}
+			}
+		}
+		
+		/**
+		 * 一键清理运行时动态加载的纹理
+		 */		
+		public function clearRuntimeLoadTexture():void{
+			for each (var texture:Texture in runtimeLoadTexture) 
+			texture.dispose();
+			runtimeLoadTexture = new Dictionary();
+		}
         
         // helpers
         
