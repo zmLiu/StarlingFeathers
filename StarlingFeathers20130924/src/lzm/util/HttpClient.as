@@ -60,7 +60,6 @@ package lzm.util
 			for (k in params){
 				url += k+"="+params[k] + "&";
 			}
-			trace(url.substring(0,url.length-1));
 			return new URLRequest(url.substring(0,url.length-1));
 		}
 		
