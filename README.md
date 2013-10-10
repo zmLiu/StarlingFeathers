@@ -3,7 +3,7 @@ StarlingFeathers
 
 #####整合Starling+Feathers 还有一些Starling扩展
 #####StarlingFeathers20130326-->1.3
-#####StarlingFeathers20130820-->1.3RC1
+#####StarlingFeathers20130820-->1.4RC1
 #####StarlingFeathers20130828-->1.4RC2
 #####StarlingFeathers20130924-->1.4
 
