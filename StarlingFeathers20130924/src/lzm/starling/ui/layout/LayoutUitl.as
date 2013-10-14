@@ -186,7 +186,7 @@ package lzm.starling.ui.layout
 			var texture:Texture = asset.getTexture(name);
 			
 			var s9Texture:Scale9Textures = new Scale9Textures(texture,new Rectangle(imageData.s9gw,imageData.s9gw,1,1));
-			var s9image:Scale9Image = new Scale9Image(s9Texture);
+			var s9image:Scale9Image = new Scale9Image(s9Texture,asset.scaleFactor);
 			
 			return s9image;
 		}
