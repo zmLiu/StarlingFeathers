@@ -25,6 +25,9 @@ package lzm.starling.util
 			this.currentTime += e.passedTime;
 			if(this.currentTime >= this.fpsTime){
 				this.currentTime -= this.fpsTime;
+				if(this.currentTime > this.fpsTime){
+					this.currentTime = 0;
+				}
 				return true;
 			}
 			return false;
