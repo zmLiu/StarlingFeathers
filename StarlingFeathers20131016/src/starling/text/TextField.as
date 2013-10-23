@@ -324,6 +324,7 @@ package starling.text
             if (mImage) 
             { 
                 mImage.removeFromParent(true); 
+				mImage.texture.dispose();
                 mImage = null; 
             }
             
