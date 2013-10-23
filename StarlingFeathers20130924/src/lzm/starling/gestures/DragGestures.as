@@ -29,6 +29,7 @@ package lzm.starling.gestures
 				_target.x += movePoint.x - _downPoint.x;
 				_target.y += movePoint.y - _downPoint.y;
 				_downPoint = movePoint;
+				if(_callBack) _callBack();
 			}else if(touch.phase == TouchPhase.ENDED){
 				_downPoint = null;
 			}
