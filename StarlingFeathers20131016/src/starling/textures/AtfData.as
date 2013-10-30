@@ -51,8 +51,8 @@ package starling.textures
 			// the "-e" and "-n" parameters of png2atf
 			if (data[5] != 0 && data[6] == 255)
             {
-                var emptyMipmaps:Boolean = data[5] & 0x01;
-                var numTextures:int = data[5] >> 1 & 0x7f;
+				var emptyMipmaps:Boolean = (data[5] & 0x01) == 1;
+				var numTextures:int  = data[5] >> 1 & 0x7f;
                 mNumTextures = emptyMipmaps ? 1 : numTextures;
             }
         }
