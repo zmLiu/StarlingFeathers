@@ -9,11 +9,7 @@
 
 package starling.display.graphics
 {
-	import flash.geom.Matrix;
-	import flash.geom.Point;
 	
-	import starling.core.RenderSupport;
-	import starling.core.Starling;
 
 	public class NGon extends Graphic
 	{

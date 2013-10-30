@@ -1,7 +1,6 @@
 package starling.display.graphics
 {
 	import starling.textures.Texture;
-	import starling.display.graphics.StrokeVertex;
 		
 	public class Stroke extends Graphic
 	{

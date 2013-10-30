@@ -1,6 +1,6 @@
 package starling.display.materials
 {
-	import starling.display.shaders.IShader;
+	
 	
 	public class FlatColorMaterial extends StandardMaterial
 	{

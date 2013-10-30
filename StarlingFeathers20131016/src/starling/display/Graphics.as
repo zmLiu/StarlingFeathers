@@ -9,7 +9,6 @@ package starling.display
 	import starling.display.graphics.Plane;
 	import starling.display.graphics.RoundedRectangle;
 	import starling.display.graphics.Stroke;
-	import starling.display.graphics.StrokeVertex;
 	import starling.display.materials.IMaterial;
 	import starling.display.shaders.fragment.TextureFragmentShader;
 	import starling.display.util.CurveUtil;

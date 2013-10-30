@@ -1,8 +1,6 @@
 package starling.display.shaders.fragment
 {
-	import flash.display3D.Context3D;
 	import flash.display3D.Context3DProgramType;
-	import flash.display3D.textures.Texture;
 	
 	import starling.display.shaders.AbstractShader;
 	
