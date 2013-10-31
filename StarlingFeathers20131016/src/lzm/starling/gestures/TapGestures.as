@@ -14,32 +14,47 @@ package lzm.starling.gestures
 	 */	
 	public class TapGestures extends Gestures
 	{
-		private var isMoved:Boolean = false;
-		
 		private var startPoint:Point;
 		
-		public function TapGestures(target:DisplayObject,callBack:Function=null)
+		private var _tempX:Number;
+		private var _tempY:Number;
+		private var _tempScaleX:Number;
+		private var _tempScaleY:Number;
+		private var _needEffect:Boolean = false;//点击的时候时候需要一个效果
+		
+		public function TapGestures(target:DisplayObject,callBack:Function=null,needTapEffect:Boolean=false)
 		{
 			super(target,callBack);
+			_needEffect = needTapEffect;
 		}
 		
 		public override function checkGestures(touches:Vector.<Touch>):void{
 			for each(var touch:Touch in touches){
 				if(touch.phase == TouchPhase.BEGAN){
 					startPoint = new Point(touch.globalX,touch.globalY);
+					if(_needEffect){
+						_tempX = _target.x;
+						_tempY = _target.y;
+						_tempScaleX = _target.scaleX;
+						_tempScaleY = _target.scaleY;
+						
+						_target.scaleX = _tempScaleX*0.9;
+						_target.scaleY = _tempScaleY*0.9;
+						
+						_target.x += (1.0 - _tempScaleX*0.9) / 2.0 * _target.width;
+						_target.y += (1.0 - _tempScaleY*0.9) / 2.0 * _target.width;
+					}
 				}else if(touch.phase == TouchPhase.MOVED){
-//					isMoved = true;
-				}else if(touch.phase == TouchPhase.ENDED){
 					
+				}else if(touch.phase == TouchPhase.ENDED){
+					if(_needEffect){
+						resetTarget();
+					}
 					var endPoint:Point = new Point(touch.globalX,touch.globalY);
 					if(Point.distance(startPoint,endPoint) > 20){
 						return;
 					}
 					
-//					if(isMoved){
-//						isMoved = false;
-//						return;
-//					}
 					
 					var buttonRect:Rectangle = _target.getBounds(_target.stage);
 					if (touch.globalX < buttonRect.x ||
@@ -58,6 +73,13 @@ package lzm.starling.gestures
 					}
 				}
 			}
+		}
+		
+		protected function resetTarget():void{
+			_target.x = _tempX;
+			_target.y = _tempY;
+			_target.scaleX = _tempScaleX;
+			_target.scaleY = _tempScaleY;
 		}
 		
 	}
