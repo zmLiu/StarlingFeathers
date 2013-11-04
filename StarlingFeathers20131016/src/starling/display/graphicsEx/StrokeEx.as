@@ -1,5 +1,7 @@
 package starling.display.graphicsEx
 {
+	import flash.display.GraphicsStroke;
+	import starling.textures.Texture;
 	import starling.display.graphics.Stroke;
 	import starling.display.graphics.StrokeVertex;
 	
