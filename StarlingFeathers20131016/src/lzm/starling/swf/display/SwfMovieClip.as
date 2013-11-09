@@ -1,0 +1,238 @@
+package lzm.starling.swf.display
+{
+	import lzm.starling.swf.Swf;
+	import lzm.starling.swf.SwfUpdateManager;
+	
+	import starling.display.DisplayObject;
+	import starling.display.Sprite;
+	
+	/**
+	 * 
+	 * @author zmliu
+	 * 
+	 */	
+	public class SwfMovieClip extends Sprite
+	{
+		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
+		
+		private var _frames:Array;
+		private var _labels:Array;
+		private var _displayObjects:Object;
+		
+		private var _startFrame:int;
+		private var _endFrame:int;
+		private var _currentFrame:int;
+		private var _currentLabel:String;
+		
+		private var _isPlay:Boolean = false;
+		private var _loop:Boolean = true;
+		
+		private var _completeFunction:Function = null;//播放完毕的回调
+		
+		public function SwfMovieClip(frames:Array,labels:Array,displayObjects:Object){
+			super();
+			
+			_frames = frames;
+			_labels = labels;
+			_displayObjects = displayObjects;
+			
+			_startFrame = 0;
+			_endFrame = _frames.length - 1;
+			_currentFrame = -1;
+			
+			play();
+		}
+		
+		public function update():void{
+			_currentFrame += 1;
+			if(_currentFrame > _endFrame){
+				if(_completeFunction) _completeFunction(this);
+				
+				if(_loop){
+					_currentFrame = _startFrame;
+				}else{
+					_currentFrame = _startFrame - 1;
+					stop();
+					return;
+				}
+				
+				if(_startFrame == _endFrame){//只有一帧就不要循环下去了
+					stop();
+					return;
+				}
+			}
+			currentFrame = _currentFrame;
+		}
+		
+		
+		private var __frameInfos:Array;
+		private var __useIndexs:Object;
+		public function set currentFrame(frame:int):void{
+			clearChild();
+			
+			__frameInfos = _frames[_currentFrame];
+			__useIndexs = {};
+			
+			var name:String;
+			var type:String;
+			var data:Array;
+			var display:DisplayObject;
+			var useIndex:int;
+			var length:int = __frameInfos.length;
+			for (var i:int = 0; i < length; i++) {
+				data = __frameInfos[i];
+				useIndex = __useIndexs[data[0]];
+				display = _displayObjects[data[0]][useIndex];
+				
+				display.x = data[2];
+				display.y = data[3];
+				if(data[1] == Swf.dataKey_Scale9){
+					display.width = data[10];
+					display.height = data[11];
+				}else{
+					display.scaleX = data[4];
+					display.scaleY = data[5];
+				}
+				display.skewX = data[6] * ANGLE_TO_RADIAN;
+				display.skewY = data[7] * ANGLE_TO_RADIAN;
+				display.alpha = data[8];
+				display.name = data[9];
+				addQuiackChild(display);
+				
+				if(data[1] == Swf.dataKey_TextField){
+					display["width"] = data[10];
+					display["height"] = data[11];
+					display["fontName"] = data[12];
+					display["color"] = data[13];
+					display["fontSize"] = data[14];
+					display["vAlign"] = data[15];
+					display["italic"] = data[16];
+					display["bold"] = data[17];
+					display["text"] = data[18];
+				}
+				__useIndexs[data[0]] = (useIndex+1);
+			}
+		}
+		
+		public function get currentFrame():int{
+			return _currentFrame;
+		}
+		
+		/**
+		 * 播放
+		 * */
+		public function play():void{
+			_isPlay = true;
+			_currentFrame = _startFrame - 1;
+			SwfUpdateManager.addSwfMovieClip(this);
+			
+			var k:String;
+			var arr:Array;
+			var l:int;
+			for(k in _displayObjects){
+				if(k.indexOf(Swf.dataKey_MovieClip) == 0){
+					arr = _displayObjects[k];
+					l = arr.length;
+					for (var i:int = 0; i < l; i++) {
+						(arr[i] as SwfMovieClip).play();
+					}
+				}
+			}
+		}
+		
+		/**
+		 * 停止
+		 * */
+		public function stop():void{
+			_isPlay = false;
+			SwfUpdateManager.removeSwfMovieClip(this);
+		}
+		
+		public function gotoAndStop(frame:Object):void{
+			goTo(frame);
+			stop();
+		}
+		
+		public function gotoAndPlay(frame:Object):void{
+			goTo(frame);
+			play();
+		}
+		
+		private function goTo(frame:*):void{
+			if((frame is String)){
+				var labelData:Array = getLabelData(frame);
+				_currentLabel = labelData[0];
+				_currentFrame = _startFrame = labelData[1];
+				_endFrame = labelData[2];
+			}else if(frame is int){
+				_currentFrame = _startFrame = 0;
+				_endFrame = _frames.length - 1;
+			}
+			currentFrame = _currentFrame;
+		}
+		
+		private function getLabelData(label:String):Array{
+			var length:int = _labels.length;
+			var labelData:Array;
+			for (var i:int = 0; i < length; i++) {
+				labelData = _labels[i];
+				if(labelData[0] == label){
+					return labelData;
+				}
+			}
+			return null;
+		}
+		
+		/**
+		 * 是否再播放
+		 * */
+		public function get isPlay():Boolean{
+			return _isPlay;
+		}
+		
+		/**
+		 * 设置/获取 是否循环播放
+		 * */
+		public function get loop():Boolean{
+			return _loop;
+		}
+		
+		public function set loop(value:Boolean):void{
+			_loop = value;
+		}
+		
+		/**
+		 * 设置播放完毕的回调
+		 */		
+		public function set completeFunction(value:Function):void{
+			_completeFunction = value;
+		}
+		
+		/**
+		 * 总共有多少帧
+		 * */
+		public function get totalFrames():int{
+			return _frames.length;
+		}
+		
+		/**
+		 * 获取所有标签
+		 * */
+		public function get labels():Array{
+			var length:int = _labels.length;
+			var returnLabels:Array = [];
+			for (var i:int = 0; i < length; i++) {
+				returnLabels.push(_labels[i][0]);
+			}
+			return returnLabels;
+		}
+		
+		public override function dispose():void{
+			SwfUpdateManager.removeSwfMovieClip(this);
+			super.dispose();
+		}
+		
+		
+		
+	}
+}
