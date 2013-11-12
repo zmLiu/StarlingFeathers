@@ -363,6 +363,7 @@ package starling.utils
             mIsLoading = false;
             mQueue.length = 0;
             clearTimeout(mTimeoutID);
+			dispatchEventWith(Event.CANCEL);
         }
         
         /** Removes assets of all types, empties the queue and aborts any pending load operations.*/
@@ -583,17 +584,20 @@ package starling.utils
         private function processRawAsset(name:String, rawAsset:Object, xmls:Vector.<XML>,
                                          onProgress:Function, onComplete:Function):void
         {
-            loadRawAsset(name, rawAsset, onProgress, process); 
-            
-            function process(asset:Object):void
-            {
-                var texture:Texture;
-                var bytes:ByteArray;
-                
-                if (!mIsLoading)
-                {
-                    onComplete();
-                }
+			var canceled:Boolean = false;
+			
+			addEventListener(Event.CANCEL, cancel);
+			loadRawAsset(name, rawAsset, progress, process);
+			
+			function process(asset:Object):void
+			{
+				var texture:Texture;
+				var bytes:ByteArray;
+				
+				if (canceled)
+				{
+					// do nothing
+				}
                 else if (asset is Sound)
                 {
                     addSound(name, asset as Sound);
@@ -690,7 +694,19 @@ package starling.utils
                 // avoid that objects stay in memory (through 'onRestore' functions)
                 asset = null;
                 bytes = null;
+				
+				removeEventListener(Event.CANCEL, cancel);
             }
+			
+			function progress(ratio:Number):void
+			{
+				if (!canceled) onProgress(ratio);
+			}
+			
+			function cancel():void
+			{
+				canceled = true;
+			}
         }
         
         private function loadRawAsset(name:String, rawAsset:Object, 
