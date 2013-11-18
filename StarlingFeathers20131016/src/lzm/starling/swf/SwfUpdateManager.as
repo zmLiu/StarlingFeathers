@@ -13,17 +13,25 @@ package lzm.starling.swf
 	public class SwfUpdateManager
 	{
 		
-		private static var _stage:Stage;
+		private var _stage:Stage;
+		private var _fpsUtil:FPSUtil;
 		
-		private static var _movieClips:Vector.<SwfMovieClip>;
+		private var _movieClips:Vector.<SwfMovieClip>;
 		
-		
-		public static function init(stage:Stage):void{
+		public function SwfUpdateManager(fps:int,stage:Stage){
+			_fpsUtil = new FPSUtil(fps);
 			_stage = stage;
+			
 			_movieClips = new Vector.<SwfMovieClip>();
 		}
 		
-		public static function addSwfMovieClip(movieClip:SwfMovieClip):void{
+		
+		public function init(stage:Stage):void{
+			_stage = stage;
+			
+		}
+		
+		public function addSwfMovieClip(movieClip:SwfMovieClip):void{
 			var index:int = _movieClips.indexOf(movieClip);
 			if(index == -1){
 				_movieClips.push(movieClip);
@@ -33,7 +41,7 @@ package lzm.starling.swf
 			}
 		}
 		
-		public static function removeSwfMovieClip(movieClip:SwfMovieClip):void{
+		public function removeSwfMovieClip(movieClip:SwfMovieClip):void{
 			var index:int = _movieClips.indexOf(movieClip);
 			if(index != -1){
 				_movieClips.splice(index,1);
@@ -43,13 +51,29 @@ package lzm.starling.swf
 			}
 		}
 		
-		private static function enterFrame(e:Event):void{
-			for each (var mc:SwfMovieClip in _movieClips) {
-				mc.update();
+		private function enterFrame(e:Event):void{
+			if(_fpsUtil.update()){
+				for each (var mc:SwfMovieClip in _movieClips) {
+					mc.update();
+				}
 			}
 		}
 		
+		public function set fps(value:int):void{
+			_fpsUtil.fps = value;
+		}
 		
+		public function get fps():int{
+			return _fpsUtil.fps;
+		}
+		
+		public function dispose():void{
+			_stage.removeEventListener(Event.ENTER_FRAME,enterFrame);
+			
+			_stage = null;
+			_fpsUtil = null;
+			_movieClips = null;
+		}
 		
 		
 		

@@ -1,7 +1,6 @@
 package lzm.starling.swf.display
 {
 	import lzm.starling.swf.Swf;
-	import lzm.starling.swf.SwfUpdateManager;
 	
 	import starling.display.DisplayObject;
 	import starling.display.Sprite;
@@ -15,6 +14,8 @@ package lzm.starling.swf.display
 	{
 		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
 		
+		private var _ownerSwf:Swf;//所属swf
+		
 		private var _frames:Array;
 		private var _labels:Array;
 		private var _displayObjects:Object;
@@ -26,10 +27,11 @@ package lzm.starling.swf.display
 		
 		private var _isPlay:Boolean = false;
 		private var _loop:Boolean = true;
+		private var _autoUpdate:Boolean = true;//是否自动更新
 		
 		private var _completeFunction:Function = null;//播放完毕的回调
 		
-		public function SwfMovieClip(frames:Array,labels:Array,displayObjects:Object){
+		public function SwfMovieClip(frames:Array,labels:Array,displayObjects:Object,ownerSwf:Swf){
 			super();
 			
 			_frames = frames;
@@ -40,18 +42,21 @@ package lzm.starling.swf.display
 			_endFrame = _frames.length - 1;
 			_currentFrame = -1;
 			
+			_ownerSwf = ownerSwf;
+			
 			play();
 		}
 		
 		public function update():void{
+			if (!_isPlay) return;
+			
 			_currentFrame += 1;
 			if(_currentFrame > _endFrame){
 				if(_completeFunction) _completeFunction(this);
 				
-				if(_loop){
-					_currentFrame = _startFrame;
-				}else{
-					_currentFrame = _startFrame - 1;
+				_currentFrame = _startFrame - 1;
+				
+				if(!_loop){
 					stop();
 					return;
 				}
@@ -60,8 +65,9 @@ package lzm.starling.swf.display
 					stop();
 					return;
 				}
+			}else{
+				currentFrame = _currentFrame;
 			}
-			currentFrame = _currentFrame;
 		}
 		
 		
@@ -124,7 +130,8 @@ package lzm.starling.swf.display
 		public function play():void{
 			_isPlay = true;
 			_currentFrame = _startFrame - 1;
-			SwfUpdateManager.addSwfMovieClip(this);
+			
+			if(_autoUpdate) _ownerSwf.swfUpdateManager.addSwfMovieClip(this);
 			
 			var k:String;
 			var arr:Array;
@@ -145,7 +152,7 @@ package lzm.starling.swf.display
 		 * */
 		public function stop():void{
 			_isPlay = false;
-			SwfUpdateManager.removeSwfMovieClip(this);
+			_ownerSwf.swfUpdateManager.removeSwfMovieClip(this);
 		}
 		
 		public function gotoAndStop(frame:Object):void{
@@ -165,7 +172,7 @@ package lzm.starling.swf.display
 				_currentFrame = _startFrame = labelData[1];
 				_endFrame = labelData[2];
 			}else if(frame is int){
-				_currentFrame = _startFrame = 0;
+				_currentFrame = _startFrame = frame;
 				_endFrame = _frames.length - 1;
 			}
 			currentFrame = _currentFrame;
@@ -227,8 +234,25 @@ package lzm.starling.swf.display
 			return returnLabels;
 		}
 		
+		/**
+		 * 设置 / 获取 动画是否自动更新
+		 * */
+		public function get autoUpdate():Boolean{
+			return _autoUpdate;
+		}
+		
+		public function set autoUpdate(value:Boolean):void{
+			_autoUpdate = value;
+			if(_autoUpdate && _isPlay){
+				_ownerSwf.swfUpdateManager.addSwfMovieClip(this);
+			}else if(!_autoUpdate && _isPlay){
+				_ownerSwf.swfUpdateManager.removeSwfMovieClip(this);
+			}
+		}
+		
 		public override function dispose():void{
-			SwfUpdateManager.removeSwfMovieClip(this);
+			_ownerSwf.swfUpdateManager.removeSwfMovieClip(this);
+			_ownerSwf = null;
 			super.dispose();
 		}
 		

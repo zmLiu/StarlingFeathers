@@ -33,8 +33,10 @@ package lzm.starling.swf
 		
 		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
 		
+		public static var stage:Stage;
+		
 		public static function init(stage:Stage):void{
-			SwfUpdateManager.init(stage);
+			Swf.stage = stage;
 		}
 		
 		private const createFuns:Object = {
@@ -48,12 +50,14 @@ package lzm.starling.swf
 		
 		private var _assets:AssetManager;
 		private var _swfDatas:Object;
+		private var _swfUpdateManager:SwfUpdateManager;
 		
-		public function Swf(swfData:ByteArray,assets:AssetManager){
+		public function Swf(swfData:ByteArray,assets:AssetManager,fps:int=24){
 			swfData.uncompress();
 			
 			this._swfDatas = JSON.parse(new String(swfData));
 			this._assets = assets;
+			this._swfUpdateManager = new SwfUpdateManager(fps,stage);
 		}
 		
 		/**
@@ -68,6 +72,25 @@ package lzm.starling.swf
 		 * */
 		public function get assets():AssetManager{
 			return _assets;
+		}
+		
+		/**
+		 * 更新器
+		 * */
+		public function get swfUpdateManager():SwfUpdateManager{
+			return _swfUpdateManager;
+		}
+		
+		
+		/**
+		 * 设置/获取 帧频率
+		 * */
+		public function set fps(value:int):void{
+			_swfUpdateManager.fps = value;
+		}
+		
+		public function get fps():int{
+			return _swfUpdateManager.fps;
 		}
 		
 		/**
@@ -131,8 +154,9 @@ package lzm.starling.swf
 				displayObjects[objName] = displayObjectArray;
 			}
 			
-			var mc:SwfMovieClip = new SwfMovieClip(movieClipData["frames"],movieClipData["labels"],displayObjects);
+			var mc:SwfMovieClip = new SwfMovieClip(movieClipData["frames"],movieClipData["labels"],displayObjects,this);
 			mc.loop = movieClipData["loop"];
+			
 			return mc;
 		}
 		
@@ -191,6 +215,18 @@ package lzm.starling.swf
 			return textfield;
 		}
 		
+		public function dispose(disposeAssets:Boolean):void{
+			_swfUpdateManager.dispose();
+			
+			if(disposeAssets){
+				_assets.purge();
+				_assets.dispose();
+			}
+			
+			_assets = null;
+			_swfDatas = null;
+			_swfUpdateManager = null;
+		}
 		
 	}
 }
