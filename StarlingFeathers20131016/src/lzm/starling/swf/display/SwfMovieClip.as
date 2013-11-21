@@ -111,7 +111,7 @@ package lzm.starling.swf.display
 					display["fontName"] = data[12];
 					display["color"] = data[13];
 					display["fontSize"] = data[14];
-					display["vAlign"] = data[15];
+					display["hAlign"] = data[15];
 					display["italic"] = data[16];
 					display["bold"] = data[17];
 					display["text"] = data[18];

@@ -207,7 +207,7 @@ package lzm.starling.swf
 				textfield.fontName = data[12];
 				textfield.color = data[13];
 				textfield.fontSize = data[14];
-				textfield.vAlign = data[15];
+				textfield.hAlign = data[15];
 				textfield.italic = data[16];
 				textfield.bold = data[17];
 				textfield.text = data[18];
