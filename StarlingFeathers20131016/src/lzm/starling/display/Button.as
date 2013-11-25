@@ -166,7 +166,7 @@ package lzm.starling.display
 			if(_enabled == value)return;
 			_content.removeChildAt(0);
 			_enabled = value;
-			var setSkin:DisplayObject = _enabled == true ? _skin : _disabledSkin;
+			var setSkin:DisplayObject = _enabled == true ? _skin : _disabledSkin ? _disabledSkin : _skin;
 			_content.addChildAt(setSkin, 0);
 			_w = setSkin.width;
 			_h = setSkin.height;
