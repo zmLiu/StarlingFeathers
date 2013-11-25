@@ -19,8 +19,9 @@ package lzm.starling.display
 	{
 		protected static const MAX_DRAG_DIST:Number = 0;
 
-		public var enabled:Boolean = true;
+		private var _enabled:Boolean = true;
 		protected var _skin:DisplayObject;
+		protected var _disabledSkin:DisplayObject;
 		protected var _content:Sprite;
 		protected var _textfield:TextField;
 		protected var _textFont:String;
@@ -90,8 +91,16 @@ package lzm.starling.display
 			}
 			_textfield.width  = _w;
 			_textfield.height = _h;
-			_textfield.x = 0;
-			_textfield.y = 0;
+			layoutTextField();
+		}
+		
+		private function layoutTextField():void
+		{
+			if(_textfield)
+			{
+				_textfield.x =( _w -_textfield.width)>>1 ;
+				_textfield.y = (_h - _textfield.height)>>1;
+			}
 		}
 		
 		public function set text(value:String):void{
@@ -123,6 +132,11 @@ package lzm.starling.display
 		public function get skin():DisplayObject{
 			return _skin;
 		}
+		public function set disabledSkin(value:DisplayObject):void
+		{
+			_disabledSkin = value;
+		}
+			
 		public override function dispose():void{
 			if(_textfield){
 				_textfield.removeFromParent();
@@ -133,8 +147,32 @@ package lzm.starling.display
 			_skin.removeFromParent();
 			_skin.dispose();
 			_skin = null;
+			if(_disabledSkin)
+			{
+				_disabledSkin.removeFromParent();
+				_disabledSkin.dispose();
+				_disabledSkin = null;
+			}
 			super.dispose();
 		}
+
+		public function get enabled():Boolean
+		{
+			return _enabled;
+		}
+
+		public function set enabled(value:Boolean):void
+		{
+			if(_enabled == value)return;
+			_content.removeChildAt(0);
+			_enabled = value;
+			var setSkin:DisplayObject = _enabled == true ? _skin : _disabledSkin;
+			_content.addChildAt(setSkin, 0);
+			_w = setSkin.width;
+			_h = setSkin.height;
+			layoutTextField();
+		}
+
 		
 	}
 }
