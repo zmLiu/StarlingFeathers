@@ -76,6 +76,7 @@ package lzm.starling.swf.display
 		public function set currentFrame(frame:int):void{
 			clearChild();
 			
+			_currentFrame = frame;
 			__frameInfos = _frames[_currentFrame];
 			__useIndexs = {};
 			
@@ -90,19 +91,20 @@ package lzm.starling.swf.display
 				useIndex = __useIndexs[data[0]];
 				display = _displayObjects[data[0]][useIndex];
 				
-				display.x = data[2];
-				display.y = data[3];
+				display.mX = data[2];
+				display.mY = data[3];
 				if(data[1] == Swf.dataKey_Scale9){
 					display.width = data[10];
 					display.height = data[11];
 				}else{
-					display.scaleX = data[4];
-					display.scaleY = data[5];
+					display.mScaleX = data[4];
+					display.mScaleY = data[5];
 				}
-				display.skewX = data[6] * ANGLE_TO_RADIAN;
-				display.skewY = data[7] * ANGLE_TO_RADIAN;
-				display.alpha = data[8];
-				display.name = data[9];
+				display.mSkewX = data[6] * ANGLE_TO_RADIAN;
+				display.mSkewY = data[7] * ANGLE_TO_RADIAN;
+				display.mAlpha = data[8];
+				display.mName = data[9];
+				display.mOrientationChanged = true;
 				addQuiackChild(display);
 				
 				if(data[1] == Swf.dataKey_TextField){
@@ -232,6 +234,13 @@ package lzm.starling.swf.display
 				returnLabels.push(_labels[i][0]);
 			}
 			return returnLabels;
+		}
+		
+		/**
+		 * 是否包含某个标签
+		 * */
+		public function hasLabel(label:String):Boolean{
+			return !(_labels.indexOf(label) == -1);
 		}
 		
 		/**
