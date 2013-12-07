@@ -97,6 +97,7 @@ package starling.text
         private var mIsRenderedText:Boolean;
         private var mTextBounds:Rectangle;
         private var mBatchable:Boolean;
+	private var mIsHtml:Boolean = false;
         
         private var mHitArea:DisplayObject;
         private var mBorder:DisplayObjectContainer;
@@ -128,7 +129,10 @@ package starling.text
             
             addEventListener(Event.FLATTEN, onFlatten);
         }
-        
+        public function set isHtml(b:Boolean):void
+	{
+		mIsHtml = b;
+	}
         /** Disposes the underlying texture data. */
         public override function dispose():void
         {
@@ -242,8 +246,13 @@ package starling.text
             sNativeTextField.antiAliasType = AntiAliasType.ADVANCED;
             sNativeTextField.selectable = false;            
             sNativeTextField.multiline = true;            
-            sNativeTextField.wordWrap = true;            
-            sNativeTextField.text = mText;
+            sNativeTextField.wordWrap = true;
+			
+	    if(mIsHtml) 
+	    	sNativeTextField.htmlText = mText;
+	    else
+	    	sNativeTextField.text = mText;				
+           
             sNativeTextField.embedFonts = true;
             sNativeTextField.filters = mNativeFilters;
             
@@ -292,7 +301,10 @@ package starling.text
             else
                 bitmapData.draw(sNativeTextField, drawMatrix);
             
-            sNativeTextField.text = "";
+	    if(mIsHtml) 
+		sNativeTextField.htmlText = "";
+	    else
+		sNativeTextField.text = "";			
             
             // update textBounds rectangle
             resultTextBounds.setTo(xOffset   / scale, yOffset    / scale,
