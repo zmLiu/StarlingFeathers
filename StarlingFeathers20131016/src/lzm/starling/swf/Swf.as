@@ -186,9 +186,9 @@ package lzm.starling.swf
 		 * 创建9宫格图片
 		 * */
 		public function createS9Image(name:String,data:Array=null):Scale9Image{
+			var scale9Data:Array = _swfDatas[dataKey_Scale9][name];
 			var texture:Texture = _assets.getTexture(name);
-			var w:Number = texture.width * 0.25 * _assets.scaleFactor;
-			var s9Texture:Scale9Textures = new Scale9Textures(texture,new Rectangle(w,w,1,1));
+			var s9Texture:Scale9Textures = new Scale9Textures(texture,new Rectangle(scale9Data[0],scale9Data[1],scale9Data[2],scale9Data[3]));
 			var s9image:Scale9Image = new Scale9Image(s9Texture,_assets.scaleFactor);
 			
 			if(data){
