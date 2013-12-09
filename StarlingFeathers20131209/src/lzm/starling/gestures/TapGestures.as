@@ -21,6 +21,7 @@ package lzm.starling.gestures
 		private var _tempScaleX:Number;
 		private var _tempScaleY:Number;
 		private var _needEffect:Boolean = false;//点击的时候时候需要一个效果
+		private var _maxDragDist:int = 64;//允许滑动的弹性范围
 		
 		public function TapGestures(target:DisplayObject,callBack:Function=null,needTapEffect:Boolean=false)
 		{
@@ -51,7 +52,7 @@ package lzm.starling.gestures
 						resetTarget();
 					}
 					var endPoint:Point = new Point(touch.globalX,touch.globalY);
-					if(Point.distance(startPoint,endPoint) > 20){
+					if(Point.distance(startPoint,endPoint) >= _maxDragDist){
 						return;
 					}
 					
