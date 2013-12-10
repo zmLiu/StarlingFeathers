@@ -12,16 +12,18 @@ package lzm.util
 	{
 		
 		/**
-		 * 顶点碰撞检测,面积碰撞
+		 * 顶点与多边形碰撞检测
 		 * p1,p2,p3 为范围点
-		 * p4为碰撞点。
-		 * @return
+		 * p4是碰撞点。
 		 */
 		public static function hitPoint(p1:Point,p2:Point,p3:Point,p4:Point):Boolean{
+			//分别把点4送入面积检测算法中
 			var a:int = hitTrianglePoint(p1,p2,p3);
 			var b:int = hitTrianglePoint(p4,p2,p3);
 			var c:int = hitTrianglePoint(p1,p2,p4);
 			var d:int = hitTrianglePoint(p1,p4,p3);
+			
+			//校验b,c,d的检测结果是否与点a也就是范围点相同,如果是则点p4在点p1,p2,p3的范围之内
 			if ((b==a)&&(c==a)&&(d==a)){
 				return true;
 			}else{
@@ -29,19 +31,14 @@ package lzm.util
 			}
 		}
 		
-		/**
-		  * 面积检测
-		  * @param   p1
-		  * @param   p2
-		  * @param   p3
-		  * @return
-		  */
+		//三角面积检测公式
 		public static function hitTrianglePoint(p1:Point,p2:Point,p3:Point):int{
-		    if ((p2.x-p1.x)*(p2.y+p1.y)+(p3.x-p2.x)*(p3.y+p2.y)+(p1.x-p3.x)*(p1.y+p3.y)){
-			     return 1;
-		    }else{
+		    if ((p2.x-p1.x)*(p2.y+p1.y)+(p3.x-p2.x)*(p3.y+p2.y)+(p1.x-p3.x)*(p1.y+p3.y)<0){
+				return 1;
+			}else{
 				return 0;
 			}
+			return 0;
 		}
 		
 		/**
