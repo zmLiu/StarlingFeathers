@@ -18,24 +18,22 @@ package lzm.starling.gestures
 			super(target, callBack);
 		}
 		
-		public override function checkGestures(touches:Vector.<Touch>):void{
-			for each(var touch:Touch in touches){
-				if(touch.phase == TouchPhase.ENDED && touch.tapCount == 2){
-					
-					var buttonRect:Rectangle = _target.getBounds(_target.stage);
-					if (touch.globalX < buttonRect.x ||
-						touch.globalY < buttonRect.y ||
-						touch.globalX > buttonRect.x + buttonRect.width ||
-						touch.globalY > buttonRect.y+ buttonRect.height ){
-						return;
-					}
-					
-					if(_callBack){
-						if(_callBack.length == 0){
-							_callBack();
-						}else{
-							_callBack(touch);
-						}
+		public override function checkGestures(touch:Touch):void{
+			if(touch.phase == TouchPhase.ENDED && touch.tapCount == 2){
+				
+				var buttonRect:Rectangle = _target.getBounds(_target.stage);
+				if (touch.globalX < buttonRect.x ||
+					touch.globalY < buttonRect.y ||
+					touch.globalX > buttonRect.x + buttonRect.width ||
+					touch.globalY > buttonRect.y+ buttonRect.height ){
+					return;
+				}
+				
+				if(_callBack){
+					if(_callBack.length == 0){
+						_callBack();
+					}else{
+						_callBack(touch);
 					}
 				}
 			}

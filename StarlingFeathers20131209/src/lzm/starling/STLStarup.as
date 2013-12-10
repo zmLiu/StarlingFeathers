@@ -59,7 +59,6 @@ package lzm.starling
 			_mStarling.antiAliasing = 0;
 			_mStarling.stage.stageWidth  = width;
 			_mStarling.stage.stageHeight = height;
-			_mStarling.simulateMultitouch  = false;
 			_mStarling.enableErrorChecking = Capabilities.isDebugger;
 			
 			_mStarling.addEventListener(starling.events.Event.ROOT_CREATED, 
@@ -105,7 +104,6 @@ package lzm.starling
 			_mStarling.antiAliasing = 0;
 			_mStarling.stage.stageWidth  = STLConstant.StageWidth;
 			_mStarling.stage.stageHeight = STLConstant.StageHeight;
-			_mStarling.simulateMultitouch  = false;
 			_mStarling.enableErrorChecking = Capabilities.isDebugger;
 			
 			_mStarling.addEventListener(starling.events.Event.ROOT_CREATED, 

@@ -29,14 +29,28 @@ package lzm.starling.gestures
 			return _callBack;
 		}
 		
-		private function onTouch(e:TouchEvent):void{
-			checkGestures(e.touches);
+		/**
+		 * 检测手势
+		 * */
+		protected function onTouch(e:TouchEvent):void{
+			var touch:Touch = e.getTouch(_target);
+			if(touch) checkGestures(touch);
+			
+			var touches:Vector.<Touch> = e.getTouches(_target);
+			if(touches && touches.length > 0) checkGesturesByTouches(touches);
 		}
 		
 		/**
 		 * 检测手势
 		 * */
-		public function checkGestures(touches:Vector.<Touch>):void{
+		public function checkGestures(touch:Touch):void{
+			
+		}
+		
+		/**
+		 * 检测手势
+		 * */
+		public function checkGesturesByTouches(touches:Vector.<Touch>):void{
 			
 		}
 		

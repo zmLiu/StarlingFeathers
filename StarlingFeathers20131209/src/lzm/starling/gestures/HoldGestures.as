@@ -25,23 +25,21 @@ package lzm.starling.gestures
 			_holdEndCallBack = holdEndCallBack;
 		}
 		
-		public override function checkGestures(touches:Vector.<Touch>):void{
-			for each(var touch:Touch in touches){
-				if(touch.phase == TouchPhase.BEGAN){
-					if(_timer == null){
-						_timer = new Timer(_holdTime);
-						_timer.addEventListener(TimerEvent.TIMER,onTimer);
-					}
-					_timer.start();
-				}else if(touch.phase == TouchPhase.MOVED){
-					
-				}else if(touch.phase == TouchPhase.ENDED){
-					if(_holdEndCallBack && _timer.delay == _callBackTime) _holdEndCallBack();
-					
-					_timer.stop();
-					_timer.reset();
-					_timer.delay = _holdTime;
+		public override function checkGestures(touch:Touch):void{
+			if(touch.phase == TouchPhase.BEGAN){
+				if(_timer == null){
+					_timer = new Timer(_holdTime);
+					_timer.addEventListener(TimerEvent.TIMER,onTimer);
 				}
+				_timer.start();
+			}else if(touch.phase == TouchPhase.MOVED){
+				
+			}else if(touch.phase == TouchPhase.ENDED){
+				if(_holdEndCallBack && _timer.delay == _callBackTime) _holdEndCallBack();
+				
+				_timer.stop();
+				_timer.reset();
+				_timer.delay = _holdTime;
 			}
 		}
 		

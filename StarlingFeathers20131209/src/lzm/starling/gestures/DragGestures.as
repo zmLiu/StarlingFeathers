@@ -20,8 +20,7 @@ package lzm.starling.gestures
 			super(target, callBack);
 		}
 		
-		public override function checkGestures(touches:Vector.<Touch>):void{
-			var touch:Touch = touches[0];
+		public override function checkGestures(touch:Touch):void{
 			if(touch.phase == TouchPhase.BEGAN){
 				_downPoint = touch.getLocation(_target.stage);
 			}else if(touch.phase == TouchPhase.MOVED){

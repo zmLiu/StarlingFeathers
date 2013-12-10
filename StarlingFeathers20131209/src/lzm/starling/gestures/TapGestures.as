@@ -29,48 +29,46 @@ package lzm.starling.gestures
 			_needEffect = needTapEffect;
 		}
 		
-		public override function checkGestures(touches:Vector.<Touch>):void{
-			for each(var touch:Touch in touches){
-				if(touch.phase == TouchPhase.BEGAN){
-					startPoint = new Point(touch.globalX,touch.globalY);
-					if(_needEffect){
-						_tempX = _target.x;
-						_tempY = _target.y;
-						_tempScaleX = _target.scaleX;
-						_tempScaleY = _target.scaleY;
-						
-						_target.scaleX = _tempScaleX*0.9;
-						_target.scaleY = _tempScaleY*0.9;
-						
-						_target.x += (1.0 - _tempScaleX*0.9) / 2.0 * _target.width;
-						_target.y += (1.0 - _tempScaleY*0.9) / 2.0 * _target.width;
-					}
-				}else if(touch.phase == TouchPhase.MOVED){
+		public override function checkGestures(touch:Touch):void{
+			if(touch.phase == TouchPhase.BEGAN){
+				startPoint = new Point(touch.globalX,touch.globalY);
+				if(_needEffect){
+					_tempX = _target.x;
+					_tempY = _target.y;
+					_tempScaleX = _target.scaleX;
+					_tempScaleY = _target.scaleY;
 					
-				}else if(touch.phase == TouchPhase.ENDED){
-					if(_needEffect){
-						resetTarget();
-					}
-					var endPoint:Point = new Point(touch.globalX,touch.globalY);
-					if(Point.distance(startPoint,endPoint) >= _maxDragDist){
-						return;
-					}
+					_target.scaleX = _tempScaleX*0.9;
+					_target.scaleY = _tempScaleY*0.9;
 					
-					
-					var buttonRect:Rectangle = _target.getBounds(_target.stage);
-					if (touch.globalX < buttonRect.x ||
-						touch.globalY < buttonRect.y ||
-						touch.globalX > buttonRect.x + buttonRect.width ||
-						touch.globalY > buttonRect.y+ buttonRect.height ){
-						return;
-					}
-					
-					if(_callBack){
-						if(_callBack.length == 0){
-							_callBack();
-						}else{
-							_callBack(touch);
-						}
+					_target.x += (1.0 - _tempScaleX*0.9) / 2.0 * _target.width;
+					_target.y += (1.0 - _tempScaleY*0.9) / 2.0 * _target.width;
+				}
+			}else if(touch.phase == TouchPhase.MOVED){
+				
+			}else if(touch.phase == TouchPhase.ENDED){
+				if(_needEffect){
+					resetTarget();
+				}
+				var endPoint:Point = new Point(touch.globalX,touch.globalY);
+				if(Point.distance(startPoint,endPoint) >= _maxDragDist){
+					return;
+				}
+				
+				
+				var buttonRect:Rectangle = _target.getBounds(_target.stage);
+				if (touch.globalX < buttonRect.x ||
+					touch.globalY < buttonRect.y ||
+					touch.globalX > buttonRect.x + buttonRect.width ||
+					touch.globalY > buttonRect.y+ buttonRect.height ){
+					return;
+				}
+				
+				if(_callBack){
+					if(_callBack.length == 0){
+						_callBack();
+					}else{
+						_callBack(touch);
 					}
 				}
 			}
