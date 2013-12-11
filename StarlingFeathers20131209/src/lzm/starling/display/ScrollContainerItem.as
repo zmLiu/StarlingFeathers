@@ -40,11 +40,13 @@ package lzm.starling.display
 		public override function set x(value:Number):void{
 			super.x = value;
 			_viewPort.x = value;
+			if(_scrollContainer) _scrollContainer.updateShowItems();
 		}
 		
 		public override function set y(value:Number):void{
 			super.y = value;
 			_viewPort.y = value;
+			if(_scrollContainer) _scrollContainer.updateShowItems();
 		}
 		
 		/**
