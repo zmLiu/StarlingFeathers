@@ -21,7 +21,7 @@ package lzm.starling.gestures
 		private var _tempScaleX:Number;
 		private var _tempScaleY:Number;
 		private var _needEffect:Boolean = false;//点击的时候时候需要一个效果
-		private var _maxDragDist:int = 64;//允许滑动的弹性范围
+		private var _maxDragDist:int = 24;//允许滑动的弹性范围
 		
 		public function TapGestures(target:DisplayObject,callBack:Function=null,needTapEffect:Boolean=false)
 		{
