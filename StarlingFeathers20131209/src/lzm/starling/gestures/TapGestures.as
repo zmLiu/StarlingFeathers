@@ -47,6 +47,9 @@ package lzm.starling.gestures
 			}else if(touch.phase == TouchPhase.MOVED){
 				
 			}else if(touch.phase == TouchPhase.ENDED){
+				if(startPoint == null){
+					return;
+				}
 				if(_needEffect){
 					resetTarget();
 				}
