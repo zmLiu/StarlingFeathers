@@ -10,6 +10,7 @@ package lzm.starling.swf
 	import lzm.starling.display.Button;
 	import lzm.starling.swf.display.ShapeImage;
 	import lzm.starling.swf.display.SwfMovieClip;
+	import lzm.util.Clone;
 	
 	import starling.display.DisplayObject;
 	import starling.display.Image;
@@ -56,9 +57,10 @@ package lzm.starling.swf
 		private var _swfUpdateManager:SwfUpdateManager;
 		
 		public function Swf(swfData:ByteArray,assets:AssetManager,fps:int=24){
-			swfData.uncompress();
+			var bytes:ByteArray = Clone.clone(swfData);
+			bytes.uncompress();
 			
-			this._swfDatas = JSON.parse(new String(swfData));
+			this._swfDatas = JSON.parse(new String(bytes));
 			this._assets = assets;
 			this._swfUpdateManager = new SwfUpdateManager(fps,stage);
 		}
