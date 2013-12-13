@@ -8,6 +8,7 @@ package lzm.starling.swf
 	import feathers.textures.Scale9Textures;
 	
 	import lzm.starling.display.Button;
+	import lzm.starling.swf.display.ShapeImage;
 	import lzm.starling.swf.display.SwfMovieClip;
 	
 	import starling.display.DisplayObject;
@@ -30,6 +31,7 @@ package lzm.starling.swf
 		public static const dataKey_TextField:String = "text";
 		public static const dataKey_Button:String = "btn";
 		public static const dataKey_Scale9:String = "s9";
+		public static const dataKey_ShapeImg:String = "shapeImg"
 		
 		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
 		
@@ -45,7 +47,8 @@ package lzm.starling.swf
 			"mc":createMovieClip,
 			"text":createTextField,
 			"btn":createButton,
-			"s9":createS9Image
+			"s9":createS9Image,
+			"shapeImg":createShapeImage
 		};
 		
 		private var _assets:AssetManager;
@@ -114,7 +117,7 @@ package lzm.starling.swf
 					
 				display.x = objData[2];
 				display.y = objData[3];
-				if(objData[1] != dataKey_Scale9){
+				if(objData[1] != dataKey_Scale9 && objData[1] != dataKey_ShapeImg){
 					display.scaleX = objData[4];
 					display.scaleY = objData[5];
 				}
@@ -197,6 +200,21 @@ package lzm.starling.swf
 			}
 			
 			return s9image;
+		}
+		
+		/**
+		 * 创建纹理填充图片
+		 * */
+		public function createShapeImage(name:String,data:Array=null):ShapeImage{
+			var imageData:Array = _swfDatas[dataKey_ShapeImg][name];
+			
+			var shapeImage:ShapeImage = new ShapeImage(_assets.getTexture(name));
+			
+			if(data){
+				shapeImage.setSize(data[10],data[11]);
+			}
+			
+			return shapeImage;
 		}
 		
 		public function createTextField(name:String,data:Array=null):TextField{
