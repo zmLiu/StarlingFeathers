@@ -10,6 +10,7 @@ package lzm.starling.swf
 	import lzm.starling.display.Button;
 	import lzm.starling.swf.display.ShapeImage;
 	import lzm.starling.swf.display.SwfMovieClip;
+	import lzm.starling.swf.display.SwfSprite;
 	import lzm.util.Clone;
 	
 	import starling.display.DisplayObject;
@@ -101,12 +102,12 @@ package lzm.starling.swf
 		/**
 		 * 创建sprite
 		 * */
-		public function createSprite(name:String,data:Array=null,sprData:Array=null):Sprite{
+		public function createSprite(name:String,data:Array=null,sprData:Array=null):SwfSprite{
 			if(sprData == null){
 				sprData = _swfDatas[dataKey_Sprite][name];
 			}
 			
-			var sprite:Sprite = new Sprite();
+			var sprite:SwfSprite = new SwfSprite();
 			var length:int = sprData.length;
 			var objData:Array;
 			var display:DisplayObject;
