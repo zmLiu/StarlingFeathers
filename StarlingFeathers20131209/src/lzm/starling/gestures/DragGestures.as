@@ -19,8 +19,7 @@ package lzm.starling.gestures
 		protected var _targetWidth:Number = NaN;
 		protected var _targetHeight:Number = NaN;
 		
-		public var cacheTargetSize:Boolean = true;//是否缓存目标大小
-		public var dragRect:Rectangle;//拖动范围
+		protected var _dragRect:Rectangle;//拖动范围
 		
 		public function DragGestures(target:DisplayObject, callBack:Function=null)
 		{
@@ -36,7 +35,7 @@ package lzm.starling.gestures
 				_target.y += movePoint.y - _downPoint.y;
 				_downPoint = movePoint;
 				
-				if(dragRect) checkTargetPosition();
+				if(_dragRect) checkTargetPosition();
 				
 				if(_callBack) _callBack();
 			}else if(touch.phase == TouchPhase.ENDED){
@@ -45,23 +44,45 @@ package lzm.starling.gestures
 		}
 		
 		protected function checkTargetPosition():void{
-			if(isNaN(_targetWidth) || isNaN(_targetHeight) || !cacheTargetSize){
-				_targetWidth = _target.width;
-				_targetHeight = _target.height;
+			if(_targetWidth * _target.scaleX > _dragRect.width){
+				if((_target.x - _target.pivotX*_target.scaleX) > _dragRect.x) 
+					_target.x = _target.pivotX*_target.scaleX + _dragRect.x;
+				
+				if((_target.x - _target.pivotX*_target.scaleX) < (_dragRect.width - _targetWidth*_target.scaleX - _dragRect.x)) 
+					_target.x = (_dragRect.width - _targetWidth*_target.scaleX  - _dragRect.x) + (_target.pivotX*_target.scaleX);
+			}else{
+				if((_target.x - _target.pivotX*_target.scaleX) < _dragRect.x) 
+					_target.x = _target.pivotX*_target.scaleX + _dragRect.x;
+				
+				if((_target.x - _target.pivotX*_target.scaleX) > (_dragRect.width - _targetWidth*_target.scaleX - _dragRect.x)) 
+					_target.x = (_dragRect.width - _targetWidth*_target.scaleX  - _dragRect.x) + (_target.pivotX*_target.scaleX);
 			}
 			
-			if((_target.x - _target.pivotX*_target.scaleX) > dragRect.x) 
-				_target.x = _target.pivotX*_target.scaleX + dragRect.x;
-			
-			if((_target.y - _target.pivotY*_target.scaleY) > dragRect.y) 
-				_target.y = _target.pivotY*_target.scaleY + dragRect.y;
-			
-			if((_target.x - _target.pivotX*_target.scaleX) < (dragRect.width - _targetWidth*_target.scaleX - dragRect.x)) 
-				_target.x = (dragRect.width - _targetWidth*_target.scaleX  - dragRect.x) + (_target.pivotX*_target.scaleX);
-			
-			if((_target.y - _target.pivotY*_target.scaleY) < (dragRect.height - _targetHeight*_target.scaleY - dragRect.y)) 
-				_target.y = (dragRect.height - _targetHeight*_target.scaleY - dragRect.y) + (_target.pivotY*_target.scaleY);
-			
+			if(_targetHeight * _target.scaleY > _dragRect.height){
+				if((_target.y - _target.pivotY*_target.scaleY) > _dragRect.y) 
+					_target.y = _target.pivotY*_target.scaleY + _dragRect.y;
+				
+				if((_target.y - _target.pivotY*_target.scaleY) < (_dragRect.height - _targetHeight*_target.scaleY - _dragRect.y)) 
+					_target.y = (_dragRect.height - _targetHeight*_target.scaleY - _dragRect.y) + (_target.pivotY*_target.scaleY);
+			}else{
+				if((_target.y - _target.pivotY*_target.scaleY) < _dragRect.y) 
+					_target.y = _target.pivotY*_target.scaleY + _dragRect.y;
+				
+				if((_target.y - _target.pivotY*_target.scaleY) > (_dragRect.height - _targetHeight*_target.scaleY - _dragRect.y)) 
+					_target.y = (_dragRect.height - _targetHeight*_target.scaleY - _dragRect.y) + (_target.pivotY*_target.scaleY);
+			}
+		}
+		
+		/**
+		 * 设置拖动范围 
+		 * @param dragRect		拖动范围
+		 * @param targetWidth	拖动对象的宽
+		 * @param targetHeight	拖动对象的高
+		 */		
+		public function setDragRectangle(dragRect:Rectangle,targetWidth:Number,targetHeight:Number):void{
+			_dragRect = dragRect;
+			_targetWidth = targetWidth;
+			_targetHeight = targetHeight;
 		}
 	}
 }
