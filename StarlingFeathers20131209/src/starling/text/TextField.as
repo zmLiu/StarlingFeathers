@@ -192,6 +192,10 @@ package starling.text
             var texture:Texture = Texture.fromBitmapData(bitmapData, false, false, scale, format);
             texture.root.onRestore = function():void
             {
+				if (mTextBounds == null)
+					mTextBounds = new Rectangle();
+				
+
                 texture.root.uploadBitmapData(renderText(scale, mTextBounds));
             };
             
