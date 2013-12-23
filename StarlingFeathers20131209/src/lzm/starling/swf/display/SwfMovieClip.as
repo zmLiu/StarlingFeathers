@@ -3,14 +3,13 @@ package lzm.starling.swf.display
 	import lzm.starling.swf.Swf;
 	
 	import starling.display.DisplayObject;
-	import starling.display.Sprite;
 	
 	/**
 	 * 
 	 * @author zmliu
 	 * 
 	 */	
-	public class SwfMovieClip extends Sprite
+	public class SwfMovieClip extends SwfSprite
 	{
 		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
 		
