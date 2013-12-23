@@ -3,13 +3,14 @@ package lzm.starling.swf.display
 	import lzm.starling.swf.Swf;
 	
 	import starling.display.DisplayObject;
+	import starling.display.Sprite;
 	
 	/**
 	 * 
 	 * @author zmliu
 	 * 
 	 */	
-	public class SwfMovieClip extends SwfSprite
+	public class SwfMovieClip extends Sprite
 	{
 		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
 		
@@ -224,6 +225,13 @@ package lzm.starling.swf.display
 		}
 		
 		/**
+		 * 返回当前播放的是哪一个标签
+		 * */
+		public function get currentLabel():String{
+			return _currentLabel;
+		}
+		
+		/**
 		 * 获取所有标签
 		 * */
 		public function get labels():Array{
@@ -239,7 +247,8 @@ package lzm.starling.swf.display
 		 * 是否包含某个标签
 		 * */
 		public function hasLabel(label:String):Boolean{
-			return !(_labels.indexOf(label) == -1);
+			var ls:Array = labels;
+			return !(ls.indexOf(label) == -1);
 		}
 		
 		/**
