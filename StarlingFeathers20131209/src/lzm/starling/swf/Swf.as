@@ -64,6 +64,8 @@ package lzm.starling.swf
 			this._swfDatas = JSON.parse(new String(bytes));
 			this._assets = assets;
 			this._swfUpdateManager = new SwfUpdateManager(fps,stage);
+			
+			bytes.clear();
 		}
 		
 		/**
