@@ -52,7 +52,7 @@ package lzm.starling.swf
 		}
 		
 		private function enterFrame(e:Event):void{
-			if(_fpsUtil.update()){
+			if(_fpsUtil &&_fpsUtil.update()){
 				for each (var mc:SwfMovieClip in _movieClips) {
 					if(mc.parent) mc.update();
 				}
