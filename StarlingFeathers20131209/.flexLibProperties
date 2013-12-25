@@ -4,6 +4,7 @@
     <classEntry path="lzm.starling.gestures.RotationGestures"/>
     <classEntry path="lzm.starling.gestures.ZoomGestures"/>
     <classEntry path="extend.PixelMaskDisplayObject"/>
+    <classEntry path="lzm.starling.display.GridMask"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
