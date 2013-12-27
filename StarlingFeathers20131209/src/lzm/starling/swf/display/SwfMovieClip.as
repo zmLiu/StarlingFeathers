@@ -115,7 +115,9 @@ package lzm.starling.swf.display
 					display["hAlign"] = data[15];
 					display["italic"] = data[16];
 					display["bold"] = data[17];
-					display["text"] = data[18];
+					if(data[18] && data[18] != "\r" && data[18] != ""){
+						display["text"] = data[18];
+					}
 				}
 				__useIndexs[data[0]] = (useIndex+1);
 			}
