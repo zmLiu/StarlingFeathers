@@ -238,6 +238,38 @@ package lzm.starling.swf
 			return textfield;
 		}
 		
+		/**
+		 * 合并swf数据 
+		 * @param swfData	需要合并的数据
+		 * 
+		 */		
+		public function mergerSwfData(swfData:Object):void{
+			var typeKey:String;
+			var typeData:Object;
+			
+			var objectKey:String;
+			for(typeKey in swfData){
+				typeData = swfData[typeKey];
+				for(objectKey in typeData){
+					this._swfDatas[typeKey][objectKey] = typeData[objectKey];
+				}
+			}
+		}
+		
+		/**
+		 * 合并swf数据 
+		 * @param mergerSwfDataBytes	需要合并的数据
+		 * 
+		 */		
+		public function mergerSwfDataBytes(swfDataBytes:ByteArray):void{
+			var bytes:ByteArray = Clone.clone(swfDataBytes);
+			bytes.uncompress();
+			
+			mergerSwfData(JSON.parse(new String(bytes)));
+			
+			bytes.clear();
+		}
+		
 		public function dispose(disposeAssets:Boolean):void{
 			_swfUpdateManager.dispose();
 			
