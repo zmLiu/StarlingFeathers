@@ -1,6 +1,7 @@
 package lzm.starling
 {
 	import flash.display.Sprite;
+	import flash.display3D.Context3DProfile;
 	import flash.geom.Rectangle;
 	import flash.system.Capabilities;
 	
@@ -55,7 +56,7 @@ package lzm.starling
 			
 			STLConstant.scale = viewPort.width > HDWidth ? 2 : 1;//Capabilities.screenDPI > 200 ? 2 : 1;
 			
-			_mStarling = new Starling(STLRootClass, stage, viewPort,null,"auto","baseline");
+			_mStarling = new Starling(STLRootClass, stage, viewPort,null,"auto",Context3DProfile.BASELINE_EXTENDED);
 			_mStarling.antiAliasing = 0;
 			_mStarling.stage.stageWidth  = width;
 			_mStarling.stage.stageHeight = height;
@@ -100,7 +101,7 @@ package lzm.starling
 			STLConstant.StageWidth = viewPort.width * (1/STLConstant.scale);
 			STLConstant.StageHeight = viewPort.height * (1/STLConstant.scale);
 			
-			_mStarling = new Starling(STLRootClass, stage, viewPort,null,"auto","baseline");
+			_mStarling = new Starling(STLRootClass, stage, viewPort,null,"auto",Context3DProfile.BASELINE_EXTENDED);
 			_mStarling.antiAliasing = 0;
 			_mStarling.stage.stageWidth  = STLConstant.StageWidth;
 			_mStarling.stage.stageHeight = STLConstant.StageHeight;
