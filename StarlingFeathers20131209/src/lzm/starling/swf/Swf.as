@@ -242,11 +242,15 @@ package lzm.starling.swf
 			return textfield;
 		}
 		
-		public function createComponent(name:String,data:Array=null):ISwfComponent{
+		public function createComponent(name:String,data:Array=null):*{
 			var sprData:Array = _swfDatas[dataKey_Componet][name];
 			var conponentContnt:SwfSprite = createSprite(name,data,sprData);
 			
 			var componentClass:Class = ComponentConfig.getComponentClass(name);
+			if(componentClass == null){
+				return conponentContnt;
+			}
+			
 			var component:ISwfComponent = new componentClass();
 			component.initialization(conponentContnt);
 			
