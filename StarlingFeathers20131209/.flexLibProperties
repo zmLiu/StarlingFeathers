@@ -5,6 +5,9 @@
     <classEntry path="lzm.starling.gestures.ZoomGestures"/>
     <classEntry path="extend.PixelMaskDisplayObject"/>
     <classEntry path="lzm.starling.display.GridMask"/>
+    <classEntry path="lzm.starling.swf.components.ComponentConfig"/>
+    <classEntry path="lzm.starling.swf.components.feathers.FeathersButton"/>
+    <classEntry path="lzm.starling.swf.components.ISwfComponent"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

@@ -8,6 +8,8 @@ package lzm.starling.swf
 	import feathers.textures.Scale9Textures;
 	
 	import lzm.starling.display.Button;
+	import lzm.starling.swf.components.ComponentConfig;
+	import lzm.starling.swf.components.ISwfComponent;
 	import lzm.starling.swf.display.ShapeImage;
 	import lzm.starling.swf.display.SwfMovieClip;
 	import lzm.starling.swf.display.SwfSprite;
@@ -33,7 +35,8 @@ package lzm.starling.swf
 		public static const dataKey_TextField:String = "text";
 		public static const dataKey_Button:String = "btn";
 		public static const dataKey_Scale9:String = "s9";
-		public static const dataKey_ShapeImg:String = "shapeImg"
+		public static const dataKey_ShapeImg:String = "shapeImg";
+		public static const dataKey_Componet:String = "comp";
 		
 		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
 		
@@ -50,7 +53,8 @@ package lzm.starling.swf
 			"text":createTextField,
 			"btn":createButton,
 			"s9":createS9Image,
-			"shapeImg":createShapeImage
+			"shapeImg":createShapeImage,
+			"comp":createComponent
 		};
 		
 		private var _assets:AssetManager;
@@ -236,6 +240,17 @@ package lzm.starling.swf
 				textfield.text = data[18];
 			}
 			return textfield;
+		}
+		
+		public function createComponent(name:String,data:Array=null):ISwfComponent{
+			var sprData:Array = _swfDatas[dataKey_Componet][name];
+			var conponentContnt:SwfSprite = createSprite(name,data,sprData);
+			
+			var componentClass:Class = ComponentConfig.getComponentClass(name);
+			var component:ISwfComponent = new componentClass();
+			component.initialization(conponentContnt);
+			
+			return component;
 		}
 		
 		/**

@@ -2,8 +2,6 @@ package lzm.starling.swf.display
 {
 	import feathers.display.Scale9Image;
 	
-	import lzm.starling.swf.display.SwfMovieClip;
-	
 	import starling.display.Button;
 	import starling.display.Image;
 	import starling.display.Sprite;
@@ -11,7 +9,7 @@ package lzm.starling.swf.display
 	
 	/**
 	 * 封装一层Sprite方便取各个类型的子对象
-	 * @author °无量	zmliu
+	 * @author °无量，zmliu
 	 */
 	public class SwfSprite extends Sprite 
 	{
@@ -48,6 +46,7 @@ package lzm.starling.swf.display
 		public function getShapeImage(name:String):ShapeImage{
 			return getChildByName(name) as ShapeImage;
 		}
+		
 		
 	}
 
