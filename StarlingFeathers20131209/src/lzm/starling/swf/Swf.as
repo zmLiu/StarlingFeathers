@@ -1,6 +1,5 @@
 package lzm.starling.swf
 {
-	import flash.display.Stage;
 	import flash.geom.Rectangle;
 	import flash.utils.ByteArray;
 	
@@ -40,10 +39,10 @@ package lzm.starling.swf
 		
 		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
 		
-		public static var stage:Stage;
+		public static var starlingRoot:Sprite;
 		
-		public static function init(stage:Stage):void{
-			Swf.stage = stage;
+		public static function init(starlingRoot:Sprite):void{
+			Swf.starlingRoot = starlingRoot;
 		}
 		
 		private const createFuns:Object = {
@@ -67,7 +66,7 @@ package lzm.starling.swf
 			
 			this._swfDatas = JSON.parse(new String(bytes));
 			this._assets = assets;
-			this._swfUpdateManager = new SwfUpdateManager(fps,stage);
+			this._swfUpdateManager = new SwfUpdateManager(fps,starlingRoot);
 			
 			bytes.clear();
 		}
@@ -136,6 +135,9 @@ package lzm.starling.swf
 				display.name = objData[9];
 				sprite.addChild(display);
 			}
+			
+			sprite.spriteName = name;
+			sprite.spriteData = sprData;
 			
 			return sprite;
 		}
@@ -253,6 +255,10 @@ package lzm.starling.swf
 			
 			var component:ISwfComponent = new componentClass();
 			component.initialization(conponentContnt);
+			
+			if(data[10] != null){
+				component.editableProperties = data[10];
+			}
 			
 			return component;
 		}
