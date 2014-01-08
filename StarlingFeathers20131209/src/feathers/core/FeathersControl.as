@@ -7,17 +7,18 @@ accordance with the terms of the accompanying license agreement.
 */
 package feathers.core
 {
-	import feathers.controls.text.BitmapFontTextRenderer;
-	import feathers.controls.text.StageTextTextEditor;
-	import feathers.events.FeathersEventType;
-	import feathers.layout.ILayoutData;
-	import feathers.layout.ILayoutDisplayObject;
-
 	import flash.errors.IllegalOperationError;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
-
+	
+	import feathers.controls.text.BitmapFontTextRenderer;
+	import feathers.controls.text.StageTextTextEditor;
+	import feathers.controls.text.TextFieldTextRenderer;
+	import feathers.events.FeathersEventType;
+	import feathers.layout.ILayoutData;
+	import feathers.layout.ILayoutDisplayObject;
+	
 	import starling.display.DisplayObject;
 	import starling.display.Sprite;
 	import starling.events.Event;
@@ -163,7 +164,8 @@ package feathers.core
 		 */
 		public static var defaultTextRendererFactory:Function = function():ITextRenderer
 		{
-			return new BitmapFontTextRenderer();
+//			return new BitmapFontTextRenderer();
+			return new TextFieldTextRenderer();
 		}
 
 		/**
