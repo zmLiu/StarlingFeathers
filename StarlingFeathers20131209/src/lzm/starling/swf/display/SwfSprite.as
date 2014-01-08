@@ -14,6 +14,15 @@ package lzm.starling.swf.display
 	public class SwfSprite extends Sprite 
 	{
 		
+		/**
+		 * sprite的类名
+		 * */
+		public var spriteName:String;
+		/**
+		 * sprite的数据
+		 * */
+		public var spriteData:Array;
+		
 		public function SwfSprite() 
 		{
 			

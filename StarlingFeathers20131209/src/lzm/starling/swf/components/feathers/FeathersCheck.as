@@ -54,5 +54,18 @@ package lzm.starling.swf.components.feathers
 			
 			componetContent.removeFromParent(true);
 		}
+		
+		public function get editableProperties():Object{
+			return {
+				label:label,
+				isSelected:isSelected
+			};
+		}
+		
+		public function set editableProperties(properties:Object):void{
+			for(var key:String in properties){
+				this[key] = properties[key];
+			}
+		}
 	}
 }

@@ -3,7 +3,6 @@ package lzm.starling.swf.components.feathers
 	import flash.text.TextFormat;
 	
 	import feathers.controls.Button;
-	import feathers.controls.text.TextFieldTextRenderer;
 	
 	import lzm.starling.swf.components.ISwfComponent;
 	import lzm.starling.swf.display.SwfSprite;
@@ -44,8 +43,17 @@ package lzm.starling.swf.components.feathers
 			componetContent.removeFromParent(true);
 		}
 		
-		private function textRendererFactory():TextFieldTextRenderer{
-			return new TextFieldTextRenderer();
+		public function get editableProperties():Object{
+			return {
+				label:label
+			};
 		}
+		
+		public function set editableProperties(properties:Object):void{
+			for(var key:String in properties){
+				this[key] = properties[key];
+			}
+		}
+		
 	}
 }

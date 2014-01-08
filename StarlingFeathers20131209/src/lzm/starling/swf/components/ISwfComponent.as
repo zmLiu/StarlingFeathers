@@ -9,5 +9,11 @@ package lzm.starling.swf.components
 		 * @param componetContent	组件的基础显示内容
 		 */	
 		function initialization(componetContent:SwfSprite):void;
+		
+		/**
+		 * 获取 / 设置 可编辑属性
+		 * */
+		function get editableProperties():Object;
+		function set editableProperties(properties:Object):void;
 	}
 }
