@@ -8,6 +8,7 @@
     <classEntry path="lzm.starling.swf.components.ComponentConfig"/>
     <classEntry path="lzm.starling.swf.components.feathers.FeathersButton"/>
     <classEntry path="lzm.starling.swf.components.ISwfComponent"/>
+    <classEntry path="lzm.starling.swf.components.feathers.FeathersCheck"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
