@@ -256,7 +256,7 @@ package lzm.starling.swf
 			var component:ISwfComponent = new componentClass();
 			component.initialization(conponentContnt);
 			
-			if(data[10] != null){
+			if(data && data[10] != null){
 				component.editableProperties = data[10];
 			}
 			
