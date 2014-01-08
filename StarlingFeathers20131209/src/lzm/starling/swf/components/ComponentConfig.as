@@ -2,6 +2,7 @@ package lzm.starling.swf.components
 {
 	import lzm.starling.swf.components.feathers.FeathersButton;
 	import lzm.starling.swf.components.feathers.FeathersCheck;
+	import lzm.starling.swf.components.feathers.FeathersProgressBar;
 	import lzm.starling.swf.components.feathers.FeathersTextInput;
 
 	public class ComponentConfig
@@ -10,7 +11,8 @@ package lzm.starling.swf.components
 		private static var componentClass:Object = {
 			"comp_feathers_button":FeathersButton,
 			"comp_feathers_check":FeathersCheck,
-			"comp_feathers_input":FeathersTextInput
+			"comp_feathers_input":FeathersTextInput,
+			"comp_feathers_progressbar":FeathersProgressBar
 		};
 		
 		/**
