@@ -386,6 +386,8 @@ package starling.utils
             mXmls = new Dictionary();
             mObjects = new Dictionary();
             mByteArrays = new Dictionary();
+			
+			clearRuntimeLoadTexture();
         }
         
         // queued adding
