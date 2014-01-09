@@ -45,7 +45,8 @@ package lzm.starling.swf.components.feathers
 		
 		public function get editableProperties():Object{
 			return {
-				label:label
+				label:label,
+				isEnabled:isEnabled
 			};
 		}
 		
