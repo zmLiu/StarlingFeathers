@@ -101,7 +101,7 @@ package lzm.starling.swf.display
 				}
 				display.mSkewX = data[6] * ANGLE_TO_RADIAN;
 				display.mSkewY = data[7] * ANGLE_TO_RADIAN;
-				display.mAlpha = data[8];
+				display.alpha = data[8];
 				display.mName = data[9];
 				display.mOrientationChanged = true;
 				addQuiackChild(display);
