@@ -34,7 +34,7 @@ package lzm.starling
 		 * @param pullUp	是否拉伸(不拉伸就留黑边)
 		 * 
 		 */		
-		protected function initStarlingWithWH(mainClass:Class,width:int,height:int,HDWidth:int=480,debug:Boolean=false,isPc:Boolean=false,pullUp:Boolean=false):void{
+		protected function initStarlingWithWH(mainClass:Class,width:int,height:int,HDWidth:int=480,debug:Boolean=false,isPc:Boolean=false,pullUp:Boolean=false,stage3DProfile:String="baselineConstrained"):void{
 			STLConstant.nativeStage = stage;
 			STLConstant.StageWidth = width;
 			STLConstant.StageHeight = height;
@@ -56,7 +56,7 @@ package lzm.starling
 			
 			STLConstant.scale = viewPort.width > HDWidth ? 2 : 1;//Capabilities.screenDPI > 200 ? 2 : 1;
 			
-			_mStarling = new Starling(STLRootClass, stage, viewPort,null,"auto",Context3DProfile.BASELINE_EXTENDED);
+			_mStarling = new Starling(STLRootClass, stage, viewPort,null,"auto",stage3DProfile);
 			_mStarling.antiAliasing = 0;
 			_mStarling.stage.stageWidth  = width;
 			_mStarling.stage.stageHeight = height;
@@ -88,7 +88,7 @@ package lzm.starling
 		 * @param isPc		是否是再web上运行
 		 * 
 		 */		
-		protected function initStarling(mainClass:Class,HDWidth:int=480,debug:Boolean=false,isPc:Boolean=false):void{
+		protected function initStarling(mainClass:Class,HDWidth:int=480,debug:Boolean=false,isPc:Boolean=false,stage3DProfile:String="baselineConstrained"):void{
 			STLConstant.nativeStage = stage;
 			
 			Starling.handleLostContext = !Mobile.isIOS();
@@ -101,7 +101,7 @@ package lzm.starling
 			STLConstant.StageWidth = viewPort.width * (1/STLConstant.scale);
 			STLConstant.StageHeight = viewPort.height * (1/STLConstant.scale);
 			
-			_mStarling = new Starling(STLRootClass, stage, viewPort,null,"auto",Context3DProfile.BASELINE_EXTENDED);
+			_mStarling = new Starling(STLRootClass, stage, viewPort,null,"auto",stage3DProfile);
 			_mStarling.antiAliasing = 0;
 			_mStarling.stage.stageWidth  = STLConstant.StageWidth;
 			_mStarling.stage.stageHeight = STLConstant.StageHeight;
