@@ -1,10 +1,10 @@
 // =================================================================================================
 //
-//	Starling Framework
-//	Copyright 2011 Gamua OG. All Rights Reserved.
+//        Starling Framework
+//        Copyright 2011 Gamua OG. All Rights Reserved.
 //
-//	This program is free software. You can redistribute and/or modify it
-//	in accordance with the terms of the accompanying license agreement.
+//        This program is free software. You can redistribute and/or modify it
+//        in accordance with the terms of the accompanying license agreement.
 //
 // =================================================================================================
 
@@ -191,6 +191,9 @@ package starling.textures
 		
 		/** @inheritDoc */
 		public override function get scale():Number { return mParent.scale; }
+		
+		/** @inheritDoc */
+		public override function get repeat():Boolean { return mParent.repeat; }
 		
 		/** @inheritDoc */
 		public override function get frame():Rectangle
