@@ -296,6 +296,8 @@ package starling.core
         public function dispose():void
         {
             stop(true);
+			
+			mContextValid = false;
             
             mNativeStage.removeEventListener(Event.ENTER_FRAME, onEnterFrame, false);
             mNativeStage.removeEventListener(KeyboardEvent.KEY_DOWN, onKey, false);
