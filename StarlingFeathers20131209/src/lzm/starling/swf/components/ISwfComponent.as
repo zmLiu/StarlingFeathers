@@ -4,6 +4,13 @@ package lzm.starling.swf.components
 
 	public interface ISwfComponent
 	{
+		
+		/**
+		 * 设置 /获取 组件名称
+		 * */
+		function get name():String;
+		function set name(value:String):void;
+		
 		/**
 		 * 初始化组件 
 		 * @param componetContent	组件的基础显示内容
