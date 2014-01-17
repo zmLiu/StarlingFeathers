@@ -122,6 +122,7 @@ package lzm.starling.swf
 				
 				fun = createFuns[objData[1]];
 				display = fun(objData[0],objData);
+				display.name = objData[9];
 				if(display is DisplayObject){
 					display.x = objData[2];
 					display.y = objData[3];
@@ -132,7 +133,6 @@ package lzm.starling.swf
 					display.skewX = objData[6] * ANGLE_TO_RADIAN;
 					display.skewY = objData[7] * ANGLE_TO_RADIAN;
 					display.alpha = objData[8];
-					display.name = objData[9];
 					sprite.addChild(display as DisplayObject);
 				}else if(display is ISwfComponent){
 					sprite.addComponent(display as ISwfComponent);
