@@ -2,6 +2,8 @@ package lzm.starling.swf.display
 {
 	import feathers.display.Scale9Image;
 	
+	import lzm.starling.swf.components.ISwfComponent;
+	
 	import starling.display.Button;
 	import starling.display.Image;
 	import starling.display.Sprite;
@@ -55,6 +57,16 @@ package lzm.starling.swf.display
 		public function getShapeImage(name:String):ShapeImage{
 			return getChildByName(name) as ShapeImage;
 		}
+		
+		
+		//---------------以下为非显示对象的组件--------//
+		public function addComponent(component:ISwfComponent):void{
+			
+		}
+		public function getComponent(name:String):ISwfComponent{
+			return null;
+		}
+		
 		
 		
 	}

@@ -115,25 +115,28 @@ package lzm.starling.swf
 			var sprite:SwfSprite = new SwfSprite();
 			var length:int = sprData.length;
 			var objData:Array;
-			var display:DisplayObject;
+			var display:Object;
 			var fun:Function;
 			for (var i:int = 0; i < length; i++) {
 				objData = sprData[i];
 				
 				fun = createFuns[objData[1]];
 				display = fun(objData[0],objData);
-					
-				display.x = objData[2];
-				display.y = objData[3];
-				if(objData[1] != dataKey_Scale9 && objData[1] != dataKey_ShapeImg){
-					display.scaleX = objData[4];
-					display.scaleY = objData[5];
+				if(display is DisplayObject){
+					display.x = objData[2];
+					display.y = objData[3];
+					if(objData[1] != dataKey_Scale9 && objData[1] != dataKey_ShapeImg){
+						display.scaleX = objData[4];
+						display.scaleY = objData[5];
+					}
+					display.skewX = objData[6] * ANGLE_TO_RADIAN;
+					display.skewY = objData[7] * ANGLE_TO_RADIAN;
+					display.alpha = objData[8];
+					display.name = objData[9];
+					sprite.addChild(display as DisplayObject);
+				}else if(display is ISwfComponent){
+					sprite.addComponent(display as ISwfComponent);
 				}
-				display.skewX = objData[6] * ANGLE_TO_RADIAN;
-				display.skewY = objData[7] * ANGLE_TO_RADIAN;
-				display.alpha = objData[8];
-				display.name = objData[9];
-				sprite.addChild(display);
 			}
 			
 			sprite.spriteName = name;
