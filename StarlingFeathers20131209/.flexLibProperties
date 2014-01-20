@@ -11,6 +11,7 @@
     <classEntry path="lzm.starling.swf.components.feathers.FeathersCheck"/>
     <classEntry path="lzm.starling.swf.components.feathers.FeathersTextInput"/>
     <classEntry path="lzm.starling.swf.components.feathers.FeathersProgressBar"/>
+    <classEntry path="lzm.starling.swf.components.propertyvalues.ArrayPropertys"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
