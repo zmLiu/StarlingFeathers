@@ -140,6 +140,7 @@ package lzm.starling.swf
 			}
 			
 			sprite.spriteName = name;
+			sprite.data = data;
 			sprite.spriteData = sprData;
 			
 			return sprite;

@@ -21,7 +21,11 @@ package lzm.starling.swf.display
 		 * */
 		public var spriteName:String;
 		/**
-		 * sprite的数据
+		 * sprite本身的数据 
+		 * */
+		public var data:Array;
+		/**
+		 * sprite child的数据
 		 * */
 		public var spriteData:Array;
 		
