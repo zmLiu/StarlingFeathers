@@ -105,6 +105,19 @@ package lzm.starling.swf
 		}
 		
 		/**
+		 * 创建显示对象
+		 * */
+		public function createDisplayObject(name:String):DisplayObject{
+			for(var k:String in createFuns){
+				if(_swfDatas[k] && _swfDatas[k][name]){
+					var fun:Function = createFuns[k];
+					return fun(name);
+				}
+			}
+			return null;
+		}
+		
+		/**
 		 * 创建sprite
 		 * */
 		public function createSprite(name:String,data:Array=null,sprData:Array=null):SwfSprite{
