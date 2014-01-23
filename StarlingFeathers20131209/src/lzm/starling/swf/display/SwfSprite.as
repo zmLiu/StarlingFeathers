@@ -2,9 +2,9 @@ package lzm.starling.swf.display
 {
 	import feathers.display.Scale9Image;
 	
+	import lzm.starling.display.Button;
 	import lzm.starling.swf.components.ISwfComponent;
 	
-	import starling.display.Button;
 	import starling.display.Image;
 	import starling.display.Sprite;
 	import starling.text.TextField;
