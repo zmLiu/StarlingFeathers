@@ -49,7 +49,7 @@ package lzm.starling.swf
 		private function enterFrame(e:EnterFrameEvent):void{
 			if(_fpsUtil &&_fpsUtil.update()){
 				for each (var mc:SwfMovieClip in _movieClips) {
-					if(mc.parent) mc.update();
+					if(mc.stage) mc.update();
 				}
 			}
 		}
