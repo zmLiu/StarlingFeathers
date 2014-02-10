@@ -71,13 +71,11 @@ package lzm.starling.swf.display
 		
 		
 		private var __frameInfos:Array;
-		private var __useIndexs:Object;
 		public function set currentFrame(frame:int):void{
 			clearChild();
 			
 			_currentFrame = frame;
 			__frameInfos = _frames[_currentFrame];
-			__useIndexs = {};
 			
 			var name:String;
 			var type:String;
@@ -87,14 +85,14 @@ package lzm.starling.swf.display
 			var length:int = __frameInfos.length;
 			for (var i:int = 0; i < length; i++) {
 				data = __frameInfos[i];
-				useIndex = __useIndexs[data[0]];
+				useIndex = data[10];
 				display = _displayObjects[data[0]][useIndex];
 				
 				display.mX = data[2];
 				display.mY = data[3];
 				if(data[1] == Swf.dataKey_Scale9){
-					display.width = data[10];
-					display.height = data[11];
+					display.width = data[11];
+					display.height = data[12];
 				}else{
 					display.mScaleX = data[4];
 					display.mScaleY = data[5];
@@ -107,19 +105,18 @@ package lzm.starling.swf.display
 				addQuiackChild(display);
 				
 				if(data[1] == Swf.dataKey_TextField){
-					display["width"] = data[10];
-					display["height"] = data[11];
-					display["fontName"] = data[12];
-					display["color"] = data[13];
-					display["fontSize"] = data[14];
-					display["hAlign"] = data[15];
-					display["italic"] = data[16];
-					display["bold"] = data[17];
-					if(data[18] && data[18] != "\r" && data[18] != ""){
-						display["text"] = data[18];
+					display["width"] = data[11];
+					display["height"] = data[12];
+					display["fontName"] = data[13];
+					display["color"] = data[14];
+					display["fontSize"] = data[15];
+					display["hAlign"] = data[16];
+					display["italic"] = data[17];
+					display["bold"] = data[18];
+					if(data[19] && data[19] != "\r" && data[19] != ""){
+						display["text"] = data[19];
 					}
 				}
-				__useIndexs[data[0]] = (useIndex+1);
 			}
 		}
 		
