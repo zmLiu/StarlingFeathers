@@ -19,6 +19,7 @@ package lzm.starling.swf
 	import starling.display.Sprite;
 	import starling.text.TextField;
 	import starling.textures.Texture;
+	import starling.textures.TextureSmoothing;
 	import starling.utils.AssetManager;
 	
 	/**
@@ -197,6 +198,8 @@ package lzm.starling.swf
 		public function createImage(name:String,data:Array=null):Image{
 			var imageData:Array = _swfDatas[dataKey_Image][name];
 			var image:Image = new Image(_assets.getTexture(name));
+			
+			image.smoothing = TextureSmoothing.NONE;
 			
 			image.pivotX = imageData[0];
 			image.pivotY = imageData[1];
