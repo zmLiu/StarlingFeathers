@@ -1,7 +1,6 @@
 package lzm.starling
 {
 	import flash.display.Sprite;
-	import flash.display3D.Context3DProfile;
 	import flash.geom.Rectangle;
 	import flash.system.Capabilities;
 	
