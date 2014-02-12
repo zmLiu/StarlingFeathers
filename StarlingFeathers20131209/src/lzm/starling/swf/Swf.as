@@ -42,6 +42,8 @@ package lzm.starling.swf
 		
 		public static var starlingRoot:Sprite;
 		
+		public static var textureSmoothing:String = TextureSmoothing.BILINEAR;
+		
 		public static function init(starlingRoot:Sprite):void{
 			Swf.starlingRoot = starlingRoot;
 		}
@@ -199,7 +201,7 @@ package lzm.starling.swf
 			var imageData:Array = _swfDatas[dataKey_Image][name];
 			var image:Image = new Image(_assets.getTexture(name));
 			
-			image.smoothing = TextureSmoothing.NONE;
+			image.smoothing = textureSmoothing;
 			
 			image.pivotX = imageData[0];
 			image.pivotY = imageData[1];
