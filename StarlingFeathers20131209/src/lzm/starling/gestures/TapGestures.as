@@ -84,5 +84,13 @@ package lzm.starling.gestures
 			_target.scaleY = _tempScaleY;
 		}
 		
+		public function get maxDragDist():int{
+			return _maxDragDist;
+		}
+		
+		public function set maxDragDist(value:int):void{
+			value = _maxDragDist;
+		}
+		
 	}
 }
