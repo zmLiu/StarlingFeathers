@@ -195,7 +195,7 @@ package starling.core
 		private static var sHandleLostContext:Boolean;
 		private static var sContextData:Dictionary = new Dictionary(true);
 		
-		private var _autoSkip:AutoSkip;
+		public var autoSkip:AutoSkip;
 		
 		// construction
 		
@@ -289,7 +289,7 @@ package starling.core
 				}
 			}
 			
-			_autoSkip = new AutoSkip(stage);
+			autoSkip = new AutoSkip(stage);
 		}
 		
 		/** Disposes all children of the stage and the render context; removes all registered
@@ -400,7 +400,7 @@ package starling.core
 			if (!mContextValid)
 				return;
 			
-			if(_autoSkip.requestFrameSkip())
+			if(autoSkip && autoSkip.requestFrameSkip())
 				return;
 			
 			makeCurrent();
