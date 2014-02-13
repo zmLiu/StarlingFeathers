@@ -42,7 +42,7 @@ package lzm.starling.swf
 		
 		public static var starlingRoot:Sprite;
 		
-		public static var textureSmoothing:String = TextureSmoothing.BILINEAR;
+		public var textureSmoothing:String = TextureSmoothing.BILINEAR;
 		
 		public static function init(starlingRoot:Sprite):void{
 			Swf.starlingRoot = starlingRoot;
@@ -167,7 +167,7 @@ package lzm.starling.swf
 		 * */
 		public function createMovieClip(name:String,data:Array=null):SwfMovieClip{
 			var movieClipData:Object = _swfDatas[dataKey_MovieClip][name];
-			
+			trace(name);
 			var objectCountData:Object = movieClipData["objCount"];
 			var displayObjects:Object = {};
 			var displayObjectArray:Array;
