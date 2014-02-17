@@ -153,6 +153,19 @@ package lzm.starling.swf.display
 		public function stop():void{
 			_isPlay = false;
 			_ownerSwf.swfUpdateManager.removeSwfMovieClip(this);
+			
+			var k:String;
+			var arr:Array;
+			var l:int;
+			for(k in _displayObjects){
+				if(k.indexOf(Swf.dataKey_MovieClip) == 0){
+					arr = _displayObjects[k];
+					l = arr.length;
+					for (var i:int = 0; i < l; i++) {
+						(arr[i] as SwfMovieClip).stop();
+					}
+				}
+			}
 		}
 		
 		public function gotoAndStop(frame:Object):void{
