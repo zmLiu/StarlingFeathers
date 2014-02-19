@@ -167,7 +167,6 @@ package lzm.starling.swf
 		 * */
 		public function createMovieClip(name:String,data:Array=null):SwfMovieClip{
 			var movieClipData:Object = _swfDatas[dataKey_MovieClip][name];
-			trace(name);
 			var objectCountData:Object = movieClipData["objCount"];
 			var displayObjects:Object = {};
 			var displayObjectArray:Array;
