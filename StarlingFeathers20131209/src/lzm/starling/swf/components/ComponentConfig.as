@@ -26,5 +26,20 @@ package lzm.starling.swf.components
 			}
 			return null;
 		}
+		
+		/**
+		 * 动态添加组件
+		 * */
+		public static function addComponentClass(compName:String,compClass:Class):void{
+			componentClass[compName] = compClass;
+		}
+		
+		/**
+		 * 移除组件
+		 * */
+		public static function removeComponentClass(compName:String):void{
+			delete componentClass[compName];
+		}
+		
 	}
 }
