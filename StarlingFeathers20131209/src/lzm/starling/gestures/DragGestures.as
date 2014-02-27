@@ -75,7 +75,7 @@ package lzm.starling.gestures
 		
 		/**
 		 * 设置拖动范围 
-		 * @param dragRect		拖动范围
+		 * @param dragRect		可视范围大小
 		 * @param targetWidth	拖动对象的宽
 		 * @param targetHeight	拖动对象的高
 		 */		
