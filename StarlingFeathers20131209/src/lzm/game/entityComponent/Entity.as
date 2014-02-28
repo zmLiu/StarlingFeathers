@@ -31,10 +31,10 @@ package lzm.game.entityComponent
 		/**
 		 * 添加子实体
 		 * */
-		public function addChildEntity(entity:Entity):void{
+		public function addChildEntity(entity:Entity):Entity{
 			if(entity._parentEntity){
 				if(entity._parentEntity == this){
-					return;
+					return entity;
 				}
 				entity._parentEntity.removeChildEntity(entity);
 			}
@@ -42,13 +42,15 @@ package lzm.game.entityComponent
 			_childEntitys.push(entity);
 			
 			addChild(entity);
+			
+			return entity;
 		}
 		
 		/**
 		 * 删除子实体
 		 * */
-		public function removeChildEntity(entity:Entity):void{
-			if(entity._parentEntity != this) return;
+		public function removeChildEntity(entity:Entity):Entity{
+			if(entity._parentEntity != this) return entity;
 			
 			entity._parentEntity = null;
 			
@@ -56,49 +58,52 @@ package lzm.game.entityComponent
 			_childEntitys.splice(index,1);
 
 			removeChild(entity);
+			
+			return entity;
 		}
 		
 		/**
 		 * 从父实体删除
 		 * */
-		public function removeFromParentEntity():void{
+		public function removeFromParentEntity():Entity{
 			if(_parentEntity) _parentEntity.removeChildEntity(this);
+			return this;
 		}
 		
 		/**
 		 * 根据类添加组件
 		 * @param componentType	组件的类
 		 */		
-		public function addComponentByType(componentType:Class):void{
+		public function addComponentByType(componentType:Class):EntityComponent{
 			var component:EntityComponent = new componentType() as EntityComponent;
-			addComponent(component);
+			return addComponent(component);
 		}
 		
 		/**
 		 * 添加组件
 		 * */
-		public function addComponent(component:EntityComponent):void{
+		public function addComponent(component:EntityComponent):EntityComponent{
 			if(component._entity) throw Error("组件已经被赋予了实体");
-			if(component._entity == this) return;
+			if(component._entity == this) return component;
 			
 			_components.push(component);
 			
 			component._entity = this;
 			component.start();
+			
+			return component;
 		}
 		
 		/**
 		 * 删除组件 
 		 * @param component	组件
-		 * @param dispose	是否销毁
-		 * 
 		 */		
-		public function removeComponent(component:EntityComponent,dispose:Boolean):void{
+		public function removeComponent(component:EntityComponent):EntityComponent{
 			var index:int = _components.indexOf(component);
 			if(index != -1){
 				_components.splice(index,1);
-				if(dispose) component.dispose();
 			}
+			return component;
 		}
 		
 		/**
