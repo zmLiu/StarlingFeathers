@@ -29,6 +29,10 @@ package lzm.game.entityComponent
 			
 		}
 		
+		public function stop():void{
+			
+		}
+		
 		public function dispose():void{
 			_entity = null;
 		}

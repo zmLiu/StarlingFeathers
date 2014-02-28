@@ -101,6 +101,7 @@ package lzm.game.entityComponent
 		public function removeComponent(component:EntityComponent):EntityComponent{
 			var index:int = _components.indexOf(component);
 			if(index != -1){
+				component.stop();
 				_components.splice(index,1);
 			}
 			return component;
