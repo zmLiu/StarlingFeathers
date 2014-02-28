@@ -12,6 +12,8 @@
     <classEntry path="lzm.starling.swf.components.feathers.FeathersTextInput"/>
     <classEntry path="lzm.starling.swf.components.feathers.FeathersProgressBar"/>
     <classEntry path="lzm.starling.swf.components.propertyvalues.ArrayPropertys"/>
+    <classEntry path="lzm.game.entityComponent.components.effects.BlurComponent"/>
+    <classEntry path="lzm.game.entityComponent.components.gestures.DragGesturesComponent"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
