@@ -21,6 +21,8 @@ package lzm.starling.gestures
 		
 		protected var _dragRect:Rectangle;//拖动范围
 		
+		protected var _isDrag:Boolean = false;
+		
 		public function DragGestures(target:DisplayObject, callBack:Function=null)
 		{
 			super(target, callBack);
@@ -38,8 +40,12 @@ package lzm.starling.gestures
 				if(_dragRect) checkTargetPosition();
 				
 				if(_callBack) _callBack();
+				
+				_isDrag = true;
 			}else if(touch.phase == TouchPhase.ENDED){
 				_downPoint = null;
+				
+				_isDrag = false;
 			}
 		}
 		
