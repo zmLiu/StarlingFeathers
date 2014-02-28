@@ -149,10 +149,13 @@ package lzm.starling.swf.display
 		
 		/**
 		 * 停止
+		 * @param	stopChild	是否停止子动画
 		 * */
-		public function stop():void{
+		public function stop(stopChild:Boolean = true):void{
 			_isPlay = false;
 			_ownerSwf.swfUpdateManager.removeSwfMovieClip(this);
+			
+			if(!stopChild) return;
 			
 			var k:String;
 			var arr:Array;
@@ -162,15 +165,15 @@ package lzm.starling.swf.display
 					arr = _displayObjects[k];
 					l = arr.length;
 					for (var i:int = 0; i < l; i++) {
-						(arr[i] as SwfMovieClip).stop();
+						(arr[i] as SwfMovieClip).stop(stopChild);
 					}
 				}
 			}
 		}
 		
-		public function gotoAndStop(frame:Object):void{
+		public function gotoAndStop(frame:Object,stopChild:Boolean = true):void{
 			goTo(frame);
-			stop();
+			stop(stopChild);
 		}
 		
 		public function gotoAndPlay(frame:Object):void{
