@@ -1,4 +1,4 @@
-package lzm.game.entityComponent
+package lzm.starling.entityComponent
 {
 	import starling.display.Sprite;
 
@@ -72,10 +72,11 @@ package lzm.game.entityComponent
 		
 		/**
 		 * 根据类添加组件
-		 * @param componentType	组件的类
+		 * @param 	componentType	组件的类
+		 * @param	componentParams	组件初始化参数
 		 */		
-		public function addComponentByType(componentType:Class):EntityComponent{
-			var component:EntityComponent = new componentType() as EntityComponent;
+		public function addComponentByType(componentType:Class,componentParams:* = null):EntityComponent{
+			var component:EntityComponent = componentParams == null ? new componentType() : new componentType(componentParams);
 			return addComponent(component);
 		}
 		
@@ -105,6 +106,19 @@ package lzm.game.entityComponent
 				_components.splice(index,1);
 			}
 			return component;
+		}
+		
+		/**
+		 * 清理所有组件
+		 * */
+		public function clearComponent():void{
+			var len:int = _components.length;
+			var component:EntityComponent;
+			for (var i:int = 0; i < len; i++) {
+				component = _components.pop();
+				component.stop();
+				component.dispose();
+			}
 		}
 		
 		/**

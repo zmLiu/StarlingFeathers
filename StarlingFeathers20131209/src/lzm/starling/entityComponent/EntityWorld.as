@@ -1,4 +1,4 @@
-package lzm.game.entityComponent
+package lzm.starling.entityComponent
 {
 	import starling.events.EnterFrameEvent;
 	import starling.events.Event;
@@ -26,6 +26,11 @@ package lzm.game.entityComponent
 		 * */
 		public function stop():void{
 			removeEventListener(Event.ENTER_FRAME,enterFrame);
+		}
+		
+		public override function dispose():void{
+			stop();
+			super.dispose();
 		}
 	}
 }

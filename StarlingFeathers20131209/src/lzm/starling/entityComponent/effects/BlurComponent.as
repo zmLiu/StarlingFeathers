@@ -1,6 +1,6 @@
-package lzm.game.entityComponent.components.effects
+package lzm.starling.entityComponent.effects
 {
-	import lzm.game.entityComponent.EntityComponent;
+	import lzm.starling.entityComponent.EntityComponent;
 	
 	import starling.display.DisplayObject;
 	import starling.display.Image;

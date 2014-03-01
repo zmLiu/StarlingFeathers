@@ -1,6 +1,6 @@
-package lzm.game.entityComponent.components.gestures 
+package lzm.starling.entityComponent.gestures 
 {
-	import lzm.game.entityComponent.EntityComponent;
+	import lzm.starling.entityComponent.EntityComponent;
 	import lzm.starling.gestures.DragGestures;
 	
 	/**

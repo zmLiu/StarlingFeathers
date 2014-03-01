@@ -1,4 +1,4 @@
-package lzm.game.entityComponent
+package lzm.starling.entityComponent
 {
 	public class EntityComponent
 	{
