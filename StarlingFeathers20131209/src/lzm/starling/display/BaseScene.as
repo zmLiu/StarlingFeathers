@@ -5,13 +5,12 @@ package lzm.starling.display
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.setTimeout;
 	
-	import lzm.starling.display.Button;
+	import lzm.starling.entityComponent.EntityWorld;
 	
 	import starling.display.DisplayObject;
 	import starling.display.DisplayObjectContainer;
 	import starling.display.Image;
 	import starling.display.Quad;
-	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.textures.Texture;
 	
@@ -19,7 +18,7 @@ package lzm.starling.display
 	 * 公用场景
 	 * @author lzm
 	 */	
-	public class BaseScene extends Sprite
+	public class BaseScene extends EntityWorld
 	{
 		public static const EVENT_BULIDERCOMPLETE:String = "EVENT_BULIDERCOMPLETE";
 		
