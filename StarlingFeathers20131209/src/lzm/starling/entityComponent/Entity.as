@@ -164,6 +164,13 @@ package lzm.starling.entityComponent
 			return _parentEntity;
 		}
 		
+		/**
+		 * 获取子实体
+		 * */
+		public function get childEntitys():Vector.<Entity>{
+			return _childEntitys;
+		}
+		
 		public override function dispose():void{
 			for each (var component:EntityComponent in _components) {
 				component.dispose();
