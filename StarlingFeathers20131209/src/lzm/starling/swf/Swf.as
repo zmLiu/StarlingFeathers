@@ -197,8 +197,11 @@ package lzm.starling.swf
 		 * 创建图片
 		 * */
 		public function createImage(name:String,data:Array=null):Image{
+			var texture:Texture = _assets.getTexture(name);
+			if(texture == null)
+				throw new Error("Texture \"" + name +"\" not exist");
 			var imageData:Array = _swfDatas[dataKey_Image][name];
-			var image:Image = new Image(_assets.getTexture(name));
+			var image:Image = new Image(texture);
 			
 			image.smoothing = textureSmoothing;
 			
