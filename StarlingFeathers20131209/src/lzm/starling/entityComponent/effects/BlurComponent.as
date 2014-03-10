@@ -17,8 +17,8 @@ package lzm.starling.entityComponent.effects
 		private var entityLastX:int;//实体最后所在的位置
 		private var entityLastY:int;
 		
-		private var alphaSpeed:Number = 0.05;
-		private var updateSpeed:int = 3;
+		public var alphaSpeed:Number = 0.05;
+		public var updateSpeed:int = 3;
 		private var currentUpdateTime:int = 0;
 		
 		public function BlurComponent()
