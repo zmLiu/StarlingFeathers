@@ -15,6 +15,8 @@ package lzm.starling.swf
 		private var _currentTime:Number;
 		private var _lastFrameTimestamp:Number;
 		
+		private var _pause:Boolean = false;
+		
 		public function FPSUtil(fps:int)
 		{
 			this.fps = fps;
@@ -32,6 +34,8 @@ package lzm.starling.swf
 		}
 		
 		public function update():Boolean{
+			if(_pause) return false;
+			
 			var now:Number = getTimer() / 1000.0;
 			var passedTime:Number = now - _lastFrameTimestamp;
 			_lastFrameTimestamp = now;
@@ -45,6 +49,14 @@ package lzm.starling.swf
 				return true;
 			}
 			return false;
+		}
+		
+		public function pause():void{
+			_pause = true;
+		}
+		
+		public function resume():void{
+			_pause = false;
 		}
 		
 	}
