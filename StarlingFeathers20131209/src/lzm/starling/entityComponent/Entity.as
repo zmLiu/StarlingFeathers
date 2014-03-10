@@ -105,6 +105,7 @@ package lzm.starling.entityComponent
 				component.stop();
 				_components.splice(index,1);
 			}
+			component._entity = null;
 			return component;
 		}
 		
@@ -173,7 +174,7 @@ package lzm.starling.entityComponent
 		
 		public override function dispose():void{
 			for each (var component:EntityComponent in _components) {
-				component.dispose();
+				removeComponent(component).dispose();
 			}
 			_components = null;
 			
