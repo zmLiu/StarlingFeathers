@@ -231,6 +231,10 @@ package lzm.starling.swf.display
 			_completeFunction = value;
 		}
 		
+		public function get completeFunction():Function{
+			return _completeFunction;
+		}
+		
 		/**
 		 * 总共有多少帧
 		 * */
