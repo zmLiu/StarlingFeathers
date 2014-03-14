@@ -56,12 +56,12 @@ package lzm.starling.swf.display
 				_currentFrame = _startFrame - 1;
 				
 				if(!_loop){
-					stop();
+					stop(false);
 					return;
 				}
 				
 				if(_startFrame == _endFrame){//只有一帧就不要循环下去了
-					stop();
+					stop(false);
 					return;
 				}
 			}else{
