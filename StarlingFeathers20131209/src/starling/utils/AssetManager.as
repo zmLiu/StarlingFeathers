@@ -923,7 +923,7 @@ package starling.utils
                 name = name.replace(/%20/g, " "); // URLs use '%20' for spaces
                 matches = /(.*[\\\/])?(.+)(\.[\w]{1,4})/.exec(name);
                 
-                if (matches && matches.length == 4) return matches[2];
+                if (matches && matches.length == 4) return decodeURI(matches[2]);
                 else throw new ArgumentError("Could not extract name from String '" + rawAsset + "'");
             }
             else
