@@ -16,6 +16,10 @@ package lzm.starling.entityComponent
 			_childEntitys = new Vector.<Entity>();
 		}
 		
+		
+		
+		
+		
 		/**
 		 * 更新方法
 		 * */
@@ -43,8 +47,13 @@ package lzm.starling.entityComponent
 			
 			addChild(entity);
 			
+			entity.onAddToParentEntity();
+			
 			return entity;
 		}
+		
+		/** 被添加到父级实体 的 回掉函数 */
+		public function onAddToParentEntity():void{}
 		
 		/**
 		 * 删除子实体
@@ -59,8 +68,13 @@ package lzm.starling.entityComponent
 
 			removeChild(entity);
 			
+			entity.onRemoveFromParentEntity();
+			
 			return entity;
 		}
+		
+		/** 父级实体移除 的 回掉函数 */
+		public function onRemoveFromParentEntity():void{}
 		
 		/**
 		 * 从父实体删除
