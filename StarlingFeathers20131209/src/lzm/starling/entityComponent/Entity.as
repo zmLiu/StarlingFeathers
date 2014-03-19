@@ -36,6 +36,14 @@ package lzm.starling.entityComponent
 		 * 添加子实体
 		 * */
 		public function addChildEntity(entity:Entity):Entity{
+			addChildEntityAt(entity,numChildren);
+			return entity;
+		}
+		
+		/**
+		 * 添加子实体
+		 * */
+		public function addChildEntityAt(entity:Entity,index:int):Entity{
 			if(entity._parentEntity){
 				if(entity._parentEntity == this){
 					return entity;
@@ -45,7 +53,7 @@ package lzm.starling.entityComponent
 			entity._parentEntity = this;
 			_childEntitys.push(entity);
 			
-			addChild(entity);
+			addChildAt(entity,index);
 			
 			entity.onAddToParentEntity();
 			
