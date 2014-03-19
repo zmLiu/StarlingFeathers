@@ -44,7 +44,12 @@ package lzm.starling.swf
 		
 		public var textureSmoothing:String = TextureSmoothing.BILINEAR;
 		
+		private static var _isInit:Boolean = false;//是否已经初始化
 		public static function init(starlingRoot:Sprite):void{
+			if(_isInit) return;
+
+			_isInit = true;
+			
 			Swf.starlingRoot = starlingRoot;
 		}
 		
@@ -64,6 +69,9 @@ package lzm.starling.swf
 		private var _swfUpdateManager:SwfUpdateManager;
 		
 		public function Swf(swfData:ByteArray,assets:AssetManager,fps:int=24){
+			if(!_isInit){
+				throw new Error("要使用Swf，请先调用Swf.init");
+			}
 			var bytes:ByteArray = Clone.clone(swfData);
 			bytes.uncompress();
 			
@@ -121,6 +129,13 @@ package lzm.starling.swf
 		}
 		
 		/**
+		 * 是否有某个Sprite
+		 * */
+		public function hasSprite(name:String):Boolean{
+			return _swfDatas[dataKey_Sprite][name] != null;
+		}
+		
+		/**
 		 * 创建sprite
 		 * */
 		public function createSprite(name:String,data:Array=null,sprData:Array=null):SwfSprite{
@@ -163,6 +178,13 @@ package lzm.starling.swf
 		}
 		
 		/**
+		 * 是否有某个MovieClip
+		 * */
+		public function hasMovieClip(name:String):Boolean{
+			return _swfDatas[dataKey_MovieClip][name] != null;
+		}
+		
+		/**
 		 * 创建movieclip
 		 * */
 		public function createMovieClip(name:String,data:Array=null):SwfMovieClip{
@@ -194,6 +216,13 @@ package lzm.starling.swf
 		}
 		
 		/**
+		 * 是否有某个Image
+		 * */
+		public function hasImage(name:String):Boolean{
+			return _swfDatas[dataKey_Image][name] != null;
+		}
+		
+		/**
 		 * 创建图片
 		 * */
 		public function createImage(name:String,data:Array=null):Image{
@@ -212,12 +241,26 @@ package lzm.starling.swf
 		}
 		
 		/**
+		 * 是否有某个Button
+		 * */
+		public function hasButton(name:String):Boolean{
+			return _swfDatas[dataKey_Button][name] != null;
+		}
+		
+		/**
 		 * 创建按钮
 		 * */
 		public function createButton(name:String,data:Array=null):Button{
 			var sprData:Array = _swfDatas[dataKey_Button][name];
 			var skin:Sprite = createSprite(null,null,sprData);
 			return new Button(skin);
+		}
+		
+		/**
+		 * 是否有某个S9Image
+		 * */
+		public function hasS9Image(name:String):Boolean{
+			return _swfDatas[dataKey_Scale9][name] != null;
 		}
 		
 		/**
@@ -235,6 +278,13 @@ package lzm.starling.swf
 			}
 			
 			return s9image;
+		}
+		
+		/**
+		 * 是否有某个S9Image
+		 * */
+		public function hasShapeImage(name:String):Boolean{
+			return _swfDatas[dataKey_ShapeImg][name] != null;
 		}
 		
 		/**
@@ -266,6 +316,13 @@ package lzm.starling.swf
 				textfield.text = data[18];
 			}
 			return textfield;
+		}
+		
+		/**
+		 * 是有有某个组件 
+		 */		
+		public function hasComponent(name:String):Boolean{
+			return _swfDatas[dataKey_Componet][name] != null;
 		}
 		
 		public function createComponent(name:String,data:Array=null):*{
