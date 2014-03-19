@@ -1,6 +1,8 @@
 package lzm.starling.entityComponent
 {
-	public class EntityComponent
+	import starling.events.EventDispatcher;
+
+	public class EntityComponent extends EventDispatcher
 	{
 		/**
 		 * 组件属于哪一个Entity
@@ -35,6 +37,8 @@ package lzm.starling.entityComponent
 		
 		public function dispose():void{
 			_entity = null;
+			
+			removeEventListeners();
 		}
 	}
 }
