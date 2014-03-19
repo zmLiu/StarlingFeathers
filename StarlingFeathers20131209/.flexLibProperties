@@ -14,6 +14,7 @@
     <classEntry path="lzm.starling.swf.components.propertyvalues.ArrayPropertys"/>
     <classEntry path="lzm.starling.entityComponent.effects.BlurComponent"/>
     <classEntry path="lzm.starling.entityComponent.gestures.DragGesturesComponent"/>
+    <classEntry path="lzm.starling.swf.SwfAssetManager"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
