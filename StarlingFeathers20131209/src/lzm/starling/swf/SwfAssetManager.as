@@ -59,6 +59,19 @@ package lzm.starling.swf
 		}
 		
 		/**
+		 * 批量添加swf到加载队列 
+		 * @param swfs	[[swf名字1,[swf资源1,swf资源2]],[swf名字1,[swf资源1,swf资源2]]]
+		 */		
+		public function enqueueWithArray(swfs:Array):void{
+			var len:int = swfs.length;
+			var swfAsset:Array;
+			for (var i:int = 0; i < len; i++) {
+				swfAsset = swfs[i];
+				enqueue(swfAsset[0],swfAsset[1]);
+			}
+		}
+		
+		/**
 		 * 开始加载队列 
 		 */		
 		public function loadQueue(onProgress:Function):void{
@@ -69,20 +82,29 @@ package lzm.starling.swf
 			
 			var swfAsset:Array;
 			var numSwfAsset:int = _loadQueue.length;
-			var currentRatio:Number;
+			var currentRatio:Number = 0;
+			var avgRatio:Number = 1 / numSwfAsset;
 			
 			if(numSwfAsset == 0){
 				log("没有需要加载的Swf");
+				onProgress(1);
 				return;
 			}
 			
 			_isLoading = true;
 			
-			load();
+			loadNext();
+			
+			function loadNext():void{
+				swfAsset = _loadQueue.shift();
+				if(getSwf(swfAsset[0]) != null){
+					loadNext();
+				}else{
+					load();
+				}
+			}
 			
 			function load():void{
-				swfAsset = _loadQueue.shift();
-				
 				var swfName:String = swfAsset[0];
 				var swfResource:Array = swfAsset[1];
 				var assetManager:AssetManager = new AssetManager(_scaleFactor,_useMipmaps);
@@ -95,15 +117,15 @@ package lzm.starling.swf
 				
 				assetManager.loadQueue(function(ratio:Number):void{
 					if(ratio == 1){
-						loadComplete(swfName,assetManager);
+						addSwf(swfName,new Swf(assetManager.getByteArray(swfName),assetManager));
+						loadComplete();
+					}else{
+						onProgress(currentRatio + avgRatio*ratio);
 					}
 				});
 			}
 			
-			function loadComplete(swfName:String,assetManager:AssetManager):void{
-				var swf:Swf = new Swf(assetManager.getByteArray(swfName),assetManager);
-				addSwf(swfName,swf);
-				
+			function loadComplete():void{
 				currentRatio = _loadQueue.length ? 1.0 - (_loadQueue.length / numSwfAsset) : 1.0;
 				
 				onProgress(currentRatio);
@@ -111,10 +133,9 @@ package lzm.starling.swf
 				if(currentRatio == 1){
 					_isLoading = false;
 				}else{
-					load();
+					loadNext();
 				}
 			}
-			
 		}
 		
 		/**
@@ -126,13 +147,15 @@ package lzm.starling.swf
 		}
 		
 		/** 添加一个swf */
-		public function addSwf(name:String,swf:Swf):void{
+		public function addSwf(name:String,swf:Swf):Boolean{
 			if(getSwf(name) != null){
 				log("Swf已经存在");
+				return false;
 			}else{
 				log("添加Swf:"+name);
 				_swfs[name] = swf;
 			}
+			return true;
 		}
 		
 		/** 删除一个swf */
