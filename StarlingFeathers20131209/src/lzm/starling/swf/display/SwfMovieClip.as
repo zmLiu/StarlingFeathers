@@ -3,6 +3,9 @@ package lzm.starling.swf.display
 	import lzm.starling.swf.Swf;
 	
 	import starling.display.DisplayObject;
+	import starling.events.Event;
+	
+	[Event(name="complete", type="starling.events.Event")]
 	
 	/**
 	 * 
@@ -29,6 +32,7 @@ package lzm.starling.swf.display
 		private var _autoUpdate:Boolean = true;//是否自动更新
 		
 		private var _completeFunction:Function = null;//播放完毕的回调
+		private var _hasCompleteListener:Boolean = false;//是否监听过播放完毕的事件
 		
 		public function SwfMovieClip(frames:Array,labels:Array,displayObjects:Object,ownerSwf:Swf){
 			super();
@@ -52,6 +56,7 @@ package lzm.starling.swf.display
 			_currentFrame += 1;
 			if(_currentFrame > _endFrame){
 				if(_completeFunction) _completeFunction(this);
+				if(_hasCompleteListener) dispatchEventWith(Event.COMPLETE);
 				
 				_currentFrame = _startFrame - 1;
 				
@@ -282,6 +287,21 @@ package lzm.starling.swf.display
 			}else if(!_autoUpdate && _isPlay){
 				_ownerSwf.swfUpdateManager.removeSwfMovieClip(this);
 			}
+		}
+		
+		public override function addEventListener(type:String, listener:Function):void{
+			super.addEventListener(type,listener);
+			_hasCompleteListener = hasEventListener(Event.COMPLETE);
+		}
+		
+		public override function removeEventListener(type:String, listener:Function):void{
+			super.removeEventListener(type,listener);
+			_hasCompleteListener = hasEventListener(Event.COMPLETE);
+		}
+		
+		public override function removeEventListeners(type:String=null):void{
+			super.removeEventListeners(type);
+			_hasCompleteListener = hasEventListener(Event.COMPLETE);
 		}
 		
 		public override function dispose():void{
