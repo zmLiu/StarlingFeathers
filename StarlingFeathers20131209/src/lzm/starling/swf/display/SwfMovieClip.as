@@ -24,7 +24,7 @@ package lzm.starling.swf.display
 		private var _currentFrame:int;
 		private var _currentLabel:String;
 		
-		private var _isPlay:Boolean = true;
+		private var _isPlay:Boolean = false;
 		private var _loop:Boolean = true;
 		private var _autoUpdate:Boolean = true;//是否自动更新
 		
@@ -39,11 +39,11 @@ package lzm.starling.swf.display
 			
 			_startFrame = 0;
 			_endFrame = _frames.length - 1;
-			_currentFrame = -1;
-			
 			_ownerSwf = ownerSwf;
 			
 			currentFrame = 0;
+			
+			play();
 		}
 		
 		public function update():void{
@@ -129,7 +129,6 @@ package lzm.starling.swf.display
 		 * */
 		public function play():void{
 			_isPlay = true;
-			_currentFrame = _startFrame - 1;
 			
 			if(_autoUpdate) _ownerSwf.swfUpdateManager.addSwfMovieClip(this);
 			
