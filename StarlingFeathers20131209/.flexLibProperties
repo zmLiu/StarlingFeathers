@@ -15,6 +15,11 @@
     <classEntry path="lzm.starling.entityComponent.effects.BlurComponent"/>
     <classEntry path="lzm.starling.entityComponent.gestures.DragGesturesComponent"/>
     <classEntry path="lzm.starling.swf.SwfAssetManager"/>
+    <classEntry path="lzm.starling.swf.display.ISwfAnimation"/>
+    <classEntry path="lzm.starling.swf.display.SwfParticleSyetem"/>
+    <classEntry path="lzm.starling.swf.display.SwfImage"/>
+    <classEntry path="lzm.starling.swf.display.SwfButton"/>
+    <classEntry path="lzm.starling.swf.display.SwfScale9Image"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
