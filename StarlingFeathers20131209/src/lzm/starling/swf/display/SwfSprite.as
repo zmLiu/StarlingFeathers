@@ -5,6 +5,8 @@ package lzm.starling.swf.display
 	import lzm.starling.display.Button;
 	import lzm.starling.swf.components.ISwfComponent;
 	
+	import starling.display.DisplayObject;
+	import starling.display.DisplayObjectContainer;
 	import starling.display.Image;
 	import starling.display.Sprite;
 	import starling.text.TextField;
@@ -67,6 +69,33 @@ package lzm.starling.swf.display
 		}
 		public function getComponent(name:String):ISwfComponent{
 			return null;
+		}
+		
+		protected var _color:uint;
+		/** 设置 / 获取 颜色 */
+		public function set color(value:uint):void{
+			_color = value;
+			setDisplayColor(this,_color);
+		}
+		public function get color():uint{
+			return _color;
+		}
+		
+		protected function setDisplayColor(display:DisplayObject,color:uint):void{
+			if(display is Image){
+				(display as Image).color = color;
+			}else if(display is DisplayObjectContainer){
+				var displayObjectContainer:DisplayObjectContainer = display as DisplayObjectContainer;
+				var numChild:int = displayObjectContainer.numChildren;
+				for (var i:int = 0; i < numChild; i++) {
+					display = displayObjectContainer.getChildAt(i);
+					if(display is DisplayObjectContainer){
+						setDisplayColor(display as DisplayObjectContainer,color);
+					}else if(display is Image){
+						(display as Image).color = color;
+					}
+				}
+			}
 		}
 		
 		

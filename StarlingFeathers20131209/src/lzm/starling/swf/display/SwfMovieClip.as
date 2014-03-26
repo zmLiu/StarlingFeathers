@@ -270,6 +270,18 @@ package lzm.starling.swf.display
 			return returnLabels;
 		}
 		
+		public override function set color(value:uint):void{
+			_color = value;
+			
+			var len:int;
+			for each (var displayArray:Array in _displayObjects) {
+				len = displayArray.length;
+				for (var i:int = 0; i < len; i++) {
+					setDisplayColor(displayArray[i],_color);
+				}
+			}
+		}
+		
 		/**
 		 * 是否包含某个标签
 		 * */
