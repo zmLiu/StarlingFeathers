@@ -16,10 +16,8 @@ package lzm.starling.swf.display
 	public class SwfSprite extends Sprite 
 	{
 		
-		/**
-		 * sprite的类名
-		 * */
-		public var spriteName:String;
+		/** 导出的链接名 */
+		public var classLink:String;
 		/**
 		 * sprite本身的数据 
 		 * */
@@ -58,8 +56,8 @@ package lzm.starling.swf.display
 			return getChildByName(name) as Scale9Image;
 		}
 		
-		public function getShapeImage(name:String):ShapeImage{
-			return getChildByName(name) as ShapeImage;
+		public function getShapeImage(name:String):SwfShapeImage{
+			return getChildByName(name) as SwfShapeImage;
 		}
 		
 		

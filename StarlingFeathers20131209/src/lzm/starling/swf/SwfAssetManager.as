@@ -5,8 +5,8 @@ package lzm.starling.swf
 	import feathers.display.Scale9Image;
 	
 	import lzm.starling.display.Button;
-	import lzm.starling.swf.display.ShapeImage;
 	import lzm.starling.swf.display.SwfMovieClip;
+	import lzm.starling.swf.display.SwfShapeImage;
 	import lzm.starling.swf.display.SwfSprite;
 	
 	import starling.display.Image;
@@ -26,6 +26,7 @@ package lzm.starling.swf
 		private var _isLoading:Boolean;
 		
 		private var _swfs:Dictionary;
+		private var _swfNames:Array;
 		
 		private var _scaleFactor:Number;
 		private var _useMipmaps:Boolean;
@@ -36,6 +37,7 @@ package lzm.starling.swf
 			_isLoading = false;
 			
 			_swfs = new Dictionary();
+			_swfNames = [];
 			
 			_scaleFactor = scaleFactor;
 			_useMipmaps = useMipmaps;
@@ -45,8 +47,9 @@ package lzm.starling.swf
 		 * 添加一个swf到队列中 
 		 * @param name		swf名字
 		 * @param resource	swf所需的资源集合
+		 * @param fps		swf创建之后的帧率
 		 */		
-		public function enqueue(name:String,resource:Array):void{
+		public function enqueue(name:String,resource:Array,fps:int=24):void{
 			if(_isLoading){
 				log("正在加载中。请稍后再试");
 				return;
@@ -54,20 +57,24 @@ package lzm.starling.swf
 			if(getSwf(name) != null){
 				log("Swf已经存在");
 			}else{
-				_loadQueue.push([name,resource]);
+				_loadQueue.push([name,resource,fps]);
 			}
 		}
 		
 		/**
 		 * 批量添加swf到加载队列 
-		 * @param swfs	[[swf名字1,[swf资源1,swf资源2]],[swf名字1,[swf资源1,swf资源2]]]
+		 * @param swfs	[[swf名字1,[swf资源1,swf资源2],swf帧率(可选)],[swf名字1,[swf资源1,swf资源2],swf帧率(可选)]]
 		 */		
 		public function enqueueWithArray(swfs:Array):void{
 			var len:int = swfs.length;
 			var swfAsset:Array;
 			for (var i:int = 0; i < len; i++) {
 				swfAsset = swfs[i];
-				enqueue(swfAsset[0],swfAsset[1]);
+				if(swfAsset.length == 3){
+					enqueue(swfAsset[0],swfAsset[1],swfAsset[2]);
+				}else{
+					enqueue(swfAsset[0],swfAsset[1]);
+				}
 			}
 		}
 		
@@ -107,6 +114,7 @@ package lzm.starling.swf
 			function load():void{
 				var swfName:String = swfAsset[0];
 				var swfResource:Array = swfAsset[1];
+				var swfFps:int = swfAsset[2];
 				var assetManager:AssetManager = new AssetManager(_scaleFactor,_useMipmaps);
 				
 				assetManager.verbose = verbose;
@@ -117,7 +125,7 @@ package lzm.starling.swf
 				
 				assetManager.loadQueue(function(ratio:Number):void{
 					if(ratio == 1){
-						addSwf(swfName,new Swf(assetManager.getByteArray(swfName),assetManager));
+						addSwf(swfName,new Swf(assetManager.getByteArray(swfName),assetManager,swfFps));
 						loadComplete();
 					}else{
 						onProgress(currentRatio + avgRatio*ratio);
@@ -154,6 +162,7 @@ package lzm.starling.swf
 			}else{
 				log("添加Swf:"+name);
 				_swfs[name] = swf;
+				_swfNames.push(name);
 			}
 			return true;
 		}
@@ -166,6 +175,8 @@ package lzm.starling.swf
 					swf.dispose(dispose);
 				}
 				delete _swfs[name];
+				
+				_swfNames.splice(_swfNames.indexOf(name),1);
 			}
 		}
 		
@@ -175,6 +186,14 @@ package lzm.starling.swf
 				swf.dispose(true);
 			}
 			_swfs = new Dictionary();
+			_swfNames = [];
+		}
+		
+		/**
+		 * 获取当前所有已经加载swf的名字
+		 * */
+		public function get swfNames():Array{
+			return _swfNames.slice();
 		}
 		
 		/** 创建Sprite */
@@ -203,7 +222,7 @@ package lzm.starling.swf
 			return null;
 		}
 		/** 创建ShapeImage */
-		public function createShapeImage(name:String):ShapeImage{
+		public function createShapeImage(name:String):SwfShapeImage{
 			for each (var swf:Swf in _swfs) if(swf.hasShapeImage(name)) return swf.createShapeImage(name);
 			return null;
 		}

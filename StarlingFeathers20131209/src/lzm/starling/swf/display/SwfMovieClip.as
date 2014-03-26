@@ -12,7 +12,7 @@ package lzm.starling.swf.display
 	 * @author zmliu
 	 * 
 	 */	
-	public class SwfMovieClip extends SwfSprite
+	public class SwfMovieClip extends SwfSprite implements ISwfAnimation
 	{
 		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
 		
@@ -29,7 +29,6 @@ package lzm.starling.swf.display
 		
 		private var _isPlay:Boolean = false;
 		private var _loop:Boolean = true;
-		private var _autoUpdate:Boolean = true;//是否自动更新
 		
 		private var _completeFunction:Function = null;//播放完毕的回调
 		private var _hasCompleteListener:Boolean = false;//是否监听过播放完毕的事件
@@ -93,8 +92,18 @@ package lzm.starling.swf.display
 				useIndex = data[10];
 				display = _displayObjects[data[0]][useIndex];
 				
-				display.mX = data[2];
-				display.mY = data[3];
+				display.mOrientationChanged = true;
+				display.mSkewX = data[6] * ANGLE_TO_RADIAN;
+				display.mSkewY = data[7] * ANGLE_TO_RADIAN;
+				display.alpha = data[8];
+				display.mName = data[9];
+				
+				if(data[1] == Swf.dataKey_Particle){
+					display["setPostion"](data[2],data[3]);
+				}else{
+					display.mX = data[2];
+					display.mY = data[3];
+				}
 				if(data[1] == Swf.dataKey_Scale9){
 					display.width = data[11];
 					display.height = data[12];
@@ -102,11 +111,7 @@ package lzm.starling.swf.display
 					display.mScaleX = data[4];
 					display.mScaleY = data[5];
 				}
-				display.mSkewX = data[6] * ANGLE_TO_RADIAN;
-				display.mSkewY = data[7] * ANGLE_TO_RADIAN;
-				display.alpha = data[8];
-				display.mName = data[9];
-				display.mOrientationChanged = true;
+				
 				addQuiackChild(display);
 				
 				if(data[1] == Swf.dataKey_TextField){
@@ -135,7 +140,7 @@ package lzm.starling.swf.display
 		public function play():void{
 			_isPlay = true;
 			
-			if(_autoUpdate) _ownerSwf.swfUpdateManager.addSwfMovieClip(this);
+			_ownerSwf.swfUpdateManager.addSwfAnimation(this);
 			
 			var k:String;
 			var arr:Array;
@@ -157,7 +162,7 @@ package lzm.starling.swf.display
 		 * */
 		public function stop(stopChild:Boolean = true):void{
 			_isPlay = false;
-			_ownerSwf.swfUpdateManager.removeSwfMovieClip(this);
+			_ownerSwf.swfUpdateManager.removeSwfAnimation(this);
 			
 			if(!stopChild) return;
 			
@@ -273,22 +278,6 @@ package lzm.starling.swf.display
 			return !(ls.indexOf(label) == -1);
 		}
 		
-		/**
-		 * 设置 / 获取 动画是否自动更新
-		 * */
-		public function get autoUpdate():Boolean{
-			return _autoUpdate;
-		}
-		
-		public function set autoUpdate(value:Boolean):void{
-			_autoUpdate = value;
-			if(_autoUpdate && _isPlay){
-				_ownerSwf.swfUpdateManager.addSwfMovieClip(this);
-			}else if(!_autoUpdate && _isPlay){
-				_ownerSwf.swfUpdateManager.removeSwfMovieClip(this);
-			}
-		}
-		
 		public override function addEventListener(type:String, listener:Function):void{
 			super.addEventListener(type,listener);
 			_hasCompleteListener = hasEventListener(Event.COMPLETE);
@@ -305,7 +294,7 @@ package lzm.starling.swf.display
 		}
 		
 		public override function dispose():void{
-			_ownerSwf.swfUpdateManager.removeSwfMovieClip(this);
+			_ownerSwf.swfUpdateManager.removeSwfAnimation(this);
 			_ownerSwf = null;
 			super.dispose();
 		}

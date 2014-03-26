@@ -10,9 +10,12 @@ package lzm.starling.swf.display
 	 * @author zmliu
 	 * 
 	 */	
-	public class ShapeImage extends TiledImage
+	public class SwfShapeImage extends TiledImage
 	{
-		public function ShapeImage(texture:Texture)
+		/** 导出的链接名 */
+		public var classLink:String;
+		
+		public function SwfShapeImage(texture:Texture)
 		{
 			super(texture,texture.scale);
 			smoothing = TextureSmoothing.NONE;

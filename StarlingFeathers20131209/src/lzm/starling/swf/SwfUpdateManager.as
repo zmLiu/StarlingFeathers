@@ -1,6 +1,6 @@
 package lzm.starling.swf
 {
-	import lzm.starling.swf.display.SwfMovieClip;
+	import lzm.starling.swf.display.ISwfAnimation;
 	
 	import starling.display.Sprite;
 	import starling.events.EnterFrameEvent;
@@ -17,39 +17,39 @@ package lzm.starling.swf
 		private var _starlingRoot:Sprite;
 		private var _fpsUtil:FPSUtil;
 		
-		private var _movieClips:Vector.<SwfMovieClip>;
+		private var _animations:Vector.<ISwfAnimation>;
 		
 		public function SwfUpdateManager(fps:int,starlingRoot:Sprite){
 			_fpsUtil = new FPSUtil(fps);
 			_starlingRoot = starlingRoot;
 			
-			_movieClips = new Vector.<SwfMovieClip>();
+			_animations = new Vector.<ISwfAnimation>();
 		}
 		
-		public function addSwfMovieClip(movieClip:SwfMovieClip):void{
-			var index:int = _movieClips.indexOf(movieClip);
+		public function addSwfAnimation(animation:ISwfAnimation):void{
+			var index:int = _animations.indexOf(animation);
 			if(index == -1){
-				_movieClips.push(movieClip);
-				if(_movieClips.length == 1){
+				_animations.push(animation);
+				if(_animations.length == 1){
 					_starlingRoot.addEventListener(Event.ENTER_FRAME,enterFrame);
 				}
 			}
 		}
 		
-		public function removeSwfMovieClip(movieClip:SwfMovieClip):void{
-			var index:int = _movieClips.indexOf(movieClip);
+		public function removeSwfAnimation(animation:ISwfAnimation):void{
+			var index:int = _animations.indexOf(animation);
 			if(index != -1){
-				_movieClips.splice(index,1);
+				_animations.splice(index,1);
 			}
-			if(_movieClips.length == 0){
+			if(_animations.length == 0){
 				_starlingRoot.removeEventListener(Event.ENTER_FRAME,enterFrame);
 			}
 		}
 		
 		private function enterFrame(e:EnterFrameEvent):void{
 			if(_fpsUtil &&_fpsUtil.update()){
-				for each (var mc:SwfMovieClip in _movieClips) {
-					if(mc.stage) mc.update();
+				for each (var animation:ISwfAnimation in _animations) {
+					if(animation.stage) animation.update();
 				}
 			}
 		}
@@ -67,7 +67,7 @@ package lzm.starling.swf
 			
 			_starlingRoot = null;
 			_fpsUtil = null;
-			_movieClips = null;
+			_animations = null;
 		}
 		
 		

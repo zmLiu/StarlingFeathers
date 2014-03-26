@@ -14,7 +14,6 @@ package extend.particlesystem
     import flash.utils.clearTimeout;
     import flash.utils.setTimeout;
     
-    import starling.core.Starling;
     import starling.textures.Texture;
     import starling.utils.deg2rad;
     
@@ -226,7 +225,7 @@ package extend.particlesystem
             mEmitterXVariance = parseFloat(config.sourcePositionVariance.attribute("x"));
             mEmitterYVariance = parseFloat(config.sourcePositionVariance.attribute("y"));
             mGravityX = parseFloat(config.gravity.attribute("x"));
-            mGravityY = -parseFloat(config.gravity.attribute("y"));
+            mGravityY = parseFloat(config.gravity.attribute("y"));
             mEmitterType = getIntValue(config.emitterType);
             mMaxNumParticles = getIntValue(config.maxParticles);
             mLifespan = Math.max(0.01, getFloatValue(config.particleLifeSpan));
@@ -419,19 +418,21 @@ package extend.particlesystem
 		 */		
 		public function startPD(callBack:Function=null,delayTime:int = 100):void{
 			super.start(mDuration);
-			Starling.juggler.add(this);
+			
 			if(!isNaN(timeoutId)) clearTimeout(timeoutId);
 			
 			if(mDuration == -1 || mDuration == Number.MAX_VALUE) return;
 			
-			timeoutId = setTimeout(function():void{
-				if(callBack) callBack();
-			},((mDuration * 1000) + delayTime));
+			if(callBack){
+				timeoutId = setTimeout(function():void{
+					callBack();
+				},((mDuration * 1000) + delayTime));
+			}
 		}
 		
 		public override function stop(clearParticles:Boolean=false):void{
 			super.stop(clearParticles);
-			Starling.juggler.remove(this);
+			
 			if(!isNaN(timeoutId)) clearTimeout(timeoutId);
 		}
 		

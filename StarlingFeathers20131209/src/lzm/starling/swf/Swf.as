@@ -3,19 +3,20 @@ package lzm.starling.swf
 	import flash.geom.Rectangle;
 	import flash.utils.ByteArray;
 	
-	import feathers.display.Scale9Image;
 	import feathers.textures.Scale9Textures;
 	
-	import lzm.starling.display.Button;
 	import lzm.starling.swf.components.ComponentConfig;
 	import lzm.starling.swf.components.ISwfComponent;
-	import lzm.starling.swf.display.ShapeImage;
+	import lzm.starling.swf.display.SwfButton;
+	import lzm.starling.swf.display.SwfImage;
 	import lzm.starling.swf.display.SwfMovieClip;
+	import lzm.starling.swf.display.SwfParticleSyetem;
+	import lzm.starling.swf.display.SwfScale9Image;
+	import lzm.starling.swf.display.SwfShapeImage;
 	import lzm.starling.swf.display.SwfSprite;
 	import lzm.util.Clone;
 	
 	import starling.display.DisplayObject;
-	import starling.display.Image;
 	import starling.display.Sprite;
 	import starling.text.TextField;
 	import starling.textures.Texture;
@@ -37,6 +38,7 @@ package lzm.starling.swf
 		public static const dataKey_Scale9:String = "s9";
 		public static const dataKey_ShapeImg:String = "shapeImg";
 		public static const dataKey_Componet:String = "comp";
+		public static const dataKey_Particle:String = "particle";
 		
 		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
 		
@@ -61,12 +63,16 @@ package lzm.starling.swf
 			"btn":createButton,
 			"s9":createS9Image,
 			"shapeImg":createShapeImage,
-			"comp":createComponent
+			"comp":createComponent,
+			"particle":createParticle
 		};
 		
 		private var _assets:AssetManager;
 		private var _swfDatas:Object;
 		private var _swfUpdateManager:SwfUpdateManager;
+		private var _passedTime:Number;
+		
+		private var _particleXML:Object;
 		
 		public function Swf(swfData:ByteArray,assets:AssetManager,fps:int=24){
 			if(!_isInit){
@@ -78,6 +84,8 @@ package lzm.starling.swf
 			this._swfDatas = JSON.parse(new String(bytes));
 			this._assets = assets;
 			this._swfUpdateManager = new SwfUpdateManager(fps,starlingRoot);
+			this._passedTime = 1000 / fps * 0.001;
+			this._particleXML = {};
 			
 			bytes.clear();
 		}
@@ -108,11 +116,16 @@ package lzm.starling.swf
 		 * 设置/获取 帧频率
 		 * */
 		public function set fps(value:int):void{
+			_passedTime = 1000 / value * 0.001;
 			_swfUpdateManager.fps = value;
 		}
 		
 		public function get fps():int{
 			return _swfUpdateManager.fps;
+		}
+		
+		public function get passedTime():Number{
+			return _passedTime;
 		}
 		
 		/**
@@ -169,10 +182,10 @@ package lzm.starling.swf
 					sprite.addComponent(display as ISwfComponent);
 				}
 			}
-			
-			sprite.spriteName = name;
 			sprite.data = data;
 			sprite.spriteData = sprData;
+			
+			sprite.classLink = name;
 			
 			return sprite;
 		}
@@ -212,6 +225,8 @@ package lzm.starling.swf
 			var mc:SwfMovieClip = new SwfMovieClip(movieClipData["frames"],movieClipData["labels"],displayObjects,this);
 			mc.loop = movieClipData["loop"];
 			
+			mc.classLink = name;
+			
 			return mc;
 		}
 		
@@ -225,17 +240,19 @@ package lzm.starling.swf
 		/**
 		 * 创建图片
 		 * */
-		public function createImage(name:String,data:Array=null):Image{
+		public function createImage(name:String,data:Array=null):SwfImage{
 			var texture:Texture = _assets.getTexture(name);
 			if(texture == null)
 				throw new Error("Texture \"" + name +"\" not exist");
 			var imageData:Array = _swfDatas[dataKey_Image][name];
-			var image:Image = new Image(texture);
+			var image:SwfImage = new SwfImage(texture);
 			
 			image.smoothing = textureSmoothing;
 			
 			image.pivotX = imageData[0];
 			image.pivotY = imageData[1];
+			
+			image.classLink = name;
 			
 			return image;
 		}
@@ -250,10 +267,12 @@ package lzm.starling.swf
 		/**
 		 * 创建按钮
 		 * */
-		public function createButton(name:String,data:Array=null):Button{
+		public function createButton(name:String,data:Array=null):SwfButton{
 			var sprData:Array = _swfDatas[dataKey_Button][name];
 			var skin:Sprite = createSprite(null,null,sprData);
-			return new Button(skin);
+			var button:SwfButton = new SwfButton(skin);
+			button.classLink = name;
+			return button;
 		}
 		
 		/**
@@ -266,16 +285,18 @@ package lzm.starling.swf
 		/**
 		 * 创建9宫格图片
 		 * */
-		public function createS9Image(name:String,data:Array=null):Scale9Image{
+		public function createS9Image(name:String,data:Array=null):SwfScale9Image{
 			var scale9Data:Array = _swfDatas[dataKey_Scale9][name];
 			var texture:Texture = _assets.getTexture(name);
 			var s9Texture:Scale9Textures = new Scale9Textures(texture,new Rectangle(scale9Data[0],scale9Data[1],scale9Data[2],scale9Data[3]));
-			var s9image:Scale9Image = new Scale9Image(s9Texture,_assets.scaleFactor);
+			var s9image:SwfScale9Image = new SwfScale9Image(s9Texture,_assets.scaleFactor);
 			
 			if(data){
 				s9image.width = data[10];
 				s9image.height = data[11];
 			}
+			
+			s9image.classLink = name;
 			
 			return s9image;
 		}
@@ -290,14 +311,16 @@ package lzm.starling.swf
 		/**
 		 * 创建纹理填充图片
 		 * */
-		public function createShapeImage(name:String,data:Array=null):ShapeImage{
+		public function createShapeImage(name:String,data:Array=null):SwfShapeImage{
 			var imageData:Array = _swfDatas[dataKey_ShapeImg][name];
 			
-			var shapeImage:ShapeImage = new ShapeImage(_assets.getTexture(name));
+			var shapeImage:SwfShapeImage = new SwfShapeImage(_assets.getTexture(name));
 			
 			if(data){
 				shapeImage.setSize(data[10],data[11]);
 			}
+			
+			shapeImage.classLink = name;
 			
 			return shapeImage;
 		}
@@ -342,6 +365,37 @@ package lzm.starling.swf
 			}
 			
 			return component;
+		}
+		
+		/**
+		 * 是否有某个粒子
+		 * */
+		public function hasParticle(name:String):Boolean{
+			return _swfDatas[dataKey_Particle][name];
+		}
+		
+		/** 
+		 * 创建粒子
+		 * */
+		public function createParticle(name:String,data:Array=null):SwfParticleSyetem{
+			var particleData:Array = _swfDatas[dataKey_Particle][name];
+			
+			var textureName:String = particleData[1];
+			var texture:Texture = _assets.getTexture(textureName);
+			if(texture == null)
+				throw new Error("Texture \"" + name +"\" not exist");
+			
+			var xml:XML = _particleXML[name];
+			if(xml == null){
+				xml = new XML(particleData[0]);
+				_particleXML[name] = xml;
+			}
+			
+			var particle:SwfParticleSyetem = new SwfParticleSyetem(xml,texture,this);
+			
+			particle.classLink = name;
+			
+			return particle;
 		}
 		
 		/**
