@@ -52,12 +52,11 @@ package lzm.starling.swf.display
 		public function update():void{
 			if (!_isPlay) return;
 			
-			_currentFrame += 1;
 			if(_currentFrame > _endFrame){
 				if(_completeFunction) _completeFunction(this);
 				if(_hasCompleteListener) dispatchEventWith(Event.COMPLETE);
 				
-				_currentFrame = _startFrame - 1;
+				_currentFrame = _startFrame;
 				
 				if(!_loop){
 					stop(false);
@@ -68,9 +67,11 @@ package lzm.starling.swf.display
 					stop(false);
 					return;
 				}
+				currentFrame = _startFrame;
 			}else{
 				currentFrame = _currentFrame;
 			}
+			_currentFrame += 1;
 		}
 		
 		
