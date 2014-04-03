@@ -37,7 +37,7 @@ package lzm.starling.swf
 		public static const dataKey_Button:String = "btn";
 		public static const dataKey_Scale9:String = "s9";
 		public static const dataKey_ShapeImg:String = "shapeImg";
-		public static const dataKey_Componet:String = "comp";
+		public static const dataKey_Component:String = "comp";
 		public static const dataKey_Particle:String = "particle";
 		
 		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
@@ -345,11 +345,11 @@ package lzm.starling.swf
 		 * 是有有某个组件 
 		 */		
 		public function hasComponent(name:String):Boolean{
-			return _swfDatas[dataKey_Componet][name] != null;
+			return _swfDatas[dataKey_Component][name] != null;
 		}
 		
 		public function createComponent(name:String,data:Array=null):*{
-			var sprData:Array = _swfDatas[dataKey_Componet][name];
+			var sprData:Array = _swfDatas[dataKey_Component][name];
 			var conponentContnt:SwfSprite = createSprite(name,data,sprData);
 			
 			var componentClass:Class = ComponentConfig.getComponentClass(name);
