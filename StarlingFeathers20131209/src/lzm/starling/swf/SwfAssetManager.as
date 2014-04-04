@@ -31,6 +31,12 @@ package lzm.starling.swf
 		private var _scaleFactor:Number;
 		private var _useMipmaps:Boolean;
 		
+		private static const ______otherAssetsTag:String = "______otherAssetsTag";
+		private var _otherAssets:AssetManager;//用于加载其他资源
+		private var _otherQueue:Array;
+		
+		
+		
 		public function SwfAssetManager(scaleFactor:Number=1, useMipmaps:Boolean=false)
 		{
 			_loadQueue = [];
@@ -41,6 +47,9 @@ package lzm.starling.swf
 			
 			_scaleFactor = scaleFactor;
 			_useMipmaps = useMipmaps;
+			
+			_otherAssets = new AssetManager(scaleFactor,useMipmaps);
+			_otherQueue = [];
 		}
 		
 		/**
@@ -66,6 +75,10 @@ package lzm.starling.swf
 		 * @param swfs	[[swf名字1,[swf资源1,swf资源2],swf帧率(可选)],[swf名字1,[swf资源1,swf资源2],swf帧率(可选)]]
 		 */		
 		public function enqueueWithArray(swfs:Array):void{
+			if(_isLoading){
+				log("正在加载中。请稍后再试");
+				return;
+			}
 			var len:int = swfs.length;
 			var swfAsset:Array;
 			for (var i:int = 0; i < len; i++) {
@@ -79,6 +92,27 @@ package lzm.starling.swf
 		}
 		
 		/**
+		 * 加载其他资源
+		 * */
+		public function enqueueOtherAssets(...rawAssets):void{
+			if(_isLoading){
+				log("正在加载中。请稍后再试");
+				return;
+			}
+			for each (var rawAsset:Object in rawAssets) {
+				_otherQueue.push(rawAsset);
+			}
+		}
+		
+		/** 将需要加载的资源推入队列 */
+		private function parseOtherAssets():void{
+			if(_otherQueue.length > 0){
+				enqueue(______otherAssetsTag,_otherQueue.slice());
+			}
+			_otherQueue = [];
+		}
+		
+		/**
 		 * 开始加载队列 
 		 */		
 		public function loadQueue(onProgress:Function):void{
@@ -86,6 +120,8 @@ package lzm.starling.swf
 				log("正在加载中。请稍后再试");
 				return;
 			}
+			
+			parseOtherAssets();
 			
 			var swfAsset:Array;
 			var numSwfAsset:int = _loadQueue.length;
@@ -115,7 +151,7 @@ package lzm.starling.swf
 				var swfName:String = swfAsset[0];
 				var swfResource:Array = swfAsset[1];
 				var swfFps:int = swfAsset[2];
-				var assetManager:AssetManager = new AssetManager(_scaleFactor,_useMipmaps);
+				var assetManager:AssetManager = swfName == ______otherAssetsTag ? _otherAssets : new AssetManager(_scaleFactor,_useMipmaps);
 				
 				assetManager.verbose = verbose;
 				
@@ -125,7 +161,9 @@ package lzm.starling.swf
 				
 				assetManager.loadQueue(function(ratio:Number):void{
 					if(ratio == 1){
-						addSwf(swfName,new Swf(assetManager.getByteArray(swfName),assetManager,swfFps));
+						if(swfName != ______otherAssetsTag){
+							addSwf(swfName,new Swf(assetManager.getByteArray(swfName),assetManager,swfFps));
+						}
 						loadComplete();
 					}else{
 						onProgress(currentRatio + avgRatio*ratio);
@@ -230,6 +268,10 @@ package lzm.starling.swf
 		public function createComponent(name:String):*{
 			for each (var swf:Swf in _swfs) if(swf.hasComponent(name)) return swf.createComponent(name);
 			return null;
+		}
+		
+		public function get otherAssets():AssetManager{
+			return _otherAssets;
 		}
 		
 		public function get verbose():Boolean { return _verbose; }
