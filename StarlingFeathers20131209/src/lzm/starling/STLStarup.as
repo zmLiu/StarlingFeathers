@@ -33,7 +33,7 @@ package lzm.starling
 		 * @param pullUp	是否拉伸(不拉伸就留黑边)
 		 * 
 		 */		
-		protected function initStarlingWithWH(mainClass:Class,width:int,height:int,HDWidth:int=480,debug:Boolean=false,isPc:Boolean=false,pullUp:Boolean=false,stage3DProfile:String="baselineConstrained"):void{
+		protected function initStarlingWithWH(mainClass:Class,width:int,height:int,HDWidth:int=480,debug:Boolean=false,isPc:Boolean=false,pullUp:Boolean=false,stage3DProfile:String="auto"):void{
 			STLConstant.nativeStage = stage;
 			STLConstant.StageWidth = width;
 			STLConstant.StageHeight = height;
