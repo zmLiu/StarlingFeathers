@@ -87,7 +87,7 @@ package lzm.starling
 		 * @param isPc		是否是再web上运行
 		 * 
 		 */		
-		protected function initStarling(mainClass:Class,HDWidth:int=480,debug:Boolean=false,isPc:Boolean=false,stage3DProfile:String="baselineConstrained"):void{
+		protected function initStarling(mainClass:Class,HDWidth:int=480,debug:Boolean=false,isPc:Boolean=false,stage3DProfile:String="auto"):void{
 			STLConstant.nativeStage = stage;
 			
 			Starling.handleLostContext = !Mobile.isIOS();
