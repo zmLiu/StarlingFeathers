@@ -165,6 +165,7 @@ package lzm.starling.swf
 				objData = sprData[i];
 				
 				fun = createFuns[objData[1]];
+				if(fun == null) continue;
 				display = fun(objData[0],objData);
 				display.name = objData[9];
 				if(display is DisplayObject){
@@ -216,6 +217,7 @@ package lzm.starling.swf
 				
 				for (var i:int = 0; i < count; i++) {
 					fun = createFuns[type];
+					if(fun == null) continue;
 					displayObjectArray.push(fun(objName,null));
 				}
 				

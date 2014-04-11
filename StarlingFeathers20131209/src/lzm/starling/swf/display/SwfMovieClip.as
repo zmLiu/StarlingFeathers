@@ -309,6 +309,12 @@ package lzm.starling.swf.display
 		public override function dispose():void{
 			_ownerSwf.swfUpdateManager.removeSwfAnimation(this);
 			_ownerSwf = null;
+			for each (var array:Array in _displayObjects) {
+				var len:int = array.length;
+				for (var i:int = 0; i < len; i++) {
+					(array[i] as DisplayObject).removeFromParent(true);
+				}
+			}
 			super.dispose();
 		}
 		

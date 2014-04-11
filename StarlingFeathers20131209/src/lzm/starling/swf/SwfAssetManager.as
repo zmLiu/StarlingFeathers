@@ -65,9 +65,9 @@ package lzm.starling.swf
 			}
 			if(getSwf(name) != null){
 				log("Swf已经存在");
-			}else{
-				_loadQueue.push([name,resource,fps]);
+				return;
 			}
+			_loadQueue.push([name,resource,fps]);
 		}
 		
 		/**

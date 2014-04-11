@@ -57,8 +57,13 @@ package lzm.starling.swf.display
 		}
 		
 		public override function dispose():void{
-			super.dispose();
+			_ownerSwf.swfUpdateManager.removeSwfAnimation(this);
 			_ownerSwf = null;
+			
+			_pdParticle.stop(true);
+			_pdParticle.removeFromParent(true);
+			
+			super.dispose();
 		}
 		
 	}
