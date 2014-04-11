@@ -20,6 +20,7 @@
     <classEntry path="lzm.starling.swf.display.SwfImage"/>
     <classEntry path="lzm.starling.swf.display.SwfButton"/>
     <classEntry path="lzm.starling.swf.display.SwfScale9Image"/>
+    <classEntry path="extend.MultidirectionalTileScroller"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
