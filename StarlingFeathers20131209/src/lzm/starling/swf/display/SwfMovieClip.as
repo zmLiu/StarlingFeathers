@@ -70,8 +70,8 @@ package lzm.starling.swf.display
 				currentFrame = _startFrame;
 			}else{
 				currentFrame = _currentFrame;
+				_currentFrame += 1;
 			}
-			_currentFrame += 1;
 		}
 		
 		
