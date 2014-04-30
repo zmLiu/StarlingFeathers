@@ -8,6 +8,7 @@ StarlingFeathers
 #####StarlingFeathers20130924-->1.4
 #####StarlingFeathers20131016-->1.4.1
 #####StarlingFeathers20131209-->Starling 1.4.1 + Feathers 1.2.0
+#####StarlingFeathers20140430-->Starling 1.5rc + Feathers 1.3.0
 
 Starling源码的优化
 ================
