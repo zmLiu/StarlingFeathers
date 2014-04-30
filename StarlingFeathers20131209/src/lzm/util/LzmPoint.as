@@ -52,6 +52,16 @@ package lzm.util
 			return Math.atan2(PointB.y-PointA.y,PointB.x-PointA.x)/0.017453292519943295
 		}
 		/**
+		 * 获取A和B点连接的直线与X轴的弧度
+		 * @param PointA
+		 * @param PointB
+		 * @return 
+		 * 
+		 */	
+		public static function angle(PointA:LzmPoint,PointB:LzmPoint):Number{
+			return Math.atan2(PointB.y-PointA.y,PointB.x-PointA.x);
+		}
+		/**
 		 * 获取A和B点连接的直线与X轴的夹角 
 		 * @param PointA
 		 * @param PointB

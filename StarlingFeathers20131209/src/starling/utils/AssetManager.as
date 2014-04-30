@@ -809,7 +809,7 @@ package starling.utils
 			var name:String = getName(path);
 			var texture:Texture = runtimeLoadTexture[name];
 			if(texture){
-				if(callBack) callBack(texture);
+				if(callBack != null) callBack(texture);
 				completeLoadIist();
 				return;
 			}
@@ -830,7 +830,7 @@ package starling.utils
 			function urlLoadError(e:Object):void{
 				urlLoader.removeEventListener(Event.COMPLETE,urlLoaderComplete);
 				urlLoader.removeEventListener(IOErrorEvent.IO_ERROR,urlLoadError);
-				if(callBack) callBack(null);
+				if(callBack != null) callBack(null);
 				completeLoadIist();
 			}
 			
@@ -845,7 +845,7 @@ package starling.utils
 						if(isCache) {
 							runtimeLoadTexture[name] = texture;
 						}
-						if(callBack) callBack(texture);
+						if(callBack != null) callBack(texture);
 						completeLoadIist();
 						break;
 					case "png":
@@ -868,7 +868,7 @@ package starling.utils
 				if(isCache) {
 					runtimeLoadTexture[name] = texture;
 				}
-				if(callBack) callBack(texture);
+				if(callBack != null) callBack(texture);
 				completeLoadIist();
 				(content as Bitmap).bitmapData.dispose();
 				

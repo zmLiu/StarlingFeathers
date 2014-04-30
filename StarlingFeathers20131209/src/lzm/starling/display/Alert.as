@@ -18,7 +18,7 @@ package lzm.starling.display
 			STLConstant.currnetAppRoot.addChild(display);
 		}
 		
-		public static function alert(dialog:DisplayObject):void{
+		public static function alert(dialog:DisplayObject,setXY:Boolean = true):void{
 			if(dialogs.indexOf(dialog) != -1){
 				return;
 			}
@@ -29,9 +29,11 @@ package lzm.starling.display
 			STLConstant.currnetAppRoot.addChild(background);
 			STLConstant.currnetAppRoot.addChild(dialog);
 			
-			var dialogRect:Rectangle = dialog.getBounds(dialog.parent);
-			dialog.x = (STLConstant.StageWidth - dialogRect.width)/2;
-			dialog.y = (STLConstant.StageHeight - dialogRect.height)/2;
+			if(setXY){
+				var dialogRect:Rectangle = dialog.getBounds(dialog.parent);
+				dialog.x = (STLConstant.StageWidth - dialogRect.width)/2;
+				dialog.y = (STLConstant.StageHeight - dialogRect.height)/2;
+			}
 		}
 		
 		private static function dialogAddToStage(e:Event):void{

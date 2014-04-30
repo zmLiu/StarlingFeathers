@@ -21,6 +21,8 @@
     <classEntry path="lzm.starling.swf.display.SwfButton"/>
     <classEntry path="lzm.starling.swf.display.SwfScale9Image"/>
     <classEntry path="extend.MultidirectionalTileScroller"/>
+    <classEntry path="lzm.starling.swf.filter.SwfFilter"/>
+    <classEntry path="lzm.starling.swf.components.ISwfComponentForEditor"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

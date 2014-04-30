@@ -14,6 +14,7 @@ package lzm.starling.swf
 	import lzm.starling.swf.display.SwfScale9Image;
 	import lzm.starling.swf.display.SwfShapeImage;
 	import lzm.starling.swf.display.SwfSprite;
+	import lzm.starling.swf.filter.SwfFilter;
 	import lzm.util.Clone;
 	
 	import starling.display.DisplayObject;
@@ -183,6 +184,9 @@ package lzm.starling.swf
 					sprite.addComponent(display as ISwfComponent);
 				}
 			}
+			
+			if(data) sprite.filter = SwfFilter.createFilter(data[10]);//滤镜
+			
 			sprite.data = data;
 			sprite.spriteData = sprData;
 			
@@ -227,6 +231,8 @@ package lzm.starling.swf
 			var mc:SwfMovieClip = new SwfMovieClip(movieClipData["frames"],movieClipData["labels"],displayObjects,this);
 			mc.loop = movieClipData["loop"];
 			
+			if(data) mc.filter = SwfFilter.createFilter(data[10]);//滤镜
+			
 			mc.classLink = name;
 			
 			return mc;
@@ -254,6 +260,8 @@ package lzm.starling.swf
 			image.pivotX = imageData[0];
 			image.pivotY = imageData[1];
 			
+			if(data) image.filter = SwfFilter.createFilter(data[10]);//滤镜
+			
 			image.classLink = name;
 			
 			return image;
@@ -273,6 +281,9 @@ package lzm.starling.swf
 			var sprData:Array = _swfDatas[dataKey_Button][name];
 			var skin:Sprite = createSprite(null,null,sprData);
 			var button:SwfButton = new SwfButton(skin);
+			
+			if(data) button.filter = SwfFilter.createFilter(data[10]);//滤镜
+			
 			button.classLink = name;
 			return button;
 		}
@@ -296,6 +307,7 @@ package lzm.starling.swf
 			if(data){
 				s9image.width = data[10];
 				s9image.height = data[11];
+				s9image.filter = SwfFilter.createFilter(data[12]);//滤镜
 			}
 			
 			s9image.classLink = name;
@@ -320,6 +332,7 @@ package lzm.starling.swf
 			
 			if(data){
 				shapeImage.setSize(data[10],data[11]);
+				shapeImage.filter = SwfFilter.createFilter(data[12]);//滤镜
 			}
 			
 			shapeImage.classLink = name;
@@ -329,6 +342,7 @@ package lzm.starling.swf
 		
 		public function createTextField(name:String,data:Array=null):TextField{
 			var textfield:TextField = new TextField(2,2,"");
+			var filters:Array;
 			if(data){
 				textfield.width = data[10];
 				textfield.height = data[11];
@@ -339,6 +353,9 @@ package lzm.starling.swf
 				textfield.italic = data[16];
 				textfield.bold = data[17];
 				textfield.text = data[18];
+				
+				filters = SwfFilter.createTextFieldFilter(data[19]);
+				if(filters) textfield.nativeFilters = filters;
 			}
 			return textfield;
 		}
@@ -362,10 +379,10 @@ package lzm.starling.swf
 			var component:ISwfComponent = new componentClass();
 			component.initialization(conponentContnt);
 			
-			if(data && data[10] != null){
-				component.editableProperties = data[10];
+			if(data){
+				if(data[10] != null) component.editableProperties = data[10];
+				if(component is DisplayObject) component["filter"] = SwfFilter.createFilter(data[11]);//滤镜
 			}
-			
 			return component;
 		}
 		

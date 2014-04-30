@@ -1,5 +1,8 @@
 package lzm.starling.entityComponent
 {
+	import starling.display.DisplayObject;
+	import starling.display.DisplayObjectContainer;
+	import starling.display.Image;
 	import starling.display.Sprite;
 
 	public class Entity extends Sprite
@@ -209,6 +212,34 @@ package lzm.starling.entityComponent
 			removeFromParentEntity();
 			
 			super.dispose();
+		}
+		
+		
+		protected var _color:uint;
+		/** 设置 / 获取 颜色 */
+		public function set color(value:uint):void{
+			_color = value;
+			setDisplayColor(this,_color);
+		}
+		public function get color():uint{
+			return _color;
+		}
+		
+		protected function setDisplayColor(display:DisplayObject,color:uint):void{
+			if(display is Image){
+				(display as Image).color = color;
+			}else if(display is DisplayObjectContainer){
+				var displayObjectContainer:DisplayObjectContainer = display as DisplayObjectContainer;
+				var numChild:int = displayObjectContainer.numChildren;
+				for (var i:int = 0; i < numChild; i++) {
+					display = displayObjectContainer.getChildAt(i);
+					if(display is DisplayObjectContainer){
+						setDisplayColor(display as DisplayObjectContainer,color);
+					}else if(display is Image){
+						(display as Image).color = color;
+					}
+				}
+			}
 		}
 	}
 }

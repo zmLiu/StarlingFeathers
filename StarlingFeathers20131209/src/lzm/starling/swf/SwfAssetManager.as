@@ -23,6 +23,7 @@ package lzm.starling.swf
 		private var _verbose:Boolean = false;
 		
 		private var _loadQueue:Array;
+		private var _loadQueueNames:Array;
 		private var _isLoading:Boolean;
 		
 		private var _swfs:Dictionary;
@@ -40,6 +41,7 @@ package lzm.starling.swf
 		public function SwfAssetManager(scaleFactor:Number=1, useMipmaps:Boolean=false)
 		{
 			_loadQueue = [];
+			_loadQueueNames = [];
 			_isLoading = false;
 			
 			_swfs = new Dictionary();
@@ -67,7 +69,13 @@ package lzm.starling.swf
 				log("Swf已经存在");
 				return;
 			}
-			_loadQueue.push([name,resource,fps]);
+			if(_loadQueueNames.indexOf(name) == -1){
+				_loadQueueNames.push(name);
+				_loadQueue.push([name,resource,fps]);
+			}else{
+				log("加载队列中已经有：" + name + ",跳过!");
+			}
+			
 		}
 		
 		/**
@@ -123,6 +131,8 @@ package lzm.starling.swf
 			
 			parseOtherAssets();
 			
+			_loadQueueNames = [];
+			
 			var swfAsset:Array;
 			var numSwfAsset:int = _loadQueue.length;
 			var currentRatio:Number = 0;
@@ -174,13 +184,13 @@ package lzm.starling.swf
 			function loadComplete():void{
 				currentRatio = _loadQueue.length ? 1.0 - (_loadQueue.length / numSwfAsset) : 1.0;
 				
-				onProgress(currentRatio);
-				
 				if(currentRatio == 1){
 					_isLoading = false;
 				}else{
 					loadNext();
 				}
+				
+				onProgress(currentRatio);
 			}
 		}
 		
@@ -209,11 +219,11 @@ package lzm.starling.swf
 		public function removeSwf(name:String,dispose:Boolean=false):void{
 			var swf:Swf = getSwf(name);
 			if(swf){
+				log("移除Swf:" + name +"  dispose:" + dispose);
 				if(dispose){
 					swf.dispose(dispose);
 				}
 				delete _swfs[name];
-				
 				_swfNames.splice(_swfNames.indexOf(name),1);
 			}
 		}
