@@ -317,8 +317,6 @@ package starling.core
                 mShareContext = false;
                 requestContext3D(stage3D, renderMode, profile);
             }
-			
-			autoSkip = new AutoSkip(stage);
         }
         
         /** Disposes all children of the stage and the render context; removes all registered
