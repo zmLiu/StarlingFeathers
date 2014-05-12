@@ -54,28 +54,28 @@ package lzm.starling.gestures
 				if((_target.x - _target.pivotX*_target.scaleX) > _dragRect.x) 
 					_target.x = _target.pivotX*_target.scaleX + _dragRect.x;
 				
-				if((_target.x - _target.pivotX*_target.scaleX) < (_dragRect.width - _targetWidth*_target.scaleX - _dragRect.x)) 
-					_target.x = (_dragRect.width - _targetWidth*_target.scaleX  - _dragRect.x) + (_target.pivotX*_target.scaleX);
+				if((_target.x - _target.pivotX*_target.scaleX) < (_dragRect.width - _targetWidth*_target.scaleX + _dragRect.x)) 
+					_target.x = (_dragRect.width - _targetWidth*_target.scaleX  + _dragRect.x) + (_target.pivotX*_target.scaleX);
 			}else{
 				if((_target.x - _target.pivotX*_target.scaleX) < _dragRect.x) 
 					_target.x = _target.pivotX*_target.scaleX + _dragRect.x;
 				
-				if((_target.x - _target.pivotX*_target.scaleX) > (_dragRect.width - _targetWidth*_target.scaleX - _dragRect.x)) 
-					_target.x = (_dragRect.width - _targetWidth*_target.scaleX  - _dragRect.x) + (_target.pivotX*_target.scaleX);
+				if((_target.x - _target.pivotX*_target.scaleX) > (_dragRect.width - _targetWidth*_target.scaleX + _dragRect.x)) 
+					_target.x = (_dragRect.width - _targetWidth*_target.scaleX  + _dragRect.x) + (_target.pivotX*_target.scaleX);
 			}
 			
 			if(_targetHeight * _target.scaleY > _dragRect.height){
 				if((_target.y - _target.pivotY*_target.scaleY) > _dragRect.y) 
 					_target.y = _target.pivotY*_target.scaleY + _dragRect.y;
 				
-				if((_target.y - _target.pivotY*_target.scaleY) < (_dragRect.height - _targetHeight*_target.scaleY - _dragRect.y)) 
-					_target.y = (_dragRect.height - _targetHeight*_target.scaleY - _dragRect.y) + (_target.pivotY*_target.scaleY);
+				if((_target.y - _target.pivotY*_target.scaleY) < (_dragRect.height - _targetHeight*_target.scaleY + _dragRect.y)) 
+					_target.y = (_dragRect.height - _targetHeight*_target.scaleY + _dragRect.y) + (_target.pivotY*_target.scaleY);
 			}else{
 				if((_target.y - _target.pivotY*_target.scaleY) < _dragRect.y) 
 					_target.y = _target.pivotY*_target.scaleY + _dragRect.y;
 				
-				if((_target.y - _target.pivotY*_target.scaleY) > (_dragRect.height - _targetHeight*_target.scaleY - _dragRect.y)) 
-					_target.y = (_dragRect.height - _targetHeight*_target.scaleY - _dragRect.y) + (_target.pivotY*_target.scaleY);
+				if((_target.y - _target.pivotY*_target.scaleY) > (_dragRect.height - _targetHeight*_target.scaleY + _dragRect.y)) 
+					_target.y = (_dragRect.height - _targetHeight*_target.scaleY + _dragRect.y) + (_target.pivotY*_target.scaleY);
 			}
 		}
 		
