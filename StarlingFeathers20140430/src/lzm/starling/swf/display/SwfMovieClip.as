@@ -82,8 +82,6 @@ package lzm.starling.swf.display
 			_currentFrame = frame;
 			__frameInfos = _frames[_currentFrame];
 			
-			var name:String;
-			var type:String;
 			var data:Array;
 			var display:DisplayObject;
 			var useIndex:int;
