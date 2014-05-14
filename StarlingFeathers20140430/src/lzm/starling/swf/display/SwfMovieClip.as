@@ -33,6 +33,8 @@ package lzm.starling.swf.display
 		private var _completeFunction:Function = null;//播放完毕的回调
 		private var _hasCompleteListener:Boolean = false;//是否监听过播放完毕的事件
 		
+		private var _autoUpdate:Boolean = true;
+		
 		public function SwfMovieClip(frames:Array,labels:Array,displayObjects:Object,ownerSwf:Swf){
 			super();
 			
@@ -133,11 +135,12 @@ package lzm.starling.swf.display
 		
 		/**
 		 * 播放
+		 * @param	rePlayChildMovie	自动化是否重新播放
 		 * */
-		public function play():void{
+		public function play(rePlayChildMovie:Boolean = false):void{
 			_isPlay = true;
 			
-			_ownerSwf.swfUpdateManager.addSwfAnimation(this);
+			if(_autoUpdate) _ownerSwf.swfUpdateManager.addSwfAnimation(this);
 			
 			var k:String;
 			var arr:Array;
@@ -147,7 +150,10 @@ package lzm.starling.swf.display
 					arr = _displayObjects[k];
 					l = arr.length;
 					for (var i:int = 0; i < l; i++) {
-						(arr[i] as SwfMovieClip).play();
+						if(rePlayChildMovie){
+							(arr[i] as SwfMovieClip).currentFrame = 0;
+						}
+						(arr[i] as SwfMovieClip).play(rePlayChildMovie);
 					}
 				}
 			}
@@ -182,9 +188,9 @@ package lzm.starling.swf.display
 			stop(stopChild);
 		}
 		
-		public function gotoAndPlay(frame:Object):void{
+		public function gotoAndPlay(frame:Object,rePlayChildMovie:Boolean = false):void{
 			goTo(frame);
-			play();
+			play(rePlayChildMovie);
 		}
 		
 		private function goTo(frame:*):void{
@@ -300,6 +306,18 @@ package lzm.starling.swf.display
 		public override function removeEventListeners(type:String=null):void{
 			super.removeEventListeners(type);
 			_hasCompleteListener = hasEventListener(Event.COMPLETE);
+		}
+		
+		/**
+		 * 设置 / 获取 动画是否自动更新
+		 * */
+		public function set autoUpdate(value:Boolean):void{
+			_autoUpdate = value;
+			if(_autoUpdate) _ownerSwf.swfUpdateManager.addSwfAnimation(this);
+			else _ownerSwf.swfUpdateManager.removeSwfAnimation(this);
+		}
+		public function get autoUpdate():Boolean{
+			return _autoUpdate;
 		}
 		
 		public override function dispose():void{
