@@ -22,11 +22,26 @@ package lzm.starling.swf.components.feathers
 			
 			var _labelTextField:TextField = componetContent.getTextField("_labelTextField");
 			
-			this.defaultSkin = _upSkin;
-			if(_selectUpSkin) this.defaultSelectedSkin = _selectUpSkin;
-			if(_downSkin) this.downSkin = _downSkin;
-			if(_disabledSkin) this.disabledSkin = _disabledSkin;
-			if(_selectDisabledSkin) this.selectedDisabledSkin = _selectDisabledSkin;
+			if(_upSkin) {
+				this.defaultSkin = _upSkin;
+				_upSkin.removeFromParent();
+			}
+			if(_selectUpSkin) {
+				this.defaultSelectedSkin = _selectUpSkin;
+				_selectUpSkin.removeFromParent();
+			}
+			if(_downSkin){
+				this.downSkin = _downSkin;
+				_downSkin.removeFromParent();
+			}
+			if(_disabledSkin) {
+				this.disabledSkin = _disabledSkin;
+				_disabledSkin.removeFromParent();
+			}
+			if(_selectDisabledSkin) {
+				this.selectedDisabledSkin = _selectDisabledSkin;
+				_disabledSkin.removeFromParent();
+			}
 			
 			if(_labelTextField){
 				var textFormat:TextFormat = new TextFormat();

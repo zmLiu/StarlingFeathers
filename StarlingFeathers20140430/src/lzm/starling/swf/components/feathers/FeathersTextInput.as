@@ -24,9 +24,18 @@ package lzm.starling.swf.components.feathers
 			
 			var _textFormat:TextField = componetContent.getTextField("_textFormat");
 			
-			this.backgroundSkin = _backgroundSkin;
-			this.backgroundDisabledSkin = _backgroundDisabledSkin;
-			this.backgroundFocusedSkin = _backgroundFocusedSkin;
+			if(_backgroundSkin){
+				this.backgroundSkin = _backgroundSkin;
+				_backgroundSkin.removeFromParent();
+			}
+			if(_backgroundDisabledSkin){
+				this.backgroundDisabledSkin = _backgroundDisabledSkin;
+				_backgroundDisabledSkin.removeFromParent();
+			}
+			if(_backgroundFocusedSkin){
+				this.backgroundFocusedSkin = _backgroundFocusedSkin;
+				_backgroundFocusedSkin.removeFromParent();
+			}
 			
 			if(_textFormat != null){
 				this.textEditorProperties.fontFamily = _textFormat.fontName;
