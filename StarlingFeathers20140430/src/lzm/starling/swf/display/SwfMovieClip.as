@@ -1,5 +1,7 @@
 package lzm.starling.swf.display
 {
+	import feathers.core.IFeathersEventDispatcher;
+	
 	import lzm.starling.swf.Swf;
 	
 	import starling.display.DisplayObject;
@@ -110,8 +112,11 @@ package lzm.starling.swf.display
 					display.mScaleX = data[4];
 					display.mScaleY = data[5];
 				}
-				
-				addQuiackChild(display);
+				if(display is IFeathersEventDispatcher){
+					addChild(display);
+				}else{
+					addQuiackChild(display);
+				}
 				
 				if(data[1] == Swf.dataKey_TextField){
 					display["width"] = data[11];
