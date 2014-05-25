@@ -1019,7 +1019,7 @@ package starling.utils
                 name = name.replace(/%20/g, " "); // URLs use '%20' for spaces
                 name = getBasenameFromUrl(name);
                 
-                if (name) return decodeURI(name);
+				if (name) return decodeURI(name);
                 else throw new ArgumentError("Could not extract name from String '" + rawAsset + "'");
             }
             else

@@ -2,13 +2,7 @@ StarlingFeathers
 ================
 
 #####整合Starling+Feathers 还有一些Starling扩展
-#####StarlingFeathers20130326-->1.3
-#####StarlingFeathers20130820-->1.4RC1
-#####StarlingFeathers20130828-->1.4RC2
-#####StarlingFeathers20130924-->1.4
-#####StarlingFeathers20131016-->1.4.1
-#####StarlingFeathers20131209-->Starling 1.4.1 + Feathers 1.2.0
-#####StarlingFeathers20140430-->Starling 1.5rc + Feathers 1.3.0
+#####Starling 1.5 + Feathers 1.3.0
 
 Starling源码的优化
 ================
