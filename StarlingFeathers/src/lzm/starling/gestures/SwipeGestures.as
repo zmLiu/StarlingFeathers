@@ -37,11 +37,11 @@ package lzm.starling.gestures
 				var yDis:int = releasePoint.y - _downPoint.y;
 				if(Math.abs(xDis) > Math.abs(yDis))
 				{
-					if(Math.abs(xDis)>DIS)
+					if(Math.abs(xDis)>DIS && _callBack != null)
 						_callBack(xDis > 0 ? RIGHT : LEFT);
 				}else
 				{
-					if(Math.abs(yDis)>DIS)
+					if(Math.abs(yDis)>DIS && _callBack != null)
 						_callBack(yDis > 0 ? DOWN : UP);
 				}
 			}
