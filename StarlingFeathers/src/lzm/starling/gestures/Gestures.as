@@ -14,6 +14,8 @@ package lzm.starling.gestures
 		protected var _target:DisplayObject;//目标
 		protected var _callBack:Function;//回调
 		
+		private var _enabled:Boolean = true;
+		
 		public function Gestures(target:DisplayObject,callBack:Function=null){
 			_target = target;
 			_callBack = callBack;
@@ -52,6 +54,21 @@ package lzm.starling.gestures
 		 * */
 		public function checkGesturesByTouches(touches:Vector.<Touch>):void{
 			
+		}
+		
+		public function set enabled(value:Boolean):void{
+			if(_enabled == value) return;
+			
+			_enabled = value;
+			
+			if(_enabled)
+				_target.addEventListener(TouchEvent.TOUCH,onTouch);
+			else
+				_target.removeEventListener(TouchEvent.TOUCH,onTouch);
+		}
+		
+		public function get enabled():Boolean{
+			return _enabled;
 		}
 		
 		public function dispose():void{
