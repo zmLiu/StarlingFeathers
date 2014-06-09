@@ -31,13 +31,13 @@ package lzm.starling.swf.filter
 				
 				switch(filterName){
 					case filters[0]://描边
-						var glow:BlurFilter = new BlurFilter(filterData.blurX, filterData.blurY);
+						var glow:BlurFilter = new BlurFilter(filterData.blurX / 100, filterData.blurY / 100);
 						glow.mode = FragmentFilterMode.BELOW;
 						glow.setUniformColor(true, filterData.color, filterData.alpha);
 						filter = glow;
 						break;
 					case filters[1]://阴影
-						var dropShadow:BlurFilter = new BlurFilter(filterData.blurX, filterData.blurY);
+						var dropShadow:BlurFilter = new BlurFilter(filterData.blurX / 100, filterData.blurY / 100);
 						dropShadow.offsetX = Math.cos(filterData.angle) * filterData.distance;
 						dropShadow.offsetY = Math.sin(filterData.angle) * filterData.distance;
 						dropShadow.mode = FragmentFilterMode.BELOW;
@@ -45,7 +45,7 @@ package lzm.starling.swf.filter
 						filter = dropShadow;
 						break;
 					case filters[2]://模糊
-						var blur:BlurFilter = new BlurFilter(filterData.blurX, filterData.blurY);
+						var blur:BlurFilter = new BlurFilter(filterData.blurX / 10, filterData.blurY / 10);
 						filter = blur;
 						break;
 				}
