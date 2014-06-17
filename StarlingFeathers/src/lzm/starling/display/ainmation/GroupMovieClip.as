@@ -154,7 +154,7 @@ package lzm.starling.display.ainmation
 				tempImage.mY = data[2];
 				tempImage.mRotation = deg2rad(data[3]);
 				tempImage.mOrientationChanged = true;
-				addQuiackChild(tempImage);
+				addQuickChild(tempImage);
 			}
 		}
 		

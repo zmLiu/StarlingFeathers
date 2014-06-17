@@ -472,7 +472,7 @@ package starling.display
 		 * @param child
 		 * 
 		 */		
-		public function addQuiackChild(child:DisplayObject):void{
+		public function addQuickChild(child:DisplayObject):void{
 			if(child.mParent){
 				child.mParent.removeQuickChild(child);
 			}
@@ -487,7 +487,7 @@ package starling.display
 		 * @return 
 		 * 
 		 */		
-		public function addQuiackChildAt(child:DisplayObject, index:int):DisplayObject
+		public function addQuickChildAt(child:DisplayObject, index:int):DisplayObject
 		{
 			var numChildren:int = mChildren.length; 
 			

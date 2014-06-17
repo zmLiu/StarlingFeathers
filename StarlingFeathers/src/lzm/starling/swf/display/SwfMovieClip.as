@@ -115,7 +115,7 @@ package lzm.starling.swf.display
 				if(display is IFeathersEventDispatcher){
 					addChild(display);
 				}else{
-					addQuiackChild(display);
+					addQuickChild(display);
 				}
 				
 				if(data[1] == Swf.dataKey_TextField){

@@ -71,7 +71,7 @@ package lzm.starling.entityComponent.effects
 				showObjects.push(sprite);
 				
 				var index:int = entity.parent.getChildIndex(entity);
-				entity.parent.addQuiackChildAt(sprite,index);
+				entity.parent.addQuickChildAt(sprite,index);
 				
 				entityLastX = entity.x;
 				entityLastY = entity.y;
@@ -97,9 +97,9 @@ package lzm.starling.entityComponent.effects
 			for (var i:int = 0; i < numChilds; i++) {
 				child = target.getChildAt(i);
 				if(child is Sprite){
-					sprite.addQuiackChild(cloneSprite(child as Sprite));
+					sprite.addQuickChild(cloneSprite(child as Sprite));
 				}else if(child is Image){
-					sprite.addQuiackChild(cloneImage(child as Image));
+					sprite.addQuickChild(cloneImage(child as Image));
 				}
 			}
 			sprite.transformationMatrix = target.transformationMatrix;

@@ -135,7 +135,7 @@ package lzm.starling.display.ainmation.bone
 				image.scaleY = imageData[4];
 				image.skewX = imageData[5] * ANGLE_TO_RADIAN;
 				image.skewY = imageData[6] * ANGLE_TO_RADIAN;
-				addQuiackChild(image);
+				addQuickChild(image);
 			}
 		}
 		
