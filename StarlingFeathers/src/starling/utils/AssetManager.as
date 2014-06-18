@@ -505,7 +505,7 @@ package starling.utils
                                         options:TextureOptions=null):String
         {
             if (getQualifiedClassName(asset) == "flash.filesystem::File")
-                asset = unescape(asset["url"]);
+                asset = decodeURI(asset["url"]);
             
             if (name == null)    name = getName(asset);
             if (options == null) options = mDefaultTextureOptions;
@@ -1019,7 +1019,7 @@ package starling.utils
                 name = name.replace(/%20/g, " "); // URLs use '%20' for spaces
                 name = getBasenameFromUrl(name);
                 
-				if (name) return decodeURI(name);
+				if (name) return name;
                 else throw new ArgumentError("Could not extract name from String '" + rawAsset + "'");
             }
             else
