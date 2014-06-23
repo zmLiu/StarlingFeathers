@@ -179,6 +179,9 @@ package lzm.starling.swf
 					display.skewX = objData[6] * ANGLE_TO_RADIAN;
 					display.skewY = objData[7] * ANGLE_TO_RADIAN;
 					display.alpha = objData[8];
+					if(display is ISwfComponent && objData[10] != null){
+						display.editableProperties = objData[10];
+					}
 					sprite.addChild(display as DisplayObject);
 				}else if(display is ISwfComponent){
 					sprite.addComponent(display as ISwfComponent);
@@ -380,7 +383,6 @@ package lzm.starling.swf
 			component.initialization(conponentContnt);
 			
 			if(data){
-				if(data[10] != null) component.editableProperties = data[10];
 				if(component is DisplayObject) component["filter"] = SwfFilter.createFilter(data[11]);//滤镜
 			}
 			return component;
