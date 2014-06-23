@@ -22,6 +22,7 @@ package lzm.starling.swf.display
 		
 		private var _frames:Array;
 		private var _labels:Array;
+		private var _labelStrings:Array;
 		private var _displayObjects:Object;
 		
 		private var _startFrame:int;
@@ -140,12 +141,14 @@ package lzm.starling.swf.display
 		
 		/**
 		 * 播放
-		 * @param	rePlayChildMovie	自动化是否重新播放
+		 * @param	rePlayChildMovie	子动画是否重新播放
 		 * */
 		public function play(rePlayChildMovie:Boolean = false):void{
 			_isPlay = true;
 			
 			if(_autoUpdate) _ownerSwf.swfUpdateManager.addSwfAnimation(this);
+			
+			if(!rePlayChildMovie) return;
 			
 			var k:String;
 			var arr:Array;
@@ -155,9 +158,7 @@ package lzm.starling.swf.display
 					arr = _displayObjects[k];
 					l = arr.length;
 					for (var i:int = 0; i < l; i++) {
-						if(rePlayChildMovie){
-							(arr[i] as SwfMovieClip).currentFrame = 0;
-						}
+						if(rePlayChildMovie) (arr[i] as SwfMovieClip).currentFrame = 0;
 						(arr[i] as SwfMovieClip).play(rePlayChildMovie);
 					}
 				}
@@ -270,12 +271,15 @@ package lzm.starling.swf.display
 		 * 获取所有标签
 		 * */
 		public function get labels():Array{
+			if(_labelStrings != null) return _labelStrings;
+			
+			_labelStrings = [];
+			
 			var length:int = _labels.length;
-			var returnLabels:Array = [];
 			for (var i:int = 0; i < length; i++) {
-				returnLabels.push(_labels[i][0]);
+				_labelStrings.push(_labels[i][0]);
 			}
-			return returnLabels;
+			return _labelStrings;
 		}
 		
 		public override function set color(value:uint):void{
@@ -294,8 +298,7 @@ package lzm.starling.swf.display
 		 * 是否包含某个标签
 		 * */
 		public function hasLabel(label:String):Boolean{
-			var ls:Array = labels;
-			return !(ls.indexOf(label) == -1);
+			return !(labels.indexOf(label) == -1);
 		}
 		
 		public override function addEventListener(type:String, listener:Function):void{
