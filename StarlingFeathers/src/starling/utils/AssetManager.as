@@ -66,6 +66,9 @@ package starling.utils
      */
     public class AssetManager extends EventDispatcher
     {
+		// This HTTPStatusEvent is only available in AIR
+		private static const HTTP_RESPONSE_STATUS:String = "httpResponseStatus";
+		
         private var mStarling:Starling;
         private var mNumLostTextures:int;
         private var mNumRestoredTextures:int;
@@ -787,7 +790,7 @@ package starling.utils
                 urlLoader = new URLLoader();
                 urlLoader.dataFormat = URLLoaderDataFormat.BINARY;
                 urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIoError);
-                urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onHttpStatus);
+				urlLoader.addEventListener(HTTP_RESPONSE_STATUS, onHttpResponseStatus);
                 urlLoader.addEventListener(ProgressEvent.PROGRESS, onLoadProgress);
                 urlLoader.addEventListener(Event.COMPLETE, onUrlLoaderComplete);
                 urlLoader.load(new URLRequest(url));
@@ -799,7 +802,7 @@ package starling.utils
                 complete(null);
             }
             
-            function onHttpStatus(event:HTTPStatusEvent):void
+            function onHttpResponseStatus(event:HTTPStatusEvent):void	
             {
                 if (extension == null)
                 {
@@ -823,11 +826,14 @@ package starling.utils
                 var sound:Sound;
                 
                 urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, onIoError);
-                urlLoader.removeEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onHttpStatus);
+				urlLoader.removeEventListener(HTTP_RESPONSE_STATUS, onHttpResponseStatus);
                 urlLoader.removeEventListener(ProgressEvent.PROGRESS, onLoadProgress);
                 urlLoader.removeEventListener(Event.COMPLETE, onUrlLoaderComplete);
+				
+				if (extension)
+					extension = extension.toLowerCase();
                 
-                switch (extension.toLowerCase())
+                switch (extension)
                 {
                     case "mpeg":
                     case "mp3":
