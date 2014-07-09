@@ -1,6 +1,7 @@
 package lzm.util
 {
 	import flash.events.Event;
+	import flash.events.HTTPStatusEvent;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
@@ -18,6 +19,7 @@ package lzm.util
 		 * @param url
 		 * @param params
 		 * @param completeFunction
+		 * @param timeoutFunction
 		 * @param method
 		 * 
 		 */		
@@ -34,8 +36,8 @@ package lzm.util
 			var callback:Function = function(e:Event):void{
 				loader.removeEventListener(Event.COMPLETE,callback);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,timeout);
+				loader.removeEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS,status);
 				if(completeFunction!=null){
-//					trace(loader.data);
 					completeFunction(loader.data);
 				}
 			};
@@ -43,13 +45,18 @@ package lzm.util
 			var timeout:Function = function(e:Event):void{
 				loader.removeEventListener(Event.COMPLETE,callback);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,timeout);
+				loader.removeEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS,status);
 				if(timeoutFunction != null){
 					timeoutFunction(loader.data);
 				}
 			};
 			
+			var status:Function = function(e:HTTPStatusEvent):void{}
+			
 			loader.addEventListener(Event.COMPLETE,callback);
 			loader.addEventListener(IOErrorEvent.IO_ERROR,timeout);
+			loader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS,status);
+			
 			loader.load(request);
 		}
 		
