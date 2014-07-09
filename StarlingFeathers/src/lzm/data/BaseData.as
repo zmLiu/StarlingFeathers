@@ -2,7 +2,7 @@ package lzm.data
 {
 	
 
-	public class BaseData
+	public dynamic class BaseData
 	{
 		public function BaseData()
 		{
