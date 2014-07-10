@@ -15,6 +15,7 @@ package lzm.starling
 	public class STLStarup extends Sprite
 	{
 		
+		protected var _statusBarHeight:Number = 0;
 		protected var _mStarling:Starling;
 		
 		public function STLStarup()
@@ -42,6 +43,7 @@ package lzm.starling
 			
 			var stageFullScreenWidth:Number = isPc ? stage.stageWidth : stage.fullScreenWidth;
 			var stageFullScreenHeight:Number = isPc ? stage.stageHeight : stage.fullScreenHeight;
+			stageFullScreenHeight -= _statusBarHeight;
 			
 			var viewPort:Rectangle;
 			if(pullUp){
@@ -52,6 +54,7 @@ package lzm.starling
 					new Rectangle(0, 0,stageFullScreenWidth,stageFullScreenHeight), 
 					ScaleMode.SHOW_ALL);
 			}
+			viewPort.y = _statusBarHeight;
 			
 			STLConstant.scale = viewPort.width > HDWidth ? 2 : 1;//Capabilities.screenDPI > 200 ? 2 : 1;
 			
@@ -96,6 +99,9 @@ package lzm.starling
 				isPc ? stage.stageWidth : stage.fullScreenWidth, 
 				isPc ? stage.stageHeight : stage.fullScreenHeight
 			);
+			viewPort.y = _statusBarHeight;
+			viewPort.height -= _statusBarHeight;
+			
 			STLConstant.scale = viewPort.width > HDWidth ? 2 : 1;//Capabilities.screenDPI > 200 ? 2 : 1;
 			STLConstant.StageWidth = viewPort.width * (1/STLConstant.scale);
 			STLConstant.StageHeight = viewPort.height * (1/STLConstant.scale);
