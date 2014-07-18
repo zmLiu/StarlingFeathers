@@ -56,6 +56,10 @@ package lzm.starling.gestures
 			
 		}
 		
+		public function get target():DisplayObject{
+			return _target;
+		}
+		
 		public function set enabled(value:Boolean):void{
 			if(_enabled == value) return;
 			
