@@ -17,12 +17,15 @@ package lzm.starling.gestures
 		private var _holdTime:int = 500;
 		private var _callBackTime:int = 100;
 		
+		private var _firstHold:Boolean = false;
+		private var _holdStartCallBack:Function;
 		private var _holdEndCallBack:Function;
 		
-		public function HoldGestures(target:DisplayObject, callBack:Function=null,holdEndCallBack:Function=null)
+		public function HoldGestures(target:DisplayObject, callBack:Function=null,holdEndCallBack:Function=null,holdStartCallBack:Function=null)
 		{
 			super(target, callBack);
 			_holdEndCallBack = holdEndCallBack;
+			_holdStartCallBack = holdStartCallBack;
 		}
 		
 		public override function checkGestures(touch:Touch):void{
@@ -45,6 +48,10 @@ package lzm.starling.gestures
 		
 		private function onTimer(e:TimerEvent):void{
 			if(_timer.delay == _holdTime) _timer.delay = _callBackTime;
+			if(!_firstHold && _holdStartCallBack) {
+				_holdStartCallBack();
+				_firstHold = true;
+			}
 			if(_callBack) _callBack();
 		}
 		
