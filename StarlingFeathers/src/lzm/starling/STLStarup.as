@@ -43,7 +43,6 @@ package lzm.starling
 			
 			var stageFullScreenWidth:Number = isPc ? stage.stageWidth : stage.fullScreenWidth;
 			var stageFullScreenHeight:Number = isPc ? stage.stageHeight : stage.fullScreenHeight;
-			stageFullScreenHeight -= _statusBarHeight;
 			
 			var viewPort:Rectangle;
 			if(pullUp){
@@ -55,6 +54,7 @@ package lzm.starling
 					ScaleMode.SHOW_ALL);
 			}
 			viewPort.y = _statusBarHeight;
+			viewPort.height -= _statusBarHeight;
 			
 			STLConstant.scale = viewPort.width > HDWidth ? 2 : 1;//Capabilities.screenDPI > 200 ? 2 : 1;
 			
@@ -99,10 +99,12 @@ package lzm.starling
 				isPc ? stage.stageWidth : stage.fullScreenWidth, 
 				isPc ? stage.stageHeight : stage.fullScreenHeight
 			);
+			
 			viewPort.y = _statusBarHeight;
 			viewPort.height -= _statusBarHeight;
 			
 			STLConstant.scale = viewPort.width > HDWidth ? 2 : 1;//Capabilities.screenDPI > 200 ? 2 : 1;
+			
 			STLConstant.StageWidth = viewPort.width * (1/STLConstant.scale);
 			STLConstant.StageHeight = viewPort.height * (1/STLConstant.scale);
 			
