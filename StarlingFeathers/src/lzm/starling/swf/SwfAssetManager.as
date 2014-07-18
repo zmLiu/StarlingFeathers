@@ -5,7 +5,9 @@ package lzm.starling.swf
 	import feathers.display.Scale9Image;
 	
 	import lzm.starling.display.Button;
+	import lzm.starling.swf.display.SwfImage;
 	import lzm.starling.swf.display.SwfMovieClip;
+	import lzm.starling.swf.display.SwfScale9Image;
 	import lzm.starling.swf.display.SwfShapeImage;
 	import lzm.starling.swf.display.SwfSprite;
 	
@@ -20,21 +22,21 @@ package lzm.starling.swf
 	public class SwfAssetManager
 	{
 		
-		private var _verbose:Boolean = false;
+		protected var _verbose:Boolean = false;
 		
-		private var _loadQueue:Array;
-		private var _loadQueueNames:Array;
-		private var _isLoading:Boolean;
+		protected var _loadQueue:Array;
+		protected var _loadQueueNames:Array;
+		protected var _isLoading:Boolean;
 		
-		private var _swfs:Dictionary;
-		private var _swfNames:Array;
+		protected var _swfs:Dictionary;
+		protected var _swfNames:Array;
 		
-		private var _scaleFactor:Number;
-		private var _useMipmaps:Boolean;
+		protected var _scaleFactor:Number;
+		protected var _useMipmaps:Boolean;
 		
-		private static const ______otherAssetsTag:String = "______otherAssetsTag";
-		private var _otherAssets:AssetManager;//用于加载其他资源
-		private var _otherQueue:Array;
+		protected static const ______otherAssetsTag:String = "______otherAssetsTag";
+		protected var _otherAssets:AssetManager;//用于加载其他资源
+		protected var _otherQueue:Array;
 		
 		
 		
@@ -113,7 +115,7 @@ package lzm.starling.swf
 		}
 		
 		/** 将需要加载的资源推入队列 */
-		private function parseOtherAssets():void{
+		protected function parseOtherAssets():void{
 			if(_otherQueue.length > 0){
 				enqueue(______otherAssetsTag,_otherQueue.slice());
 			}
@@ -255,7 +257,7 @@ package lzm.starling.swf
 			return null;
 		}
 		/** 创建Image */
-		public function createImage(name:String):Image{
+		public function createImage(name:String):SwfImage{
 			for each (var swf:Swf in _swfs) if(swf.hasImage(name)) return swf.createImage(name);
 			return null;
 		}
@@ -265,7 +267,7 @@ package lzm.starling.swf
 			return null;
 		}
 		/** 创建S9Image */
-		public function createS9Image(name:String):Scale9Image{
+		public function createS9Image(name:String):SwfScale9Image{
 			for each (var swf:Swf in _swfs) if(swf.hasS9Image(name)) return swf.createS9Image(name);
 			return null;
 		}
@@ -286,7 +288,7 @@ package lzm.starling.swf
 		
 		public function get verbose():Boolean { return _verbose; }
 		public function set verbose(value:Boolean):void { _verbose = value; }
-		private function log(message:String):void{
+		protected function log(message:String):void{
 			if(_verbose){
 				trace("SwfAssetManager:"+message);
 			}
