@@ -114,7 +114,7 @@ package starling.text
         
         /** Helper objects. */
         private static var sHelperMatrix:Matrix = new Matrix();
-        private static var sNativeTextField:flash.text.TextField = new flash.text.TextField();
+		private static var sNativeTextField:flash.text.TextField = new flash.text.TextField();
         
         /** Create a new text field with the given properties. */
         public function TextField(width:int, height:int, text:String, fontName:String="Verdana",
@@ -315,7 +315,7 @@ package starling.text
             resultTextBounds.setTo((textOffsetX + filterOffset.x) / scale,
                                    (textOffsetY + filterOffset.y) / scale,
                                    textWidth / scale, textHeight / scale);
-            
+			
             return bitmapData;
         }
         
