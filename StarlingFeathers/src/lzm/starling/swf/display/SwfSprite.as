@@ -37,9 +37,9 @@ package lzm.starling.swf.display
 		{
 			return getChildByName(name) as TextField;
 		}
-		public function getButton(name:String):Button
+		public function getButton(name:String):SwfButton
 		{
-			return getChildByName(name) as Button;
+			return getChildByName(name) as SwfButton;
 		}
 		public function getMovie(name:String):SwfMovieClip
 		{
@@ -49,13 +49,13 @@ package lzm.starling.swf.display
 		{
 			return getChildByName(name) as SwfSprite;
 		}
-		public function getImage(name:String):Image
+		public function getImage(name:String):SwfImage
 		{
-			return getChildByName(name) as Image;
+			return getChildByName(name) as SwfImage;
 		}
-		public function getScale9Image(name:String):Scale9Image
+		public function getScale9Image(name:String):SwfScale9Image
 		{
-			return getChildByName(name) as Scale9Image;
+			return getChildByName(name) as SwfScale9Image;
 		}
 		
 		public function getShapeImage(name:String):SwfShapeImage{
