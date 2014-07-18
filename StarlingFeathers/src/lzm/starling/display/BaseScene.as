@@ -114,11 +114,11 @@ package lzm.starling.display
 		/**
 		 * 删除子场景
 		 */		
-		public function popScene():void{
+		public function popScene(dispose:Boolean = true):void{
 			if(_childScene == null) return;
 			
 			_childScene._parentScene = null;
-			_childScene.removeFromParent(true);
+			_childScene.removeFromParent(dispose);
 			this._childScene = null;
 			this.visible = true;
 		}
