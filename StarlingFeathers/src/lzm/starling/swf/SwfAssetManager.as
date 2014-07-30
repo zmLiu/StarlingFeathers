@@ -5,6 +5,7 @@ package lzm.starling.swf
 	import feathers.display.Scale9Image;
 	
 	import lzm.starling.display.Button;
+	import lzm.starling.swf.display.SwfButton;
 	import lzm.starling.swf.display.SwfImage;
 	import lzm.starling.swf.display.SwfMovieClip;
 	import lzm.starling.swf.display.SwfScale9Image;
@@ -262,7 +263,7 @@ package lzm.starling.swf
 			return null;
 		}
 		/** 创建Button */
-		public function createButton(name:String):Button{
+		public function createButton(name:String):SwfButton{
 			for each (var swf:Swf in _swfs) if(swf.hasButton(name)) return swf.createButton(name);
 			return null;
 		}
