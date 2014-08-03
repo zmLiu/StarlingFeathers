@@ -30,9 +30,9 @@ package lzm.starling.gestures
 		
 		public override function checkGestures(touch:Touch):void{
 			if(touch.phase == TouchPhase.BEGAN){
-				_downPoint = touch.getLocation(_target.stage);
+				_downPoint = touch.getLocation(_target.parent);
 			}else if(touch.phase == TouchPhase.MOVED){
-				var movePoint:Point = touch.getLocation(_target.stage);
+				var movePoint:Point = touch.getLocation(_target.parent);
 				_target.x += movePoint.x - _downPoint.x;
 				_target.y += movePoint.y - _downPoint.y;
 				_downPoint = movePoint;
