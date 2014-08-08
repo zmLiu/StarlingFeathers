@@ -456,7 +456,7 @@ package lzm.starling.swf
 			
 			if(disposeAssets){
 				_assets.purge();
-				_assets.dispose();
+				_assets.clearRuntimeLoadTexture();
 			}
 			
 			_assets = null;
