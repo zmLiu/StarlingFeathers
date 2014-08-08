@@ -37,7 +37,7 @@ package starling.utils
             
             sInitialized = true;
             sPlatform = Capabilities.version.substr(0, 3);
-            
+			
             try
             {
                 var nativeAppClass:Object = getDefinitionByName("flash.desktop::NativeApplication");
@@ -102,6 +102,9 @@ package starling.utils
         public static function get isDesktop():Boolean
         {
             initialize();
+			if(Capabilities.isDebugger){
+				return true;
+			}
             return /(WIN|MAC|LNX)/.exec(sPlatform) != null;
         }
         
