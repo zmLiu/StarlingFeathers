@@ -2,9 +2,6 @@ package lzm.starling.swf
 {
 	import flash.utils.Dictionary;
 	
-	import feathers.display.Scale9Image;
-	
-	import lzm.starling.display.Button;
 	import lzm.starling.swf.display.SwfButton;
 	import lzm.starling.swf.display.SwfImage;
 	import lzm.starling.swf.display.SwfMovieClip;
@@ -12,7 +9,6 @@ package lzm.starling.swf
 	import lzm.starling.swf.display.SwfShapeImage;
 	import lzm.starling.swf.display.SwfSprite;
 	
-	import starling.display.Image;
 	import starling.utils.AssetManager;
 
 	/**
@@ -240,6 +236,12 @@ package lzm.starling.swf
 			_swfNames = [];
 		}
 		
+		public function clearAll():void{
+			clearSwf();
+			_otherAssets.purge();
+			_otherAssets.clearRuntimeLoadTexture();
+		}
+		
 		/**
 		 * 获取当前所有已经加载swf的名字
 		 * */
@@ -294,6 +296,5 @@ package lzm.starling.swf
 				trace("SwfAssetManager:"+message);
 			}
 		}
-		
 	}
 }
