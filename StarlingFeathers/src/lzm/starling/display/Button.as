@@ -163,14 +163,20 @@ package lzm.starling.display
 
 		public function set enabled(value:Boolean):void
 		{
+			
 			if(_enabled == value)return;
-			_content.removeChildAt(0);
-			_enabled = value;
-			var setSkin:DisplayObject = _enabled == true ? _skin : _disabledSkin ? _disabledSkin : _skin;
-			_content.addChildAt(setSkin, 0);
-			_w = setSkin.width;
-			_h = setSkin.height;
-			layoutTextField();
+			touchable = _enabled = value;
+			
+			if(_disabledSkin){
+				_content.removeChildAt(0);
+				var setSkin:DisplayObject = _enabled ? _skin : _disabledSkin ? _disabledSkin : _skin;
+				_content.addChildAt(setSkin, 0);
+				_w = setSkin.width;
+				_h = setSkin.height;
+				layoutTextField();
+			}else{
+				alpha = _enabled ? 1 : 0.5;
+			}
 		}
 
 		
