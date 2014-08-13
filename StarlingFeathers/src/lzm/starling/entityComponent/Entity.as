@@ -73,7 +73,6 @@ package lzm.starling.entityComponent
 			if(entity._parentEntity != this) return entity;
 			
 			entity._parentEntity = null;
-			
 			var index:int = _childEntitys.indexOf(entity);
 			_childEntitys.splice(index,1);
 
@@ -203,7 +202,8 @@ package lzm.starling.entityComponent
 			}
 			_components = null;
 			
-			for each (var entity:Entity in _childEntitys) {
+			while(_childEntitys.length > 0){
+				var entity:Entity = _childEntitys[0];
 				entity.removeFromParentEntity();
 				entity.dispose();
 			}
