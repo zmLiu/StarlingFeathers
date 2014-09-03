@@ -22,6 +22,7 @@ package lzm.starling.swf.display
 		
 		private var _frames:Array;
 		private var _labels:Array;
+		private var _frameEvents:Object;
 		private var _labelStrings:Array;
 		private var _displayObjects:Object;
 		
@@ -38,12 +39,13 @@ package lzm.starling.swf.display
 		
 		private var _autoUpdate:Boolean = true;
 		
-		public function SwfMovieClip(frames:Array,labels:Array,displayObjects:Object,ownerSwf:Swf){
+		public function SwfMovieClip(frames:Array,labels:Array,displayObjects:Object,ownerSwf:Swf,frameEvents:Object = null){
 			super();
 			
 			_frames = frames;
 			_labels = labels;
 			_displayObjects = displayObjects;
+			_frameEvents = frameEvents;
 			
 			_startFrame = 0;
 			_endFrame = _frames.length - 1;
@@ -132,6 +134,10 @@ package lzm.starling.swf.display
 						display["text"] = data[19];
 					}
 				}
+			}
+			
+			if(_frameEvents != null && _frameEvents[_currentFrame] != null){
+				dispatchEventWith(_frameEvents[_currentFrame]);
 			}
 		}
 		

@@ -231,7 +231,7 @@ package lzm.starling.swf
 				displayObjects[objName] = displayObjectArray;
 			}
 			
-			var mc:SwfMovieClip = new SwfMovieClip(movieClipData["frames"],movieClipData["labels"],displayObjects,this);
+			var mc:SwfMovieClip = new SwfMovieClip(movieClipData["frames"],movieClipData["labels"],displayObjects,this,movieClipData["frameEvents"]);
 			mc.loop = movieClipData["loop"];
 			
 			if(data) mc.filter = SwfFilter.createFilter(data[10]);//滤镜
