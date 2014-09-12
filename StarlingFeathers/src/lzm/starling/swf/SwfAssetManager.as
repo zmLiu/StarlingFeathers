@@ -5,6 +5,7 @@ package lzm.starling.swf
 	import lzm.starling.swf.display.SwfButton;
 	import lzm.starling.swf.display.SwfImage;
 	import lzm.starling.swf.display.SwfMovieClip;
+	import lzm.starling.swf.display.SwfParticleSyetem;
 	import lzm.starling.swf.display.SwfScale9Image;
 	import lzm.starling.swf.display.SwfShapeImage;
 	import lzm.starling.swf.display.SwfSprite;
@@ -282,6 +283,11 @@ package lzm.starling.swf
 		/** 创建Component */
 		public function createComponent(name:String):*{
 			for each (var swf:Swf in _swfs) if(swf.hasComponent(name)) return swf.createComponent(name);
+			return null;
+		}
+		/** 创建粒子 */
+		public function createParticle(name:String):SwfParticleSyetem{
+			for each (var swf:Swf in _swfs) if(swf.hasParticle(name)) return swf.createParticle(name);
 			return null;
 		}
 		
