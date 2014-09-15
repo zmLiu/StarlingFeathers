@@ -51,7 +51,7 @@ package lzm.starling.swf.display
 			_endFrame = _frames.length - 1;
 			_ownerSwf = ownerSwf;
 			
-			currentFrame = 0;
+//			currentFrame = 0;
 			
 			play();
 		}
