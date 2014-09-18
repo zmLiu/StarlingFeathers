@@ -60,18 +60,18 @@ package lzm.starling.swf.display
 			if (!_isPlay) return;
 			
 			if(_currentFrame == _endFrame){
+				var isReturn:Boolean = false;
+				
+				if(!_loop || _startFrame == _endFrame){//只有一帧就不要循环下去了
+					if(_ownerSwf) stop(false);
+					isReturn = true;
+				}
+				
 				if(_completeFunction) _completeFunction(this);
 				if(_hasCompleteListener) dispatchEventWith(Event.COMPLETE);
 				
-				if(!_loop){
-					if(_ownerSwf) stop(false);
-					return;
-				}
+				if(isReturn) return;
 				
-				if(_startFrame == _endFrame){//只有一帧就不要循环下去了
-					if(_ownerSwf) stop(false);
-					return;
-				}
 				_currentFrame = _startFrame;
 			}else{
 				_currentFrame ++
