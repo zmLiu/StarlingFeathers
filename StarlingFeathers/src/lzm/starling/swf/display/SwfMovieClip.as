@@ -3,6 +3,7 @@ package lzm.starling.swf.display
 	import feathers.core.IFeathersEventDispatcher;
 	
 	import lzm.starling.swf.Swf;
+	import lzm.starling.swf.blendmode.SwfBlendMode;
 	
 	import starling.display.DisplayObject;
 	import starling.events.Event;
@@ -59,7 +60,7 @@ package lzm.starling.swf.display
 		public function update():void{
 			if (!_isPlay) return;
 			
-			if(_currentFrame == _endFrame){
+			if(_currentFrame >= _endFrame){
 				var isReturn:Boolean = false;
 				
 				if(!_loop || _startFrame == _endFrame){//只有一帧就不要循环下去了
@@ -108,32 +109,45 @@ package lzm.starling.swf.display
 					display.mX = data[2];
 					display.mY = data[3];
 				}
-				if(data[1] == Swf.dataKey_Scale9){
-					display.width = data[11];
-					display.height = data[12];
-				}else{
-					display.mScaleX = data[4];
-					display.mScaleY = data[5];
+				
+				switch(data[1]){
+					case Swf.dataKey_Scale9:
+						display.width = data[11];
+						display.height = data[12];
+						SwfBlendMode.setBlendMode(display,data[13]);
+						break;
+					case Swf.dataKey_ShapeImg:
+						display["setSize"](data[11],data[12]);
+						SwfBlendMode.setBlendMode(display,data[13]);
+						break;
+					case Swf.dataKey_TextField:
+						display["width"] = data[11];
+						display["height"] = data[12];
+						display["fontName"] = data[13];
+						display["color"] = data[14];
+						display["fontSize"] = data[15];
+						display["hAlign"] = data[16];
+						display["italic"] = data[17];
+						display["bold"] = data[18];
+						if(data[19] && data[19] != "\r" && data[19] != ""){
+							display["text"] = data[19];
+						}
+						SwfBlendMode.setBlendMode(display,data[20]);
+						break;
+					default:
+						display.mScaleX = data[4];
+						display.mScaleY = data[5];
+						SwfBlendMode.setBlendMode(display,data[11]);
+						break;
 				}
+				
 				if(display is IFeathersEventDispatcher){
 					addChild(display);
 				}else{
 					addQuickChild(display);
 				}
 				
-				if(data[1] == Swf.dataKey_TextField){
-					display["width"] = data[11];
-					display["height"] = data[12];
-					display["fontName"] = data[13];
-					display["color"] = data[14];
-					display["fontSize"] = data[15];
-					display["hAlign"] = data[16];
-					display["italic"] = data[17];
-					display["bold"] = data[18];
-					if(data[19] && data[19] != "\r" && data[19] != ""){
-						display["text"] = data[19];
-					}
-				}
+				
 			}
 			
 			if(_frameEvents != null && _frameEvents[_currentFrame] != null){
@@ -333,6 +347,26 @@ package lzm.starling.swf.display
 		public function get autoUpdate():Boolean{
 			return _autoUpdate;
 		}
+		
+		/** 设置/获取 开始播放的帧 */
+		public function set startFrame(value:int):void{
+			_startFrame = value < 0 ? 0 : value;
+			_startFrame = _startFrame > _endFrame ? _endFrame : _startFrame;
+		}
+		public function get startFrame():int{
+			return _startFrame;
+		}
+		
+		/** 设置/获取 结束播放的帧 */
+		public function set endFrame(value:int):void{
+			_endFrame = value > _frames.length - 1 ? _frames.length - 1 : value;
+			_endFrame = _endFrame < _startFrame ? _startFrame : _endFrame;
+		}
+		public function get endFrame():int{
+			return _endFrame;
+		}
+		
+		
 		
 		public override function dispose():void{
 			_ownerSwf.swfUpdateManager.removeSwfAnimation(this);
