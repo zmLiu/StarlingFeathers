@@ -15,10 +15,8 @@ package lzm.starling.swf.components.feathers
 		
 		public function initialization(componetContent:SwfSprite):void{
 			var _upSkin:DisplayObject = componetContent.getChildByName("_upSkin");
-			var _selectUpSkin:DisplayObject = componetContent.getChildByName("_selectUpSkin");
 			var _downSkin:DisplayObject = componetContent.getChildByName("_downSkin");
 			var _disabledSkin:DisplayObject = componetContent.getChildByName("_disabledSkin");
-			var _selectDisabledSkin:DisplayObject = componetContent.getChildByName("_selectDisabledSkin");
 			
 			var _labelTextField:TextField = componetContent.getTextField("_labelTextField");
 			
@@ -26,20 +24,12 @@ package lzm.starling.swf.components.feathers
 				this.defaultSkin = _upSkin;
 				_upSkin.removeFromParent();
 			}
-			if(_selectUpSkin) {
-				this.defaultSelectedSkin = _selectUpSkin;
-				_selectUpSkin.removeFromParent();
-			}
 			if(_downSkin){
 				this.downSkin = _downSkin;
 				_downSkin.removeFromParent();
 			}
 			if(_disabledSkin) {
 				this.disabledSkin = _disabledSkin;
-				_disabledSkin.removeFromParent();
-			}
-			if(_selectDisabledSkin) {
-				this.selectedDisabledSkin = _selectDisabledSkin;
 				_disabledSkin.removeFromParent();
 			}
 			

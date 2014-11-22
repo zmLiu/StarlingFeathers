@@ -9,6 +9,7 @@ package feathers.controls.renderers
 {
 	import feathers.controls.GroupedList;
 	import feathers.events.FeathersEventType;
+	import feathers.skins.IStyleProvider;
 
 	/**
 	 * The default item renderer for a GroupedList control. Supports up to three
@@ -165,11 +166,28 @@ package feathers.controls.renderers
 		public static const LAYOUT_ORDER_LABEL_ICON_ACCESSORY:String = "labelIconAccessory";
 
 		/**
+		 * The default <code>IStyleProvider</code> for all <code>DefaultGroupedListItemRenderer</code>
+		 * components.
+		 *
+		 * @default null
+		 * @see feathers.core.FeathersControl#styleProvider
+		 */
+		public static var globalStyleProvider:IStyleProvider;
+
+		/**
 		 * Constructor.
 		 */
 		public function DefaultGroupedListItemRenderer()
 		{
 			super();
+		}
+
+		/**
+		 * @private
+		 */
+		override protected function get defaultStyleProvider():IStyleProvider
+		{
+			return DefaultGroupedListItemRenderer.globalStyleProvider;
 		}
 		
 		/**
@@ -260,7 +278,7 @@ package feathers.controls.renderers
 			this._owner = value;
 			if(this._owner)
 			{
-				const list:GroupedList = GroupedList(this._owner);
+				var list:GroupedList = GroupedList(this._owner);
 				this.isSelectableWithoutToggle = list.isSelectable;
 				this._owner.addEventListener(FeathersEventType.SCROLL_START, owner_scrollStartHandler);
 				this._owner.addEventListener(FeathersEventType.SCROLL_COMPLETE, owner_scrollCompleteHandler);

@@ -12,7 +12,7 @@ package feathers.textures
 	import starling.textures.Texture;
 
 	/**
-	 * A set of nine textures used by <code>Scale9Image</code>.
+	 * Slices a Starling Texture into nine regions to be used by <code>Scale9Image</code>.
 	 *
 	 * @see feathers.display.Scale9Image
 	 */
@@ -21,7 +21,22 @@ package feathers.textures
 		/**
 		 * @private
 		 */
-		private static const DIMENSIONS_ERROR:String = "The width and height of the scale9Grid must be greater than zero.";
+		private static const ZERO_WIDTH_ERROR:String = "The width of the scale9Grid must be greater than zero.";
+
+		/**
+		 * @private
+		 */
+		private static const ZERO_HEIGHT_ERROR:String = "The height of the scale9Grid must be greater than zero.";
+
+		/**
+		 * @private
+		 */
+		private static const SUM_X_REGIONS_ERROR:String = "The sum of the x and width properties of the scale9Grid must be greater than the width of the texture.";
+
+		/**
+		 * @private
+		 */
+		private static const SUM_Y_REGIONS_ERROR:String = "The sum of the y and height properties of the scale9Grid must be greater than the height of the texture.";
 
 		/**
 		 * @private
@@ -30,12 +45,41 @@ package feathers.textures
 
 		/**
 		 * Constructor.
+		 *
+		 * @param texture		A Starling Texture to slice up into nine regions. It is recommended to turn of mip-maps for best rendering results.
+		 * @param scale9Grid	The rectangle defining the region in the horizontal center and vertical middle, with other regions being calculated automatically. This value should be based on the original texture dimensions, with no adjustments for scale factor.
 		 */
 		public function Scale9Textures(texture:Texture, scale9Grid:Rectangle)
 		{
-			if(scale9Grid.width <= 0 || scale9Grid.height <= 0)
+			if(scale9Grid.width <= 0)
 			{
-				throw new ArgumentError(DIMENSIONS_ERROR)
+				throw new ArgumentError(ZERO_WIDTH_ERROR);
+			}
+			if(scale9Grid.height <= 0)
+			{
+				throw new ArgumentError(ZERO_HEIGHT_ERROR);
+			}
+			var textureScale:Number = texture.scale;
+			//the scale9Grid does not account for the texture's scale factor,
+			//so we need to scale the grid to match.
+			if(textureScale != 1)
+			{
+				scale9Grid = scale9Grid.clone();
+				scale9Grid.setTo(scale9Grid.x / textureScale, scale9Grid.y / textureScale, scale9Grid.width / textureScale, scale9Grid.height / textureScale);
+			}
+			var textureFrame:Rectangle = texture.frame;
+			if(!textureFrame)
+			{
+				textureFrame = HELPER_RECTANGLE;
+				textureFrame.setTo(0, 0, texture.width, texture.height);
+			}
+			if((scale9Grid.x + scale9Grid.width) > textureFrame.width)
+			{
+				throw new ArgumentError(SUM_X_REGIONS_ERROR);
+			}
+			if((scale9Grid.y + scale9Grid.height) > textureFrame.height)
+			{
+				throw new ArgumentError(SUM_Y_REGIONS_ERROR);
 			}
 			this._texture = texture;
 			this._scale9Grid = scale9Grid;

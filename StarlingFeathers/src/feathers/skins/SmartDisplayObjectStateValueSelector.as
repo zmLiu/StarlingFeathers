@@ -36,17 +36,18 @@ package feathers.skins
 		/**
 		 * The value type handler for type <code>starling.textures.Texture</code>.
 		 *
-		 * @see starling.textures.Texture
+		 * @see http://doc.starling-framework.org/core/starling/textures/Texture.html starling.display.Texture
 		 */
 		public static function textureValueTypeHandler(value:Texture, oldDisplayObject:DisplayObject = null):DisplayObject
 		{
-			var displayObject:Image = oldDisplayObject as Image;
-			if(displayObject)
+			var displayObject:Image;
+			if(oldDisplayObject && Object(oldDisplayObject).constructor === Image)
 			{
+				displayObject = Image(oldDisplayObject);
 				displayObject.texture = value;
 				displayObject.readjustSize();
 			}
-			else
+			if(!displayObject)
 			{
 				displayObject = new Image(value);
 			}
@@ -60,13 +61,14 @@ package feathers.skins
 		 */
 		public static function scale3TextureValueTypeHandler(value:Scale3Textures, oldDisplayObject:DisplayObject = null):DisplayObject
 		{
-			var displayObject:Scale3Image = oldDisplayObject as Scale3Image;
-			if(displayObject)
+			var displayObject:Scale3Image;
+			if(oldDisplayObject && Object(oldDisplayObject).constructor === Scale3Image)
 			{
+				displayObject = Scale3Image(oldDisplayObject);
 				displayObject.textures = value;
 				displayObject.readjustSize();
 			}
-			else
+			if(!displayObject)
 			{
 				displayObject = new Scale3Image(value);
 			}
@@ -80,13 +82,14 @@ package feathers.skins
 		 */
 		public static function scale9TextureValueTypeHandler(value:Scale9Textures, oldDisplayObject:DisplayObject = null):DisplayObject
 		{
-			var displayObject:Scale9Image = oldDisplayObject as Scale9Image;
-			if(displayObject)
+			var displayObject:Scale9Image;
+			if(oldDisplayObject && Object(oldDisplayObject).constructor === Scale9Image)
 			{
+				displayObject = Scale9Image(oldDisplayObject);
 				displayObject.textures = value;
 				displayObject.readjustSize();
 			}
-			else
+			if(!displayObject)
 			{
 				displayObject = new Scale9Image(value);
 			}
@@ -96,13 +99,19 @@ package feathers.skins
 		/**
 		 * The value type handler for type <code>uint</code> (a color to display
 		 * by a quad).
+		 *
+		 * @see http://doc.starling-framework.org/core/starling/display/Quad.html starling.display.Quad
 		 */
 		public static function uintValueTypeHandler(value:uint, oldDisplayObject:DisplayObject = null):DisplayObject
 		{
-			var displayObject:Quad = oldDisplayObject as Quad;
+			var displayObject:Quad;
+			if(oldDisplayObject && Object(oldDisplayObject).constructor === Quad)
+			{
+				displayObject = Quad(oldDisplayObject);
+			}
 			if(!displayObject)
 			{
-				displayObject = new Quad(100, 100, value);
+				displayObject = new Quad(1, 1, value);
 			}
 			displayObject.color = value;
 			return displayObject;
@@ -159,10 +168,13 @@ package feathers.skins
 		 */
 		override public function setValueForState(value:Object, state:Object, isSelected:Boolean = false):void
 		{
-			const type:Class = Class(value.constructor);
-			if(this._handlers[type] == null)
+			if(value !== null)
 			{
-				throw new ArgumentError("Handler for value type " + type + " has not been set.");
+				var type:Class = Class(value.constructor);
+				if(this._handlers[type] == null)
+				{
+					throw new ArgumentError("Handler for value type " + type + " has not been set.");
+				}
 			}
 			super.setValueForState(value, state, isSelected);
 		}
@@ -172,16 +184,16 @@ package feathers.skins
 		 */
 		override public function updateValue(target:Object, state:Object, oldValue:Object = null):Object
 		{
-			const value:Object = super.updateValue(target, state);
+			var value:Object = super.updateValue(target, state);
 			if(value === null)
 			{
 				return null;
 			}
 
-			const typeHandler:Function = this.valueToValueTypeHandler(value);
+			var typeHandler:Function = this.valueToValueTypeHandler(value);
 			if(typeHandler != null)
 			{
-				const displayObject:DisplayObject = typeHandler(value, oldValue);
+				var displayObject:DisplayObject = typeHandler(value, oldValue);
 			}
 			else
 			{
@@ -190,11 +202,8 @@ package feathers.skins
 
 			for(var propertyName:String in this._displayObjectProperties)
 			{
-				if(displayObject.hasOwnProperty(propertyName))
-				{
-					var propertyValue:Object = this._displayObjectProperties[propertyName];
-					displayObject[propertyName] = propertyValue;
-				}
+				var propertyValue:Object = this._displayObjectProperties[propertyName];
+				displayObject[propertyName] = propertyValue;
 			}
 
 			return displayObject;
@@ -219,7 +228,7 @@ package feathers.skins
 		/**
 		 * Returns the function that handles updating a value of a specific type.
 		 */
-		public function getValueTypeHandler(type:Class, handler:Function):Function
+		public function getValueTypeHandler(type:Class):Function
 		{
 			return this._handlers[type] as Function;
 		}
@@ -237,7 +246,7 @@ package feathers.skins
 		 */
 		protected function valueToValueTypeHandler(value:Object):Function
 		{
-			const type:Class = Class(value.constructor);
+			var type:Class = Class(value.constructor);
 			return this._handlers[type] as Function;
 		}
 	}

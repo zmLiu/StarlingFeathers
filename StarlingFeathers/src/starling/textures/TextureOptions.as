@@ -1,7 +1,7 @@
 // =================================================================================================
 //
 //	Starling Framework
-//	Copyright 2013 Gamua OG. All Rights Reserved.
+//	Copyright 2011-2014 Gamua. All Rights Reserved.
 //
 //	This program is free software. You can redistribute and/or modify it
 //	in accordance with the terms of the accompanying license agreement.
@@ -49,7 +49,9 @@ package starling.textures
             mScale = value > 0 ? value : Starling.contentScaleFactor;
         }
         
-        /** The <code>Context3DTextureFormat</code> of the underlying texture data. */
+        /** The <code>Context3DTextureFormat</code> of the underlying texture data. Only used
+         *  for textures that are created from Bitmaps; the format of ATF files is set when they
+         *  are created. */
         public function get format():String { return mFormat; }
         public function set format(value:String):void { mFormat = value; }
         

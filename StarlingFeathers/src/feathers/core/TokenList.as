@@ -7,11 +7,37 @@ accordance with the terms of the accompanying license agreement.
 */
 package feathers.core
 {
+	import starling.events.Event;
+	import starling.events.EventDispatcher;
+
+	/**
+	 * Dispatched when a token is added, removed, or toggled or if all tokens
+	 * have been replaced by setting the <code>value</code> property.
+	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>null</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
+	 *
+	 * @eventType starling.events.Event.CHANGE
+	 */
+	[Event(name="change",type="starling.events.Event")]
+
 	/**
 	 * A list of space-delimited tokens. Obviously, since they are delimited by
 	 * spaces, tokens cannot contain spaces.
 	 */
-	public class TokenList
+	public class TokenList extends EventDispatcher
 	{
 		/**
 		 * Constructor.
@@ -41,8 +67,13 @@ package feathers.core
 		 */
 		public function set value(value:String):void
 		{
+			if(this.value == value)
+			{
+				return;
+			}
 			this.names.length = 0;
 			this.names = Vector.<String>(value.split(" "));
+			this.dispatchEventWith(Event.CHANGE);
 		}
 
 		/**
@@ -78,6 +109,7 @@ package feathers.core
 				return;
 			}
 			this.names[this.names.length] = name;
+			this.dispatchEventWith(Event.CHANGE);
 		}
 
 		/**
@@ -100,6 +132,7 @@ package feathers.core
 			if(index < 0)
 			{
 				this.names[this.names.length] = name;
+				this.dispatchEventWith(Event.CHANGE);
 			}
 			else
 			{
@@ -127,15 +160,18 @@ package feathers.core
 			if(index == 0)
 			{
 				this.names.shift();
+				this.dispatchEventWith(Event.CHANGE);
 				return;
 			}
 			var lastIndex:int = this.names.length - 1;
 			if(index == lastIndex)
 			{
 				this.names.pop();
+				this.dispatchEventWith(Event.CHANGE);
 				return;
 			}
 			this.names.splice(index,  1);
+			this.dispatchEventWith(Event.CHANGE);
 		}
 
 	}

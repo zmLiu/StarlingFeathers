@@ -2,9 +2,11 @@ package starling.utils
 {
     import flash.display.Bitmap;
     import flash.display.Loader;
+    import flash.display.LoaderInfo;
     import flash.events.HTTPStatusEvent;
     import flash.events.IOErrorEvent;
     import flash.events.ProgressEvent;
+    import flash.events.SecurityErrorEvent;
     import flash.media.Sound;
     import flash.media.SoundChannel;
     import flash.media.SoundTransform;
@@ -17,7 +19,6 @@ package starling.utils
     import flash.system.System;
     import flash.utils.ByteArray;
     import flash.utils.Dictionary;
-    import flash.utils.clearTimeout;
     import flash.utils.describeType;
     import flash.utils.getQualifiedClassName;
     import flash.utils.setTimeout;
@@ -35,6 +36,18 @@ package starling.utils
     /** Dispatched when all textures have been restored after a context loss. */
     [Event(name="texturesRestored", type="starling.events.Event")]
     
+    /** Dispatched when an URLLoader fails with an IO_ERROR while processing the queue.
+     *  The 'data' property of the Event contains the URL-String that could not be loaded. */
+    [Event(name="ioError", type="starling.events.Event")]
+
+    /** Dispatched when an URLLoader fails with a SECURITY_ERROR while processing the queue.
+     *  The 'data' property of the Event contains the URL-String that could not be loaded. */
+    [Event(name="securityError", type="starling.events.Event")]
+
+    /** Dispatched when an XML or JSON file couldn't be parsed.
+     *  The 'data' property of the Event contains the name of the asset that could not be parsed. */
+    [Event(name="parseError", type="starling.events.Event")]
+
     /** The AssetManager handles loading and accessing a variety of asset types. You can 
      *  add assets directly (via the 'add...' methods) or asynchronously via a queue. This allows
      *  you to deal with assets in a unified way, no matter if they are loaded from a file, 
@@ -63,25 +76,51 @@ package starling.utils
      *  not reappear all at once, but during a timeframe of several seconds. If you want, you can
      *  pause your game during that time; the AssetManager dispatches an "Event.TEXTURES_RESTORED"
      *  event when all textures have been restored.</p>
+     *
+     *  <strong>Error handling</strong>
+     *
+     *  <p>Loading of some assets may fail while the queue is being processed. In that case, the
+     *  AssetManager will dispatch events of type "IO_ERROR", "SECURITY_ERROR" or "PARSE_ERROR".
+     *  You can listen to those events and handle the errors manually (e.g., you could enqueue
+     *  them once again and retry, or provide placeholder textures). Queue processing will
+     *  continue even when those events are dispatched.</p>
+     *
+     *  <strong>Using variable texture formats</strong>
+     *
+     *  <p>When you enqueue a texture, its properties for "format", "scale", "mipMapping", and
+     *  "repeat" will reflect the settings of the AssetManager at the time they were enqueued.
+     *  This means that you can enqueue a bunch of textures, then change the settings and enqueue
+     *  some more. Like this:</p>
+     *
+     *  <listing>
+     *  var appDir:File = File.applicationDirectory;
+     *  var assets:AssetManager = new AssetManager();
+     *  
+     *  assets.textureFormat = Context3DTextureFormat.BGRA;
+     *  assets.enqueue(appDir.resolvePath("textures/32bit"));
+     *  
+     *  assets.textureFormat = Context3DTextureFormat.BGRA_PACKED;
+     *  assets.enqueue(appDir.resolvePath("textures/16bit"));
+     *  
+     *  assets.loadQueue(...);</listing>
      */
     public class AssetManager extends EventDispatcher
     {
-		// This HTTPStatusEvent is only available in AIR
-		private static const HTTP_RESPONSE_STATUS:String = "httpResponseStatus";
-		
+        // This HTTPStatusEvent is only available in AIR
+        private static const HTTP_RESPONSE_STATUS:String = "httpResponseStatus";
+
         private var mStarling:Starling;
         private var mNumLostTextures:int;
         private var mNumRestoredTextures:int;
+        private var mNumLoadingQueues:int;
 
         private var mDefaultTextureOptions:TextureOptions;
         private var mCheckPolicyFile:Boolean;
         private var mKeepAtlasXmls:Boolean;
         private var mKeepFontXmls:Boolean;
+        private var mNumConnections:int;
         private var mVerbose:Boolean;
-        
         private var mQueue:Array;
-        private var mIsLoading:Boolean;
-        private var mTimeoutID:uint;
         
         private var mTextures:Dictionary;
         private var mAtlases:Dictionary;
@@ -89,8 +128,6 @@ package starling.utils
         private var mXmls:Dictionary;
         private var mObjects:Dictionary;
         private var mByteArrays:Dictionary;
-		
-		private var runtimeLoadTexture:Dictionary;//运行时临时加载的纹理，单独缓存起来以便清理
         
         /** helper objects */
         private static var sNames:Vector.<String> = new <String>[];
@@ -109,9 +146,9 @@ package starling.utils
             mXmls = new Dictionary();
             mObjects = new Dictionary();
             mByteArrays = new Dictionary();
+            mNumConnections = 3;
+            mVerbose = true;
             mQueue = [];
-			
-			runtimeLoadTexture = new Dictionary();
         }
         
         /** Disposes all contained textures. */
@@ -156,8 +193,8 @@ package starling.utils
             if (result == null) result = new <Texture>[];
             
             for each (var name:String in getTextureNames(prefix, sNames))
-                result.push(getTexture(name));
-            
+                result[result.length] = getTexture(name); // avoid 'push'
+
             sNames.length = 0;
             return result;
         }
@@ -397,9 +434,7 @@ package starling.utils
         /** Empties the queue and aborts any pending load operations. */
         public function purgeQueue():void
         {
-            mIsLoading = false;
             mQueue.length = 0;
-            clearTimeout(mTimeoutID);
             dispatchEventWith(Event.CANCEL);
         }
         
@@ -511,7 +546,7 @@ package starling.utils
                 asset = decodeURI(asset["url"]);
             
             if (name == null)    name = getName(asset);
-            if (options == null) options = mDefaultTextureOptions;
+            if (options == null) options = mDefaultTextureOptions.clone();
             else                 options = options.clone();
             
             log("Enqueuing '" + name + "'");
@@ -533,102 +568,179 @@ package starling.utils
          *  if you are working with more than one Starling instance, be sure to call
          *  "makeCurrent()" on the appropriate instance before processing the queue.</p>
          *
-         *  @param onProgress: <code>function(ratio:Number):void;</code> 
+         *  @param onProgress <code>function(ratio:Number):void;</code>
          */
         public function loadQueue(onProgress:Function):void
         {
+            if (onProgress == null)
+                throw new ArgumentError("Argument 'onProgress' must not be null");
+
+            if (mQueue.length == 0)
+            {
+                onProgress(1.0);
+                return;
+            }
+
             mStarling = Starling.current;
             
             if (mStarling == null || mStarling.context == null)
-                throw new Error("The Starling instance needs to be ready before textures can be loaded.");
-            
-            if (mIsLoading)
-                throw new Error("The queue is already being processed");
-            
+                throw new Error("The Starling instance needs to be ready before assets can be loaded.");
+
+            const PROGRESS_PART_ASSETS:Number = 0.9;
+            const PROGRESS_PART_XMLS:Number = 1.0 - PROGRESS_PART_ASSETS;
+
+            var i:int;
+            var canceled:Boolean = false;
             var xmls:Vector.<XML> = new <XML>[];
-            var numElements:int = mQueue.length;
-            var currentRatio:Number = 0.0;
+            var assetInfos:Array = mQueue.concat();
+            var assetCount:int = mQueue.length;
+            var assetProgress:Array = [];
+            var assetIndex:int = 0;
             
-            mIsLoading = true;
-            resume();
-            
-            function resume():void
+            for (i=0; i<assetCount; ++i)
+                assetProgress[i] = 0.0;
+
+            for (i=0; i<mNumConnections; ++i)
+                loadNextQueueElement();
+
+            mQueue.length = 0;
+            mNumLoadingQueues++;
+            addEventListener(Event.CANCEL, cancel);
+
+            function loadNextQueueElement():void
             {
-                currentRatio = mQueue.length ? 1.0 - (mQueue.length / numElements) : 1.0;
-                
-                if (mQueue.length)
-                    mTimeoutID = setTimeout(processNext, 1);
-                else
+                if (assetIndex < assetInfos.length)
                 {
-                    processXmls();
-                    mIsLoading = false;
+                    // increment asset index *before* using it, since
+                    // 'loadQueueElement' could by synchronous in subclasses.
+                    var index:int = assetIndex++;
+                    loadQueueElement(index, assetInfos[index]);
                 }
+            }
+
+            function loadQueueElement(index:int, assetInfo:Object):void
+            {
+                if (canceled) return;
                 
-                if (onProgress != null)
-                    onProgress(currentRatio);
+                var onElementProgress:Function = function(progress:Number):void
+                {
+                    updateAssetProgress(index, progress * 0.8); // keep 20 % for completion
+                };
+                var onElementLoaded:Function = function():void
+                {
+                    updateAssetProgress(index, 1.0);
+                    assetCount--;
+
+                    if (assetCount > 0) loadNextQueueElement();
+                    else                processXmls();
+                };
+                
+                processRawAsset(assetInfo.name, assetInfo.asset, assetInfo.options,
+                    xmls, onElementProgress, onElementLoaded);
             }
             
-            function processNext():void
+            function updateAssetProgress(index:int, progress:Number):void
             {
-                var assetInfo:Object = mQueue.shift();
-                clearTimeout(mTimeoutID);
-                processRawAsset(assetInfo.name, assetInfo.asset, assetInfo.options,
-                                xmls, progress, resume);
+                assetProgress[index] = progress;
+
+                var sum:Number = 0.0;
+                var len:int = assetProgress.length;
+
+                for (i=0; i<len; ++i)
+                    sum += assetProgress[i];
+
+                onProgress(sum / len * PROGRESS_PART_ASSETS);
             }
             
             function processXmls():void
             {
-                // xmls are processed seperately at the end, because the textures they reference
+                // xmls are processed separately at the end, because the textures they reference
                 // have to be available for other XMLs. Texture atlases are processed first:
                 // that way, their textures can be referenced, too.
                 
                 xmls.sort(function(a:XML, b:XML):int { 
                     return a.localName() == "TextureAtlas" ? -1 : 1; 
                 });
-                
-                for each (var xml:XML in xmls)
+
+                setTimeout(processXml, 1, 0);
+            }
+
+            function processXml(index:int):void
+            {
+                if (canceled) return;
+                else if (index == xmls.length)
                 {
-                    var name:String;
-                    var texture:Texture;
-                    var rootNode:String = xml.localName();
-                    
-                    if (rootNode == "TextureAtlas")
-                    {
-                        name = getName(xml.@imagePath.toString());
-                        texture = getTexture(name);
-                        
-                        if (texture)
-                        {
-                            addTextureAtlas(name, new TextureAtlas(texture, xml));
-
-                            if (mKeepAtlasXmls) addXml(name, xml);
-                            else System.disposeXML(xml);
-                        }
-                        else log("Cannot create atlas: texture '" + name + "' is missing.");
-                    }
-                    else if (rootNode == "font")
-                    {
-                        name = getName(xml.pages.page.@file.toString());
-                        texture = getTexture(name);
-                        
-                        if (texture)
-                        {
-                            log("Adding bitmap font '" + name + "'");
-                            TextField.registerBitmapFont(new BitmapFont(texture, xml), name);
-
-                            if (mKeepFontXmls) addXml(name, xml);
-                            else System.disposeXML(xml);
-                        }
-                        else log("Cannot create bitmap font: texture '" + name + "' is missing.");
-                    }
-                    else
-                        throw new Error("XML contents not recognized: " + rootNode);
+                    finish();
+                    return;
                 }
+
+                var name:String;
+                var texture:Texture;
+                var xml:XML = xmls[index];
+                var rootNode:String = xml.localName();
+                var xmlProgress:Number = (index + 1) / (xmls.length + 1);
+
+                if (rootNode == "TextureAtlas")
+                {
+                    name = getName(xml.@imagePath.toString());
+                    texture = getTexture(name);
+
+                    if (texture)
+                    {
+                        addTextureAtlas(name, new TextureAtlas(texture, xml));
+
+                        if (mKeepAtlasXmls) addXml(name, xml);
+                        else System.disposeXML(xml);
+                    }
+                    else log("Cannot create atlas: texture '" + name + "' is missing.");
+                }
+                else if (rootNode == "font")
+                {
+                    name = getName(xml.pages.page.@file.toString());
+                    texture = getTexture(name);
+
+                    if (texture)
+                    {
+                        log("Adding bitmap font '" + name + "'");
+                        TextField.registerBitmapFont(new BitmapFont(texture, xml), name);
+
+                        if (mKeepFontXmls) addXml(name, xml);
+                        else System.disposeXML(xml);
+                    }
+                    else log("Cannot create bitmap font: texture '" + name + "' is missing.");
+                }
+                else
+                    throw new Error("XML contents not recognized: " + rootNode);
+
+                onProgress(PROGRESS_PART_ASSETS + PROGRESS_PART_XMLS * xmlProgress);
+                setTimeout(processXml, 1, index + 1);
             }
             
-            function progress(ratio:Number):void
+            function cancel():void
             {
-                onProgress(currentRatio + (1.0 / numElements) * Math.min(1.0, ratio) * 0.99);
+                removeEventListener(Event.CANCEL, cancel);
+                mNumLoadingQueues--;
+                canceled = true;
+            }
+
+            function finish():void
+            {
+                // now would be a good time for a clean-up
+                System.pauseForGCIfCollectionImminent(0);
+                System.gc();
+
+                // We dance around the final "onProgress" call with some "setTimeout" calls here
+                // to make sure the progress bar gets the chance to be rendered. Otherwise, all
+                // would happen in one frame.
+
+                setTimeout(function():void
+                {
+                    if (!canceled)
+                    {
+                        cancel();
+                        onProgress(1.0);
+                    }
+                }, 1);
             }
         }
         
@@ -645,6 +757,8 @@ package starling.utils
             {
                 var texture:Texture;
                 var bytes:ByteArray;
+                var object:Object = null;
+                var xml:XML = null;
                 
                 // the 'current' instance might have changed by now
                 // if we're running in a set-up with multiple instances.
@@ -665,10 +779,9 @@ package starling.utils
                 }
                 else if (asset is XML)
                 {
-                    var xml:XML = asset as XML;
-                    var rootNode:String = xml.localName();
+                    xml = asset as XML;
                     
-                    if (rootNode == "TextureAtlas" || rootNode == "font")
+                    if (xml.localName() == "TextureAtlas" || xml.localName() == "font")
                         xmls.push(xml);
                     else
                         addXml(name, xml);
@@ -710,7 +823,7 @@ package starling.utils
                     
                     if (AtfData.isAtfData(bytes))
                     {
-                        options.onReady = onComplete;
+                        options.onReady = prependCallback(options.onReady, onComplete);
                         texture = Texture.fromData(bytes, options);
                         texture.root.onRestore = function():void
                         {
@@ -733,13 +846,28 @@ package starling.utils
                     }
                     else if (byteArrayStartsWith(bytes, "{") || byteArrayStartsWith(bytes, "["))
                     {
-                        addObject(name, JSON.parse(bytes.readUTFBytes(bytes.length)));
+                        try { object = JSON.parse(bytes.readUTFBytes(bytes.length)); }
+                        catch (e:Error)
+                        {
+                            log("Could not parse JSON: " + e.message);
+                            dispatchEventWith(Event.PARSE_ERROR, false, name);
+                        }
+
+                        if (object) addObject(name, object);
+
                         bytes.clear();
                         onComplete();
                     }
                     else if (byteArrayStartsWith(bytes, "<"))
                     {
-                        process(new XML(bytes));
+                        try { xml = new XML(bytes); }
+                        catch (e:Error)
+                        {
+                            log("Could not parse XML: " + e.message);
+                            dispatchEventWith(Event.PARSE_ERROR, false, name);
+                        }
+
+                        process(xml);
                         bytes.clear();
                     }
                     else
@@ -750,7 +878,7 @@ package starling.utils
                 }
                 else
                 {
-                    log("Ignoring unsupported asset type: " + getQualifiedClassName(asset));
+                    addObject(name, asset);
                     onComplete();
                 }
                 
@@ -772,9 +900,25 @@ package starling.utils
             }
         }
         
-        private function loadRawAsset(rawAsset:Object, onProgress:Function, onComplete:Function):void
+        /** This method is called internally for each element of the queue when it is loaded.
+         *  'rawAsset' is typically either a class (pointing to an embedded asset) or a string
+         *  (containing the path to a file). For texture data, it will also be called after a
+         *  context loss.
+         *
+         *  <p>The method has to transform this object into one of the types that the AssetManager
+         *  can work with, e.g. a Bitmap, a Sound, XML data, or a ByteArray. This object needs to
+         *  be passed to the 'onComplete' callback.</p>
+         *
+         *  <p>The calling method will then process this data accordingly (e.g. a Bitmap will be
+         *  transformed into a texture). Unknown types will be available via 'getObject()'.</p>
+         *
+         *  <p>When overriding this method, you can call 'onProgress' with a number between 0 and 1
+         *  to update the total queue loading progress.</p>
+         */
+        protected function loadRawAsset(rawAsset:Object, onProgress:Function, onComplete:Function):void
         {
             var extension:String = null;
+            var loaderInfo:LoaderInfo = null;
             var urlLoader:URLLoader = null;
             var url:String = null;
             
@@ -790,7 +934,8 @@ package starling.utils
                 urlLoader = new URLLoader();
                 urlLoader.dataFormat = URLLoaderDataFormat.BINARY;
                 urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIoError);
-				urlLoader.addEventListener(HTTP_RESPONSE_STATUS, onHttpResponseStatus);
+                urlLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onSecurityError);
+                urlLoader.addEventListener(HTTP_RESPONSE_STATUS, onHttpResponseStatus);
                 urlLoader.addEventListener(ProgressEvent.PROGRESS, onLoadProgress);
                 urlLoader.addEventListener(Event.COMPLETE, onUrlLoaderComplete);
                 urlLoader.load(new URLRequest(url));
@@ -799,10 +944,18 @@ package starling.utils
             function onIoError(event:IOErrorEvent):void
             {
                 log("IO error: " + event.text);
+                dispatchEventWith(Event.IO_ERROR, false, url);
                 complete(null);
             }
-            
-            function onHttpResponseStatus(event:HTTPStatusEvent):void	
+
+            function onSecurityError(event:SecurityErrorEvent):void
+            {
+                log("security error: " + event.text);
+                dispatchEventWith(Event.SECURITY_ERROR, false, url);
+                complete(null);
+            }
+
+            function onHttpResponseStatus(event:HTTPStatusEvent):void
             {
                 if (extension == null)
                 {
@@ -816,7 +969,7 @@ package starling.utils
 
             function onLoadProgress(event:ProgressEvent):void
             {
-                if (onProgress != null)
+                if (onProgress != null && event.bytesTotal > 0)
                     onProgress(event.bytesLoaded / event.bytesTotal);
             }
             
@@ -825,14 +978,9 @@ package starling.utils
                 var bytes:ByteArray = transformData(urlLoader.data as ByteArray, url);
                 var sound:Sound;
                 
-                urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, onIoError);
-				urlLoader.removeEventListener(HTTP_RESPONSE_STATUS, onHttpResponseStatus);
-                urlLoader.removeEventListener(ProgressEvent.PROGRESS, onLoadProgress);
-                urlLoader.removeEventListener(Event.COMPLETE, onUrlLoaderComplete);
-				
-				if (extension)
-					extension = extension.toLowerCase();
-                
+                if (extension)
+                    extension = extension.toLowerCase();
+
                 switch (extension)
                 {
                     case "mpeg":
@@ -849,7 +997,9 @@ package starling.utils
                         var loaderContext:LoaderContext = new LoaderContext(mCheckPolicyFile);
                         var loader:Loader = new Loader();
                         loaderContext.imageDecodingPolicy = ImageDecodingPolicy.ON_LOAD;
-                        loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderComplete);
+                        loaderInfo = loader.contentLoaderInfo;
+                        loaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIoError);
+                        loaderInfo.addEventListener(Event.COMPLETE, onLoaderComplete);
                         loader.loadBytes(bytes, loaderContext);
                         break;
                     default: // any XML / JSON / binary data 
@@ -861,12 +1011,28 @@ package starling.utils
             function onLoaderComplete(event:Object):void
             {
                 urlLoader.data.clear();
-                event.target.removeEventListener(Event.COMPLETE, onLoaderComplete);
                 complete(event.target.content);
             }
             
             function complete(asset:Object):void
             {
+                // clean up event listeners
+
+                if (urlLoader)
+                {
+                    urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, onIoError);
+                    urlLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onSecurityError);
+                    urlLoader.removeEventListener(HTTP_RESPONSE_STATUS, onHttpResponseStatus);
+                    urlLoader.removeEventListener(ProgressEvent.PROGRESS, onLoadProgress);
+                    urlLoader.removeEventListener(Event.COMPLETE, onUrlLoaderComplete);
+                }
+
+                if (loaderInfo)
+                {
+                    loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onIoError);
+                    loaderInfo.removeEventListener(Event.COMPLETE, onLoaderComplete);
+                }
+
                 // On mobile, it is not allowed / endorsed to make stage3D calls while the app
                 // is in the background. Thus, we pause queue processing if that's the case.
                 
@@ -876,7 +1042,203 @@ package starling.utils
                     SystemUtil.executeWhenApplicationIsActive(onComplete, asset);
             }
         }
+        
+        // helpers
+        
+        /** This method is called by 'enqueue' to determine the name under which an asset will be
+         *  accessible; override it if you need a custom naming scheme. Typically, 'rawAsset' is 
+         *  either a String or a FileReference. Note that this method won't be called for embedded
+         *  assets. */
+        protected function getName(rawAsset:Object):String
+        {
+            var name:String;
+            
+            if (rawAsset is String || rawAsset is FileReference)
+            {
+                name = rawAsset is String ? rawAsset as String : (rawAsset as FileReference).name;
+                name = name.replace(/%20/g, " "); // URLs use '%20' for spaces
+                name = getBasenameFromUrl(name);
+                
+                if (name) return name;
+                else throw new ArgumentError("Could not extract name from String '" + rawAsset + "'");
+            }
+            else
+            {
+                name = getQualifiedClassName(rawAsset);
+                throw new ArgumentError("Cannot extract names for objects of type '" + name + "'");
+            }
+        }
+
+        /** This method is called when raw byte data has been loaded from an URL or a file.
+         *  Override it to process the downloaded data in some way (e.g. decompression) or
+         *  to cache it on disk. */
+        protected function transformData(data:ByteArray, url:String):ByteArray
+        {
+            return data;
+        }
+
+        /** This method is called during loading of assets when 'verbose' is activated. Per
+         *  default, it traces 'message' to the console. */
+        protected function log(message:String):void
+        {
+            if (mVerbose) trace("[AssetManager]", message);
+        }
+        
+        private function byteArrayStartsWith(bytes:ByteArray, char:String):Boolean
+        {
+            var start:int = 0;
+            var length:int = bytes.length;
+            var wanted:int = char.charCodeAt(0);
+            
+            // recognize BOMs
+            
+            if (length >= 4 &&
+                (bytes[0] == 0x00 && bytes[1] == 0x00 && bytes[2] == 0xfe && bytes[3] == 0xff) ||
+                (bytes[0] == 0xff && bytes[1] == 0xfe && bytes[2] == 0x00 && bytes[3] == 0x00))
+            {
+                start = 4; // UTF-32
+            }
+            else if (length >= 3 && bytes[0] == 0xef && bytes[1] == 0xbb && bytes[2] == 0xbf)
+            {
+                start = 3; // UTF-8
+            }
+            else if (length >= 2 &&
+                (bytes[0] == 0xfe && bytes[1] == 0xff) || (bytes[0] == 0xff && bytes[1] == 0xfe))
+            {
+                start = 2; // UTF-16
+            }
+            
+            // find first meaningful letter
+            
+            for (var i:int=start; i<length; ++i)
+            {
+                var byte:int = bytes[i];
+                if (byte == 0 || byte == 10 || byte == 13 || byte == 32) continue; // null, \n, \r, space
+                else return byte == wanted;
+            }
+            
+            return false;
+        }
+        
+        private function getDictionaryKeys(dictionary:Dictionary, prefix:String="",
+                                           result:Vector.<String>=null):Vector.<String>
+        {
+            if (result == null) result = new <String>[];
+            
+            for (var name:String in dictionary)
+                if (name.indexOf(prefix) == 0)
+                    result[result.length] = name; // avoid 'push'
+
+            result.sort(Array.CASEINSENSITIVE);
+            return result;
+        }
+        
+        private function getHttpHeader(headers:Array, headerName:String):String
+        {
+            if (headers)
+            {
+                for each (var header:Object in headers)
+                    if (header.name == headerName) return header.value;
+            }
+            return null;
+        }
+
+        /** Extracts the base name of a file path or URL, i.e. the file name without extension. */
+        protected function getBasenameFromUrl(url:String):String
+        {
+            var matches:Array = NAME_REGEX.exec(url);
+            if (matches && matches.length > 0) return matches[1];
+            else return null;
+        }
+
+        /** Extracts the file extension from an URL. */
+        protected function getExtensionFromUrl(url:String):String
+        {
+            var matches:Array = NAME_REGEX.exec(url);
+            if (matches && matches.length > 1) return matches[2];
+            else return null;
+        }
+
+        private function prependCallback(oldCallback:Function, newCallback:Function):Function
+        {
+            // TODO: it might make sense to add this (together with "appendCallback")
+            //       as a public utility method ("FunctionUtil"?)
+
+            if (oldCallback == null) return newCallback;
+            else if (newCallback == null) return oldCallback;
+            else return function():void
+            {
+                newCallback();
+                oldCallback();
+            };
+        }
+
+        // properties
+        
+        /** The queue contains one 'Object' for each enqueued asset. Each object has 'asset'
+         *  and 'name' properties, pointing to the raw asset and its name, respectively. */
+        protected function get queue():Array { return mQueue; }
+        
+        /** Returns the number of raw assets that have been enqueued, but not yet loaded. */
+        public function get numQueuedAssets():int { return mQueue.length; }
+        
+        /** When activated, the class will trace information about added/enqueued assets.
+         *  @default true */
+        public function get verbose():Boolean { return mVerbose; }
+        public function set verbose(value:Boolean):void { mVerbose = value; }
+        
+        /** Indicates if a queue is currently being loaded. */
+        public function get isLoading():Boolean { return mNumLoadingQueues > 0; }
+
+        /** For bitmap textures, this flag indicates if mip maps should be generated when they 
+         *  are loaded; for ATF textures, it indicates if mip maps are valid and should be
+         *  used. @default false */
+        public function get useMipMaps():Boolean { return mDefaultTextureOptions.mipMapping; }
+        public function set useMipMaps(value:Boolean):void { mDefaultTextureOptions.mipMapping = value; }
+        
+        /** Textures that are created from Bitmaps or ATF files will have the repeat setting
+         *  assigned here. @default false */
+        public function get textureRepeat():Boolean { return mDefaultTextureOptions.repeat; }
+        public function set textureRepeat(value:Boolean):void { mDefaultTextureOptions.repeat = value; }
+
+        /** Textures that are created from Bitmaps or ATF files will have the scale factor 
+         *  assigned here. @default 1 */
+        public function get scaleFactor():Number { return mDefaultTextureOptions.scale; }
+        public function set scaleFactor(value:Number):void { mDefaultTextureOptions.scale = value; }
+
+        /** Textures that are created from Bitmaps will be uploaded to the GPU with the
+         *  <code>Context3DTextureFormat</code> assigned to this property. @default "bgra" */
+        public function get textureFormat():String { return mDefaultTextureOptions.format; }
+        public function set textureFormat(value:String):void { mDefaultTextureOptions.format = value; }
+        
+        /** Specifies whether a check should be made for the existence of a URL policy file before
+         *  loading an object from a remote server. More information about this topic can be found 
+         *  in the 'flash.system.LoaderContext' documentation. @default false */
+        public function get checkPolicyFile():Boolean { return mCheckPolicyFile; }
+        public function set checkPolicyFile(value:Boolean):void { mCheckPolicyFile = value; }
+
+        /** Indicates if atlas XML data should be stored for access via the 'getXml' method.
+         *  If true, you can access an XML under the same name as the atlas.
+         *  If false, XMLs will be disposed when the atlas was created. @default false. */
+        public function get keepAtlasXmls():Boolean { return mKeepAtlasXmls; }
+        public function set keepAtlasXmls(value:Boolean):void { mKeepAtlasXmls = value; }
+
+        /** Indicates if bitmap font XML data should be stored for access via the 'getXml' method.
+         *  If true, you can access an XML under the same name as the bitmap font.
+         *  If false, XMLs will be disposed when the font was created. @default false. */
+        public function get keepFontXmls():Boolean { return mKeepFontXmls; }
+        public function set keepFontXmls(value:Boolean):void { mKeepFontXmls = value; }
+
+        /** The maximum number of parallel connections that are spawned when loading the queue.
+         *  More connections can reduce loading times, but require more memory. @default 3. */
+        public function get numConnections():int { return mNumConnections; }
+        public function set numConnections(value:int):void { mNumConnections = value; }
 		
+		
+		//-----------------------动态加载纹理---------------//
+		
+		
+		private var _runtimeLoadTexture:Dictionary;//运行时临时加载的纹理，单独缓存起来以便清理
 		private var _loadTextureList:Vector.<Array> = new Vector.<Array>();
 		private var _isLoading:Boolean = false;
 		/**
@@ -884,13 +1246,16 @@ package starling.utils
 		 * <p>可通过clearRuntimeLoadTexture一键清理运行时动态加载的纹理</>
 		 * */
 		public function loadTexture(path:String,callBack:Function,isCache:Boolean=true):void{
+			
+			if(_runtimeLoadTexture == null) _runtimeLoadTexture = new Dictionary();
+			
 			if(_isLoading){
 				_loadTextureList.push([path,callBack,isCache]);
 				return;
 			}
 			
 			var name:String = getName(path);
-			var texture:Texture = runtimeLoadTexture[name];
+			var texture:Texture = _runtimeLoadTexture[name];
 			if(texture){
 				if(callBack != null) callBack(texture);
 				completeLoadIist();
@@ -983,7 +1348,7 @@ package starling.utils
 					}
 				}
 				bytes.clear();
-				if(isCache) runtimeLoadTexture[name] = texture;
+				if(isCache) _runtimeLoadTexture[name] = texture;
 				completeLoadIist();
 			}
 			
@@ -1004,165 +1369,10 @@ package starling.utils
 		 * 一键清理运行时动态加载的纹理
 		 */		
 		public function clearRuntimeLoadTexture():void{
-			for each (var texture:Texture in runtimeLoadTexture) texture.dispose();
-			runtimeLoadTexture = new Dictionary();
+			if(_runtimeLoadTexture != null){
+				for each (var texture:Texture in _runtimeLoadTexture) texture.dispose();
+				_runtimeLoadTexture = new Dictionary();
+			}
 		}
-        
-        // helpers
-        
-        /** This method is called by 'enqueue' to determine the name under which an asset will be
-         *  accessible; override it if you need a custom naming scheme. Typically, 'rawAsset' is 
-         *  either a String or a FileReference. Note that this method won't be called for embedded
-         *  assets. */
-        protected function getName(rawAsset:Object):String
-        {
-            var matches:Array;
-            var name:String;
-            
-            if (rawAsset is String || rawAsset is FileReference)
-            {
-                name = rawAsset is String ? rawAsset as String : (rawAsset as FileReference).name;
-                name = name.replace(/%20/g, " "); // URLs use '%20' for spaces
-                name = getBasenameFromUrl(name);
-                
-				if (name) return name;
-                else throw new ArgumentError("Could not extract name from String '" + rawAsset + "'");
-            }
-            else
-            {
-                name = getQualifiedClassName(rawAsset);
-                throw new ArgumentError("Cannot extract names for objects of type '" + name + "'");
-            }
-        }
-
-        /** This method is called when raw byte data has been loaded from an URL or a file.
-         *  Override it to process the downloaded data in some way (e.g. decompression) or
-         *  to cache it on disk. */
-        protected function transformData(data:ByteArray, url:String):ByteArray
-        {
-            return data;
-        }
-
-        /** This method is called during loading of assets when 'verbose' is activated. Per
-         *  default, it traces 'message' to the console. */
-        protected function log(message:String):void
-        {
-            if (mVerbose) trace("[AssetManager]", message);
-        }
-        
-        private function byteArrayStartsWith(bytes:ByteArray, char:String):Boolean
-        {
-            var start:int = 0;
-            var length:int = bytes.length;
-            var wanted:int = char.charCodeAt(0);
-            
-            // recognize BOMs
-            
-            if (length >= 4 &&
-                (bytes[0] == 0x00 && bytes[1] == 0x00 && bytes[2] == 0xfe && bytes[3] == 0xff) ||
-                (bytes[0] == 0xff && bytes[1] == 0xfe && bytes[2] == 0x00 && bytes[3] == 0x00))
-            {
-                start = 4; // UTF-32
-            }
-            else if (length >= 3 && bytes[0] == 0xef && bytes[1] == 0xbb && bytes[2] == 0xbf)
-            {
-                start = 3; // UTF-8
-            }
-            else if (length >= 2 &&
-                (bytes[0] == 0xfe && bytes[1] == 0xff) || (bytes[0] == 0xff && bytes[1] == 0xfe))
-            {
-                start = 2; // UTF-16
-            }
-            
-            // find first meaningful letter
-            
-            for (var i:int=start; i<length; ++i)
-            {
-                var byte:int = bytes[i];
-                if (byte == 0 || byte == 10 || byte == 13 || byte == 32) continue; // null, \n, \r, space
-                else return byte == wanted;
-            }
-            
-            return false;
-        }
-        
-        private function getDictionaryKeys(dictionary:Dictionary, prefix:String="",
-                                           result:Vector.<String>=null):Vector.<String>
-        {
-            if (result == null) result = new <String>[];
-            
-            for (var name:String in dictionary)
-                if (name.indexOf(prefix) == 0)
-                    result.push(name);
-            
-            result.sort(Array.CASEINSENSITIVE);
-            return result;
-        }
-        
-        private function getHttpHeader(headers:Array, headerName:String):String
-        {
-            if (headers)
-            {
-                for each (var header:Object in headers)
-                    if (header.name == headerName) return header.value;
-            }
-            return null;
-        }
-
-        private function getBasenameFromUrl(url:String):String
-        {
-            var matches:Array = NAME_REGEX.exec(url);
-            if (matches && matches.length > 0) return matches[1];
-            else return null;
-        }
-
-        private function getExtensionFromUrl(url:String):String
-        {
-            var matches:Array = NAME_REGEX.exec(url);
-            if (matches && matches.length > 1) return matches[2];
-            else return null;
-        }
-
-        // properties
-        
-        /** The queue contains one 'Object' for each enqueued asset. Each object has 'asset'
-         *  and 'name' properties, pointing to the raw asset and its name, respectively. */
-        protected function get queue():Array { return mQueue; }
-        
-        /** Returns the number of raw assets that have been enqueued, but not yet loaded. */
-        public function get numQueuedAssets():int { return mQueue.length; }
-        
-        /** When activated, the class will trace information about added/enqueued assets. */
-        public function get verbose():Boolean { return mVerbose; }
-        public function set verbose(value:Boolean):void { mVerbose = value; }
-        
-        /** For bitmap textures, this flag indicates if mip maps should be generated when they 
-         *  are loaded; for ATF textures, it indicates if mip maps are valid and should be
-         *  used. */
-        public function get useMipMaps():Boolean { return mDefaultTextureOptions.mipMapping; }
-        public function set useMipMaps(value:Boolean):void { mDefaultTextureOptions.mipMapping = value; }
-        
-        /** Textures that are created from Bitmaps or ATF files will have the scale factor 
-         *  assigned here. */
-        public function get scaleFactor():Number { return mDefaultTextureOptions.scale; }
-        public function set scaleFactor(value:Number):void { mDefaultTextureOptions.scale = value; }
-        
-        /** Specifies whether a check should be made for the existence of a URL policy file before
-         *  loading an object from a remote server. More information about this topic can be found 
-         *  in the 'flash.system.LoaderContext' documentation. */
-        public function get checkPolicyFile():Boolean { return mCheckPolicyFile; }
-        public function set checkPolicyFile(value:Boolean):void { mCheckPolicyFile = value; }
-
-        /** Indicates if atlas XML data should be stored for access via the 'getXml' method.
-         *  If true, you can access an XML under the same name as the atlas.
-         *  If false, XMLs will be disposed when the atlas was created. @default false. */
-        public function get keepAtlasXmls():Boolean { return mKeepAtlasXmls; }
-        public function set keepAtlasXmls(value:Boolean):void { mKeepAtlasXmls = value; }
-
-        /** Indicates if bitmap font XML data should be stored for access via the 'getXml' method.
-         *  If true, you can access an XML under the same name as the bitmap font.
-         *  If false, XMLs will be disposed when the font was created. @default false. */
-        public function get keepFontXmls():Boolean { return mKeepFontXmls; }
-        public function set keepFontXmls(value:Boolean):void { mKeepFontXmls = value; }
     }
 }

@@ -1,7 +1,6 @@
 package lzm.starling.swf.components.feathers
 {
 	import flash.text.TextFormat;
-	import flash.text.TextFormatAlign;
 	
 	import feathers.controls.TextInput;
 	

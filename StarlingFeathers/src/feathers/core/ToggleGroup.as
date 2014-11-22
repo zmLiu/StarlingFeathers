@@ -15,6 +15,21 @@ package feathers.core
 	/**
 	 * Dispatched when the selection changes.
 	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>null</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
+	 *
 	 * @eventType starling.events.Event.CHANGE
 	 */
 	[Event(name="change",type="starling.events.Event")]
@@ -140,12 +155,12 @@ package feathers.core
 		 */
 		public function set selectedIndex(value:int):void
 		{
-			const itemCount:int = this._items.length;
+			var itemCount:int = this._items.length;
 			if(value < -1 || value >= itemCount)
 			{
 				throw new RangeError("Index " + value + " is out of range " + itemCount + " for ToggleGroup.");
 			}
-			const hasChanged:Boolean = this._selectedIndex != value;
+			var hasChanged:Boolean = this._selectedIndex != value;
 			this._selectedIndex = value;
 
 			//refresh all the items
@@ -183,7 +198,7 @@ package feathers.core
 				throw new ArgumentError("IToggle passed to ToggleGroup addItem() must not be null.");
 			}
 			
-			const index:int = this._items.indexOf(item);
+			var index:int = this._items.indexOf(item);
 			if(index >= 0)
 			{
 				throw new IllegalOperationError("Cannot add an item to a ToggleGroup more than once.");
@@ -218,7 +233,7 @@ package feathers.core
 		 */
 		public function removeItem(item:IToggle):void
 		{
-			const index:int = this._items.indexOf(item);
+			var index:int = this._items.indexOf(item);
 			if(index < 0)
 			{
 				return;
@@ -252,7 +267,7 @@ package feathers.core
 		 */
 		public function removeAllItems():void
 		{
-			const itemCount:int = this._items.length;
+			var itemCount:int = this._items.length;
 			for(var i:int = 0; i < itemCount; i++)
 			{
 				var item:IToggle = this._items.shift();
@@ -278,7 +293,7 @@ package feathers.core
 		 */
 		public function hasItem(item:IToggle):Boolean
 		{
-			const index:int = this._items.indexOf(item);
+			var index:int = this._items.indexOf(item);
 			return index >= 0;
 		}
 
@@ -346,8 +361,8 @@ package feathers.core
 				return;
 			}
 
-			const item:IToggle = IToggle(event.currentTarget);
-			const index:int = this._items.indexOf(item);
+			var item:IToggle = IToggle(event.currentTarget);
+			var index:int = this._items.indexOf(item);
 			if(item.isSelected || (this._isSelectionRequired && this._selectedIndex == index))
 			{
 				//don't let it deselect the item

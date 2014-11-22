@@ -9,6 +9,7 @@ package feathers.controls
 {
 	import feathers.core.IGroupedToggle;
 	import feathers.core.ToggleGroup;
+	import feathers.skins.IStyleProvider;
 
 	import flash.errors.IllegalOperationError;
 
@@ -45,7 +46,7 @@ package feathers.controls
 	 * @see http://wiki.starling-framework.org/feathers/radio
 	 * @see feathers.core.ToggleGroup
 	 */
-	public class Radio extends Button implements IGroupedToggle
+	public class Radio extends ToggleButton implements IGroupedToggle
 	{
 		/**
 		 * If a <code>Radio</code> has not been added to a <code>ToggleGroup</code>,
@@ -56,13 +57,31 @@ package feathers.controls
 		public static const defaultRadioGroup:ToggleGroup = new ToggleGroup();
 
 		/**
+		 * The default <code>IStyleProvider</code> for all <code>Radio</code>
+		 * components.
+		 *
+		 * @default null
+		 * @see feathers.core.FeathersControl#styleProvider
+		 */
+		public static var globalStyleProvider:IStyleProvider;
+
+		/**
 		 * Constructor.
 		 */
 		public function Radio()
 		{
+			super();
 			super.isToggle = true;
 			this.addEventListener(Event.ADDED_TO_STAGE, radio_addedToStageHandler);
 			this.addEventListener(Event.REMOVED_FROM_STAGE, radio_removedFromStageHandler);
+		}
+
+		/**
+		 * @private
+		 */
+		override protected function get defaultStyleProvider():IStyleProvider
+		{
+			return Radio.globalStyleProvider;
 		}
 
 		/**

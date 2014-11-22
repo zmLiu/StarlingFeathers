@@ -12,6 +12,7 @@ package feathers.controls
 	import feathers.core.IFocusDisplayObject;
 	import feathers.core.PropertyProxy;
 	import feathers.events.FeathersEventType;
+	import feathers.skins.IStyleProvider;
 
 	import flash.geom.Point;
 	import flash.ui.Mouse;
@@ -26,6 +27,21 @@ package feathers.controls
 	/**
 	 * Dispatched when the text area's <code>text</code> property changes.
 	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>null</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
+	 *
 	 * @eventType starling.events.Event.CHANGE
 	 */
 	[Event(name="change",type="starling.events.Event")]
@@ -33,12 +49,42 @@ package feathers.controls
 	/**
 	 * Dispatched when the text area receives focus.
 	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>null</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
+	 *
 	 * @eventType feathers.events.FeathersEventType.FOCUS_IN
 	 */
 	[Event(name="focusIn",type="starling.events.Event")]
 
 	/**
 	 * Dispatched when the text area loses focus.
+	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>null</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
 	 *
 	 * @eventType feathers.events.FeathersEventType.FOCUS_OUT
 	 */
@@ -51,9 +97,11 @@ package feathers.controls
 	 * <p><strong>Important:</strong> <code>TextArea</code> is not recommended
 	 * for mobile. Instead, you should generally use a <code>TextInput</code>
 	 * with a <code>StageTextTextEditor</code> that has its <code>multiline</code>
-	 * property set to <code>true</code>. In that situation, the
-	 * <code>StageText</code> instance will automatically provide its own
-	 * scroll bars. <code>TextArea</code> is intended for use on desktop.</p>
+	 * property set to <code>true</code> and the text input's <code>verticalAlign</code>
+	 * property should be set to <code>TextInput.VERTICAL_ALIGN_JUSTIFY</code>.
+	 * In that situation, the <code>StageText</code> instance will automatically
+	 * provide its own operating system native scroll bars. <code>TextArea</code>
+	 * is intended for use on desktop and may not behave correctly on mobile.</p>
 	 *
 	 * <p>The following example sets the text in a text area, selects the text,
 	 * and listens for when the text value changes:</p>
@@ -157,12 +205,50 @@ package feathers.controls
 		public static const INTERACTION_MODE_TOUCH_AND_SCROLL_BARS:String = "touchAndScrollBars";
 
 		/**
+		 * @copy feathers.controls.Scroller#DECELERATION_RATE_NORMAL
+		 *
+		 * @see feathers.controls.Scroller#decelerationRate
+		 */
+		public static const DECELERATION_RATE_NORMAL:Number = 0.998;
+
+		/**
+		 * @copy feathers.controls.Scroller#DECELERATION_RATE_FAST
+		 *
+		 * @see feathers.controls.Scroller#decelerationRate
+		 */
+		public static const DECELERATION_RATE_FAST:Number = 0.99;
+
+		/**
+		 * The <code>TextArea</code> is enabled and does not have focus.
+		 */
+		public static const STATE_ENABLED:String = "enabled";
+
+		/**
+		 * The <code>TextArea</code> is disabled.
+		 */
+		public static const STATE_DISABLED:String = "disabled";
+
+		/**
+		 * The <code>TextArea</code> is enabled and has focus.
+		 */
+		public static const STATE_FOCUSED:String = "focused";
+
+		/**
+		 * The default <code>IStyleProvider</code> for all <code>TextArea</code>
+		 * components.
+		 *
+		 * @default null
+		 * @see feathers.core.FeathersControl#styleProvider
+		 */
+		public static var globalStyleProvider:IStyleProvider;
+
+		/**
 		 * Constructor.
 		 */
 		public function TextArea()
 		{
 			super();
-
+			this._measureViewPort = false;
 			this.addEventListener(TouchEvent.TOUCH, textArea_touchHandler);
 			this.addEventListener(Event.REMOVED_FROM_STAGE, textArea_removedFromStageHandler);
 		}
@@ -210,9 +296,99 @@ package feathers.controls
 		/**
 		 * @private
 		 */
+		override protected function get defaultStyleProvider():IStyleProvider
+		{
+			return TextArea.globalStyleProvider;
+		}
+
+		/**
+		 * @private
+		 */
 		override public function get isFocusEnabled():Boolean
 		{
-			return this._isEditable && this._isFocusEnabled;
+			return this._isEditable && this._isEnabled && this._isFocusEnabled;
+		}
+
+		/**
+		 * When the <code>FocusManager</code> isn't enabled, <code>hasFocus</code>
+		 * can be used instead of <code>FocusManager.focus == textArea</code>
+		 * to determine if the text area has focus.
+		 */
+		public function get hasFocus():Boolean
+		{
+			if(!this._focusManager)
+			{
+				return this._textEditorHasFocus;
+			}
+			return this._hasFocus;
+		}
+
+		/**
+		 * @private
+		 */
+		override public function set isEnabled(value:Boolean):void
+		{
+			super.isEnabled = value;
+			if(this._isEnabled)
+			{
+				this.currentState = this._hasFocus ? STATE_FOCUSED : STATE_ENABLED;
+			}
+			else
+			{
+				this.currentState = STATE_DISABLED;
+			}
+		}
+
+		/**
+		 * @private
+		 */
+		protected var _stateNames:Vector.<String> = new <String>
+		[
+			STATE_ENABLED, STATE_DISABLED, STATE_FOCUSED
+		];
+
+		/**
+		 * A list of all valid state names for use with <code>currentState</code>.
+		 *
+		 * <p>For internal use in subclasses.</p>
+		 *
+		 * @see #currentState
+		 */
+		protected function get stateNames():Vector.<String>
+		{
+			return this._stateNames;
+		}
+
+		/**
+		 * @private
+		 */
+		protected var _currentState:String = STATE_ENABLED;
+
+		/**
+		 * The current state of the input.
+		 *
+		 * <p>For internal use in subclasses.</p>
+		 */
+		protected function get currentState():String
+		{
+			return this._currentState;
+		}
+
+		/**
+		 * @private
+		 */
+		protected function set currentState(value:String):void
+		{
+			if(this._currentState == value)
+			{
+				return;
+			}
+			if(this.stateNames.indexOf(value) < 0)
+			{
+				throw new ArgumentError("Invalid state: " + value + ".");
+			}
+			this._currentState = value;
+			this.invalidate(INVALIDATION_FLAG_STATE);
 		}
 
 		/**
@@ -410,6 +586,37 @@ package feathers.controls
 		/**
 		 * @private
 		 */
+		protected var _stateToSkinFunction:Function;
+
+		/**
+		 * Returns a skin for the current state.
+		 *
+		 * <p>The following function signature is expected:</p>
+		 * <pre>function( target:TextArea, state:Object, oldSkin:DisplayObject = null ):DisplayObject</pre>
+		 *
+		 * @default null
+		 */
+		public function get stateToSkinFunction():Function
+		{
+			return this._stateToSkinFunction;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set stateToSkinFunction(value:Function):void
+		{
+			if(this._stateToSkinFunction == value)
+			{
+				return;
+			}
+			this._stateToSkinFunction = value;
+			this.invalidate(INVALIDATION_FLAG_SKIN);
+		}
+
+		/**
+		 * @private
+		 */
 		protected var _textEditorFactory:Function;
 
 		/**
@@ -515,7 +722,7 @@ package feathers.controls
 			}
 			if(!(value is PropertyProxy))
 			{
-				const newValue:PropertyProxy = new PropertyProxy();
+				var newValue:PropertyProxy = new PropertyProxy();
 				for(var propertyName:String in value)
 				{
 					newValue[propertyName] = value[propertyName];
@@ -569,6 +776,19 @@ package feathers.controls
 		}
 
 		/**
+		 * Manually removes focus from the text input control.
+		 */
+		public function clearFocus():void
+		{
+			this._isWaitingToSetFocus = false;
+			if(!this.textEditorViewPort || !this._textEditorHasFocus)
+			{
+				return;
+			}
+			this.textEditorViewPort.clearFocus();
+		}
+
+		/**
 		 * Sets the range of selected characters. If both values are the same,
 		 * or the end index is <code>-1</code>, the text insertion position is
 		 * changed and nothing is selected.
@@ -607,10 +827,10 @@ package feathers.controls
 		 */
 		override protected function draw():void
 		{
-			const textEditorInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_TEXT_EDITOR);
-			const dataInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_DATA);
-			const stylesInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STYLES);
-			const stateInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STATE);
+			var textEditorInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_TEXT_EDITOR);
+			var dataInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_DATA);
+			var stylesInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STYLES);
+			var stateInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STATE);
 
 			if(textEditorInvalid)
 			{
@@ -624,7 +844,7 @@ package feathers.controls
 
 			if(textEditorInvalid || dataInvalid)
 			{
-				const oldIgnoreTextChanges:Boolean = this._ignoreTextChanges;
+				var oldIgnoreTextChanges:Boolean = this._ignoreTextChanges;
 				this._ignoreTextChanges = true;
 				this.textEditorViewPort.text = this._text;
 				this._ignoreTextChanges = oldIgnoreTextChanges;
@@ -645,45 +865,6 @@ package feathers.controls
 			this.refreshFocusIndicator();
 
 			this.doPendingActions();
-		}
-
-		/**
-		 * @inheritDoc
-		 */
-		override protected function autoSizeIfNeeded():Boolean
-		{
-			const needsWidth:Boolean = isNaN(this.explicitWidth);
-			const needsHeight:Boolean = isNaN(this.explicitHeight);
-			if(!needsWidth && !needsHeight)
-			{
-				return false;
-			}
-
-			var newWidth:Number = this.explicitWidth;
-			var newHeight:Number = this.explicitHeight;
-			if(needsWidth)
-			{
-				if(!isNaN(this.originalBackgroundWidth))
-				{
-					newWidth = this.originalBackgroundWidth;
-				}
-				else
-				{
-					newWidth = 0;
-				}
-			}
-			if(needsHeight)
-			{
-				if(!isNaN(this.originalBackgroundHeight))
-				{
-					newHeight = this.originalBackgroundHeight;
-				}
-				else
-				{
-					newHeight = 0;
-				}
-			}
-			return this.setSizeInternal(newWidth, newHeight, false);
 		}
 
 		/**
@@ -718,7 +899,7 @@ package feathers.controls
 			this.textEditorViewPort.addEventListener(FeathersEventType.FOCUS_IN, textEditor_focusInHandler);
 			this.textEditorViewPort.addEventListener(FeathersEventType.FOCUS_OUT, textEditor_focusOutHandler);
 
-			const oldViewPort:ITextEditorViewPort = ITextEditorViewPort(this._viewPort);
+			var oldViewPort:ITextEditorViewPort = ITextEditorViewPort(this._viewPort);
 			this.viewPort = this.textEditorViewPort;
 			if(oldViewPort)
 			{
@@ -742,8 +923,8 @@ package feathers.controls
 			}
 			if(this._pendingSelectionStartIndex >= 0)
 			{
-				const startIndex:int = this._pendingSelectionStartIndex;
-				const endIndex:int = this._pendingSelectionEndIndex;
+				var startIndex:int = this._pendingSelectionStartIndex;
+				var endIndex:int = this._pendingSelectionEndIndex;
 				this._pendingSelectionStartIndex = -1;
 				this._pendingSelectionEndIndex = -1;
 				this.selectRange(startIndex, endIndex);
@@ -758,14 +939,10 @@ package feathers.controls
 			this.textEditorViewPort.maxChars = this._maxChars;
 			this.textEditorViewPort.restrict = this._restrict;
 			this.textEditorViewPort.isEditable = this._isEditable;
-			const displayTextEditor:DisplayObject = DisplayObject(this.textEditorViewPort);
 			for(var propertyName:String in this._textEditorProperties)
 			{
-				if(displayTextEditor.hasOwnProperty(propertyName))
-				{
-					var propertyValue:Object = this._textEditorProperties[propertyName];
-					this.textEditorViewPort[propertyName] = propertyValue;
-				}
+				var propertyValue:Object = this._textEditorProperties[propertyName];
+				this.textEditorViewPort[propertyName] = propertyValue;
 			}
 		}
 
@@ -774,23 +951,42 @@ package feathers.controls
 		 */
 		override protected function refreshBackgroundSkin():void
 		{
-			if(this._hasFocus && this._backgroundFocusedSkin)
+			var oldSkin:DisplayObject = this.currentBackgroundSkin;
+			if(this._stateToSkinFunction != null)
+			{
+				this.currentBackgroundSkin = DisplayObject(this._stateToSkinFunction(this, this._currentState, oldSkin));
+			}
+			else if(!this._isEnabled && this._backgroundDisabledSkin)
+			{
+				this.currentBackgroundSkin = this._backgroundDisabledSkin;
+			}
+			else if(this._hasFocus && this._backgroundFocusedSkin)
 			{
 				this.currentBackgroundSkin = this._backgroundFocusedSkin;
-				this.setChildIndex(this.currentBackgroundSkin, 0);
-				this.currentBackgroundSkin.visible = true;
-
-				if(isNaN(this.originalBackgroundWidth))
-				{
-					this.originalBackgroundWidth = this.currentBackgroundSkin.width;
-				}
-				if(isNaN(this.originalBackgroundHeight))
-				{
-					this.originalBackgroundHeight = this.currentBackgroundSkin.height;
-				}
-				return;
 			}
-			super.refreshBackgroundSkin();
+			else
+			{
+				this.currentBackgroundSkin = this._backgroundSkin;
+			}
+			if(oldSkin != this.currentBackgroundSkin)
+			{
+				if(oldSkin)
+				{
+					this.removeChild(oldSkin, false);
+				}
+				if(this.currentBackgroundSkin)
+				{
+					this.addChildAt(this.currentBackgroundSkin, 0);
+					if(this.originalBackgroundWidth !== this.originalBackgroundWidth) //isNaN
+					{
+						this.originalBackgroundWidth = this.currentBackgroundSkin.width;
+					}
+					if(this.originalBackgroundHeight !== this.originalBackgroundHeight) //isNaN
+					{
+						this.originalBackgroundHeight = this.currentBackgroundSkin.height;
+					}
+				}
+			}
 		}
 
 		/**
@@ -803,7 +999,7 @@ package feathers.controls
 				return;
 			}
 			touch.getLocation(this.stage, HELPER_POINT);
-			const isInBounds:Boolean = this.contains(this.stage.hitTest(HELPER_POINT, true));
+			var isInBounds:Boolean = this.contains(this.stage.hitTest(HELPER_POINT, true));
 			if(!this._textEditorHasFocus && isInBounds)
 			{
 				this.globalToLocal(HELPER_POINT, HELPER_POINT);
@@ -825,8 +1021,8 @@ package feathers.controls
 				return;
 			}
 
-			const horizontalScrollBar:DisplayObject = DisplayObject(this.horizontalScrollBar);
-			const verticalScrollBar:DisplayObject = DisplayObject(this.verticalScrollBar);
+			var horizontalScrollBar:DisplayObject = DisplayObject(this.horizontalScrollBar);
+			var verticalScrollBar:DisplayObject = DisplayObject(this.verticalScrollBar);
 			if(this._textAreaTouchPointID >= 0)
 			{
 				var touch:Touch = event.getTouch(this, TouchPhase.ENDED, this._textAreaTouchPointID);
@@ -895,6 +1091,10 @@ package feathers.controls
 		 */
 		protected function textArea_removedFromStageHandler(event:Event):void
 		{
+			if(!this._focusManager && this._textEditorHasFocus)
+			{
+				this.clearFocus();
+			}
 			this._isWaitingToSetFocus = false;
 			this._textEditorHasFocus = false;
 			this._textAreaTouchPointID = -1;
@@ -951,6 +1151,7 @@ package feathers.controls
 		protected function textEditor_focusInHandler(event:Event):void
 		{
 			this._textEditorHasFocus = true;
+			this.currentState = STATE_FOCUSED;
 			this._touchPointID = -1;
 			this.invalidate(INVALIDATION_FLAG_STATE);
 			if(this._focusManager)
@@ -969,6 +1170,7 @@ package feathers.controls
 		protected function textEditor_focusOutHandler(event:Event):void
 		{
 			this._textEditorHasFocus = false;
+			this.currentState = this._isEnabled ? STATE_ENABLED : STATE_DISABLED;
 			this.invalidate(INVALIDATION_FLAG_STATE);
 			if(this._focusManager)
 			{

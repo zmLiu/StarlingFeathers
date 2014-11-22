@@ -9,6 +9,7 @@ package feathers.controls
 {
 	import feathers.core.FeathersControl;
 	import feathers.events.FeathersEventType;
+	import feathers.skins.IStyleProvider;
 
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -27,6 +28,7 @@ package feathers.controls
 	import flash.system.ImageDecodingPolicy;
 	import flash.system.LoaderContext;
 	import flash.utils.ByteArray;
+	import flash.utils.setTimeout;
 
 	import starling.core.RenderSupport;
 	import starling.core.Starling;
@@ -37,9 +39,26 @@ package feathers.controls
 	import starling.textures.TextureSmoothing;
 	import starling.utils.RectangleUtil;
 	import starling.utils.ScaleMode;
+	import starling.utils.SystemUtil;
 
 	/**
-	 * Dispatched when the source content finishes loading.
+	 * Dispatched when the source finishes loading, if the source is a URL. This
+	 * event is not dispatched when the source is a texture.
+	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>null</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
 	 *
 	 * @eventType starling.events.Event.COMPLETE
 	 */
@@ -47,6 +66,22 @@ package feathers.controls
 
 	/**
 	 * Dispatched if an error occurs while loading the source content.
+	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>The <code>flash.events.ErrorEvent</code>
+	 *   dispatched by the loader.</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
 	 *
 	 * @eventType feathers.events.FeathersEventType.ERROR
 	 */
@@ -94,6 +129,11 @@ package feathers.controls
 		/**
 		 * @private
 		 */
+		private static const CONTEXT_LOST_WARNING:String = "ImageLoader: Context lost while processing loaded image, retrying...";
+
+		/**
+		 * @private
+		 */
 		protected static const LOADER_CONTEXT:LoaderContext = new LoaderContext(true);
 		LOADER_CONTEXT.imageDecodingPolicy = ImageDecodingPolicy.ON_LOAD;
 
@@ -111,6 +151,15 @@ package feathers.controls
 		 * @private
 		 */
 		protected static var textureQueueTail:ImageLoader;
+
+		/**
+		 * The default <code>IStyleProvider</code> for all <code>ImageLoader</code>
+		 * components.
+		 *
+		 * @default null
+		 * @see feathers.core.FeathersControl#styleProvider
+		 */
+		public static var globalStyleProvider:IStyleProvider;
 
 		/**
 		 * Constructor.
@@ -180,6 +229,14 @@ package feathers.controls
 		/**
 		 * @private
 		 */
+		override protected function get defaultStyleProvider():IStyleProvider
+		{
+			return ImageLoader.globalStyleProvider;
+		}
+
+		/**
+		 * @private
+		 */
 		protected var _source:Object;
 
 		/**
@@ -230,7 +287,15 @@ package feathers.controls
 				this.image.visible = false;
 			}
 			this._lastURL = null;
-			this._isLoaded = false;
+			if(this._source is Texture)
+			{
+				this._isLoaded = true;
+			}
+			else
+			{
+
+				this._isLoaded = false;
+			}
 			this.invalidate(INVALIDATION_FLAG_DATA);
 		}
 
@@ -315,7 +380,8 @@ package feathers.controls
 		protected var _isLoaded:Boolean = false;
 
 		/**
-		 * Indicates if the source has fully loaded.
+		 * Indicates if the source has completed loading, if the source is a
+		 * URL. Always returns <code>true</code> when the source is a texture.
 		 *
 		 * <p>In the following example, we check if the image loader's source
 		 * has finished loading:</p>
@@ -337,7 +403,8 @@ package feathers.controls
 		private var _textureScale:Number = 1;
 
 		/**
-		 * The scale of the texture. Useful for UI that scales to DPI.
+		 * Scales the texture dimensions during measurement. Useful for UI that
+		 * should scale based on screen density or resolution.
 		 *
 		 * <p>In the following example, the image loader's texture scale is
 		 * customized:</p>
@@ -381,8 +448,8 @@ package feathers.controls
 		 *
 		 * @default starling.textures.TextureSmoothing.BILINEAR
 		 *
-		 * @see starling.textures.TextureSmoothing
-		 * @see starling.display.Image#smoothing
+		 * @see http://doc.starling-framework.org/core/starling/textures/TextureSmoothing.html starling.textures.TextureSmoothing
+		 * @see http://doc.starling-framework.org/core/starling/display/Image.html#smoothing starling.display.Image.smoothing
 		 */
 		public function get smoothing():String
 		{
@@ -418,7 +485,7 @@ package feathers.controls
 		 *
 		 * @default 0xffffff
 		 *
-		 * @see starling.display.Image#color
+		 * @see http://doc.starling-framework.org/core/starling/display/Image.html#color starling.display.Image.color
 		 */
 		public function get color():uint
 		{
@@ -454,7 +521,7 @@ package feathers.controls
 		 *
 		 * @default flash.display3d.Context3DTextureFormat.BGRA
 		 *
-		 * @see flash.display3d.Context3DTextureFormat
+		 * @see http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display3D/Context3DTextureFormat.html flash.display3d.Context3DTextureFormat
 		 */
 		public function get textureFormat():String
 		{
@@ -552,7 +619,7 @@ package feathers.controls
 		 */
 		public function get originalSourceWidth():Number
 		{
-			if(this._currentTextureWidth == this._currentTextureWidth) //!isNaN
+			if(this._currentTextureWidth === this._currentTextureWidth) //!isNaN
 			{
 				return this._currentTextureWidth;
 			}
@@ -567,7 +634,7 @@ package feathers.controls
 		 */
 		public function get originalSourceHeight():Number
 		{
-			if(this._currentTextureHeight == this._currentTextureHeight) //!isNaN
+			if(this._currentTextureHeight === this._currentTextureHeight) //!isNaN
 			{
 				return this._currentTextureHeight;
 			}
@@ -944,9 +1011,9 @@ package feathers.controls
 		 */
 		override protected function draw():void
 		{
-			const dataInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_DATA);
-			const layoutInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_LAYOUT);
-			const stylesInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STYLES);
+			var dataInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_DATA);
+			var layoutInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_LAYOUT);
+			var stylesInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STYLES);
 			var sizeInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_SIZE);
 
 			if(dataInvalid)
@@ -985,8 +1052,8 @@ package feathers.controls
 		 */
 		protected function autoSizeIfNeeded():Boolean
 		{
-			const needsWidth:Boolean = isNaN(this.explicitWidth);
-			const needsHeight:Boolean = isNaN(this.explicitHeight);
+			var needsWidth:Boolean = this.explicitWidth !== this.explicitWidth; //isNaN
+			var needsHeight:Boolean = this.explicitHeight !== this.explicitHeight; //isNaN
 			if(!needsWidth && !needsHeight)
 			{
 				return false;
@@ -995,12 +1062,12 @@ package feathers.controls
 			var newWidth:Number = this.explicitWidth;
 			if(needsWidth)
 			{
-				if(this._currentTextureWidth == this._currentTextureWidth) //!isNaN
+				if(this._currentTextureWidth === this._currentTextureWidth) //!isNaN
 				{
 					newWidth = this._currentTextureWidth * this._textureScale;
-					if(!needsHeight)
+					if(this._maintainAspectRatio && !needsHeight)
 					{
-						const heightScale:Number = this.explicitHeight / (this._currentTextureHeight * this._textureScale);
+						var heightScale:Number = this.explicitHeight / (this._currentTextureHeight * this._textureScale);
 						newWidth *= heightScale;
 					}
 				}
@@ -1014,12 +1081,12 @@ package feathers.controls
 			var newHeight:Number = this.explicitHeight;
 			if(needsHeight)
 			{
-				if(this._currentTextureHeight == this._currentTextureHeight) //!isNaN
+				if(this._currentTextureHeight === this._currentTextureHeight) //!isNaN
 				{
 					newHeight = this._currentTextureHeight * this._textureScale;
-					if(!needsWidth)
+					if(this._maintainAspectRatio && !needsWidth)
 					{
-						const widthScale:Number = this.explicitWidth / (this._currentTextureWidth * this._textureScale);
+						var widthScale:Number = this.explicitWidth / (this._currentTextureWidth * this._textureScale);
 						newHeight *= widthScale;
 					}
 				}
@@ -1043,11 +1110,10 @@ package feathers.controls
 				this._lastURL = null;
 				this._texture = Texture(this._source);
 				this.refreshCurrentTexture();
-				this._isLoaded = true;
 			}
 			else
 			{
-				const sourceURL:String = this._source as String;
+				var sourceURL:String = this._source as String;
 				if(!sourceURL)
 				{
 					this._lastURL = null;
@@ -1272,8 +1338,41 @@ package feathers.controls
 		/**
 		 * @private
 		 */
+		protected function verifyCurrentStarling():void
+		{
+			if(!this.stage || Starling.current.stage === this.stage)
+			{
+				return;
+			}
+			for each(var starling:Starling in Starling.all)
+			{
+				if(starling.stage === this.stage)
+				{
+					starling.makeCurrent();
+					break;
+				}
+			}
+		}
+
+		/**
+		 * @private
+		 */
 		protected function replaceBitmapDataTexture(bitmapData:BitmapData):void
 		{
+			if(Starling.handleLostContext && !Starling.current.contextValid)
+			{
+				//this trace duplicates the behavior of AssetManager
+				trace(CONTEXT_LOST_WARNING);
+				setTimeout(replaceBitmapDataTexture, 1, bitmapData);
+				return;
+			}
+			if(!SystemUtil.isDesktop && !SystemUtil.isApplicationActive)
+			{
+				//avoiding stage3d calls when a mobile application isn't active
+				SystemUtil.executeWhenApplicationIsActive(replaceBitmapDataTexture, bitmapData);
+				return;
+			}
+			this.verifyCurrentStarling();
 			this._texture = Texture.fromBitmapData(bitmapData, false, false, 1, this._textureFormat);
 			if(Starling.handleLostContext)
 			{
@@ -1298,6 +1397,20 @@ package feathers.controls
 		 */
 		protected function replaceRawTextureData(rawData:ByteArray):void
 		{
+			if(Starling.handleLostContext && !Starling.current.contextValid)
+			{
+				//this trace duplicates the behavior of AssetManager
+				trace(CONTEXT_LOST_WARNING);
+				setTimeout(replaceRawTextureData, 1, rawData);
+				return;
+			}
+			if(!SystemUtil.isDesktop && !SystemUtil.isApplicationActive)
+			{
+				//avoiding stage3d calls when a mobile application isn't active
+				SystemUtil.executeWhenApplicationIsActive(replaceRawTextureData, rawData);
+				return;
+			}
+			this.verifyCurrentStarling();
 			this._texture = Texture.fromAtfData(rawData);
 			if(Starling.handleLostContext)
 			{
@@ -1421,13 +1534,13 @@ package feathers.controls
 		{
 			if(this._pendingBitmapDataTexture)
 			{
-				const bitmapData:BitmapData = this._pendingBitmapDataTexture;
+				var bitmapData:BitmapData = this._pendingBitmapDataTexture;
 				this._pendingBitmapDataTexture = null;
 				this.replaceBitmapDataTexture(bitmapData);
 			}
 			if(this._pendingRawTextureData)
 			{
-				const rawData:ByteArray = this._pendingRawTextureData;
+				var rawData:ByteArray = this._pendingRawTextureData;
 				this._pendingRawTextureData = null;
 				this.replaceRawTextureData(rawData);
 			}
@@ -1466,14 +1579,14 @@ package feathers.controls
 		 */
 		protected function loader_completeHandler(event:flash.events.Event):void
 		{
-			const bitmap:Bitmap = Bitmap(this.loader.content);
+			var bitmap:Bitmap = Bitmap(this.loader.content);
 			this.loader.contentLoaderInfo.removeEventListener(flash.events.Event.COMPLETE, loader_completeHandler);
 			this.loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, loader_errorHandler);
 			this.loader.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, loader_errorHandler);
 			this.loader = null;
 
 			this.cleanupTexture();
-			const bitmapData:BitmapData = bitmap.bitmapData;
+			var bitmapData:BitmapData = bitmap.bitmapData;
 			if(this._delayTextureCreation)
 			{
 				this._pendingBitmapDataTexture = bitmapData;
@@ -1508,7 +1621,7 @@ package feathers.controls
 		 */
 		protected function rawDataLoader_completeHandler(event:flash.events.Event):void
 		{
-			const rawData:ByteArray = ByteArray(this.urlLoader.data);
+			var rawData:ByteArray = ByteArray(this.urlLoader.data);
 			this.urlLoader.removeEventListener(flash.events.Event.COMPLETE, rawDataLoader_completeHandler);
 			this.urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, rawDataLoader_errorHandler);
 			this.urlLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, rawDataLoader_errorHandler);

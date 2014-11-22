@@ -7,6 +7,8 @@ accordance with the terms of the accompanying license agreement.
 */
 package feathers.core
 {
+	import starling.display.DisplayObjectContainer;
+
 	/**
 	 * Interface for focus management.
 	 *
@@ -28,13 +30,13 @@ package feathers.core
 		function set isEnabled(value:Boolean):void;
 
 		/**
-		 * The object that currently has focus. May be <code>null</code> if no
-		 * object has focus.
+		 * The object that currently has focus. May return <code>null</code> if
+		 * no object has focus.
 		 *
 		 * <p>In the following example, the focus is changed:</p>
 		 *
 		 * <listing version="3.0">
-		 * object.focus = someObject;</listing>
+		 * focusManager.focus = someObject;</listing>
 		 */
 		function get focus():IFocusDisplayObject;
 
@@ -42,5 +44,11 @@ package feathers.core
 		 * @private
 		 */
 		function set focus(value:IFocusDisplayObject):void;
+
+		/**
+		 * The top-level container of the focus manager. This isn't necessarily
+		 * the root of the display list.
+		 */
+		function get root():DisplayObjectContainer;
 	}
 }

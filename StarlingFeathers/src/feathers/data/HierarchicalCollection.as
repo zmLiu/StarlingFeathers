@@ -16,6 +16,21 @@ package feathers.data
 	 * Dispatched when the underlying data source changes and the ui will
 	 * need to redraw the data.
 	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>null</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
+	 *
 	 * @eventType starling.events.Event.CHANGE
 	 */
 	[Event(name="change",type="starling.events.Event")]
@@ -24,6 +39,21 @@ package feathers.data
 	 * Dispatched when the collection has changed drastically, such as when
 	 * the underlying data source is replaced completely.
 	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>null</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
+	 *
 	 * @eventType feathers.events.CollectionEventType.RESET
 	 */
 	[Event(name="reset",type="starling.events.Event")]
@@ -31,9 +61,22 @@ package feathers.data
 	/**
 	 * Dispatched when an item is added to the collection.
 	 *
-	 * <p>The <code>data</code> property of the event is the index path of the
-	 * item that has been added. It is of type <code>Array</code> and contains
-	 * objects of type <code>int</code>.</p>
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>The index path of the item that has
+	 * been added. It is of type <code>Array</code> and contains objects of
+	 * type <code>int</code>.</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
 	 *
 	 * @eventType feathers.events.CollectionEventType.ADD_ITEM
 	 */
@@ -42,9 +85,22 @@ package feathers.data
 	/**
 	 * Dispatched when an item is removed from the collection.
 	 *
-	 * <p>The <code>data</code> property of the event is the index path of the
-	 * item that has been removed. It is of type <code>Array</code> and contains
-	 * objects of type <code>int</code>.</p>
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>The index path of the item that has
+	 * been removed. It is of type <code>Array</code> and contains objects of
+	 * type <code>int</code>.</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
 	 *
 	 * @eventType feathers.events.CollectionEventType.REMOVE_ITEM
 	 */
@@ -53,9 +109,22 @@ package feathers.data
 	/**
 	 * Dispatched when an item is replaced in the collection.
 	 *
-	 * <p>The <code>data</code> property of the event is the index path of the
-	 * item that has been replaced. It is of type <code>Array</code> and contains
-	 * objects of type <code>int</code>.</p>
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>The index path of the item that has
+	 * been re[;aced. It is of type <code>Array</code> and contains objects of
+	 * type <code>int</code>.</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
 	 *
 	 * @eventType feathers.events.CollectionEventType.REPLACE_ITEM
 	 */
@@ -70,9 +139,22 @@ package feathers.data
 	 * <p>In general, it's better for the items themselves to dispatch events
 	 * or signals when their properties change.</p>
 	 *
-	 * <p>The <code>data</code> property of the event is the index path of the
-	 * item that has been updated. It is of type <code>Array</code> and contains
-	 * objects of type <code>int</code>.</p>
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>The index path of the item that has
+	 * been updated. It is of type <code>Array</code> and contains objects of
+	 * type <code>int</code>.</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
 	 *
 	 * @eventType feathers.events.CollectionEventType.UPDATE_ITEM
 	 */
@@ -223,7 +305,7 @@ package feathers.data
 		{
 			rest.unshift(index);
 			rest.unshift(this._data);
-			const item:Object = this._dataDescriptor.removeItemAt.apply(null, rest);
+			var item:Object = this._dataDescriptor.removeItemAt.apply(null, rest);
 			this.dispatchEventWith(Event.CHANGE);
 			rest.shift();
 			this.dispatchEventWith(CollectionEventType.REMOVE_ITEM, false, rest);
@@ -235,12 +317,12 @@ package feathers.data
 		 */
 		public function removeItem(item:Object):void
 		{
-			const location:Vector.<int> = this.getItemLocation(item);
+			var location:Vector.<int> = this.getItemLocation(item);
 			if(location)
 			{
 				//this is hacky. a future version probably won't use rest args.
-				const locationAsArray:Array = [];
-				const indexCount:int = location.length;
+				var locationAsArray:Array = [];
+				var indexCount:int = location.length;
 				for(var i:int = 0; i < indexCount; i++)
 				{
 					locationAsArray.push(location[i]);
@@ -262,6 +344,77 @@ package feathers.data
 			rest.shift();
 			this.dispatchEventWith(CollectionEventType.REPLACE_ITEM, false, rest);
 			this.dispatchEventWith(Event.CHANGE);
+		}
+
+		/**
+		 * Calls a function for each group in the collection and another
+		 * function for each item in a group, where each function handles any
+		 * properties that require disposal on these objects. For example,
+		 * display objects or textures may need to be disposed. You may pass in
+		 * a value of <code>null</code> for either function if you don't have
+		 * anything to dispose in one or the other.
+		 *
+		 * <p>The function to dispose a group is expected to have the following signature:</p>
+		 * <pre>function( group:Object ):void</pre>
+		 *
+		 * <p>The function to dispose an item is expected to have the following signature:</p>
+		 * <pre>function( item:Object ):void</pre>
+		 *
+		 * <p>In the following example, the items in the collection are disposed:</p>
+		 *
+		 * <listing version="3.0">
+		 * collection.dispose( function( group:Object ):void
+		 * {
+		 *     var content:DisplayObject = DisplayObject(group.content);
+		 *     content.dispose();
+		 * },
+		 * function( item:Object ):void
+		 * {
+		 *     var accessory:DisplayObject = DisplayObject(item.accessory);
+		 *     accessory.dispose();
+		 * },)</listing>
+		 *
+		 * @see http://doc.starling-framework.org/core/starling/display/DisplayObject.html#dispose() starling.display.DisplayObject.dispose()
+		 * @see http://doc.starling-framework.org/core/starling/textures/Texture.html#dispose() starling.textures.Texture.dispose()
+		 */
+		public function dispose(disposeGroup:Function, disposeItem:Function):void
+		{
+			var groupCount:int = this.getLength();
+			var path:Array = [];
+			for(var i:int = 0; i < groupCount; i++)
+			{
+				var group:Object = this.getItemAt(i);
+				path[0] = i;
+				this.disposeGroupInternal(group, path, disposeGroup, disposeItem);
+				path.length = 0;
+			}
+		}
+
+		/**
+		 * @private
+		 */
+		protected function disposeGroupInternal(group:Object, path:Array, disposeGroup:Function, disposeItem:Function):void
+		{
+			if(disposeGroup != null)
+			{
+				disposeGroup(group);
+			}
+
+			var itemCount:int = this.getLength.apply(this, path);
+			for(var i:int = 0; i < itemCount; i++)
+			{
+				path[path.length] = i;
+				var item:Object = this.getItemAt.apply(this, path);
+				if(this.isBranch(item))
+				{
+					this.disposeGroupInternal(item, path, disposeGroup, disposeItem);
+				}
+				else if(disposeItem != null)
+				{
+					disposeItem(item);
+				}
+				path.length--;
+			}
 		}
 	}
 }

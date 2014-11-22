@@ -7,6 +7,8 @@ accordance with the terms of the accompanying license agreement.
 */
 package feathers.controls
 {
+	import feathers.skins.IStyleProvider;
+
 	import flash.errors.IllegalOperationError;
 
 	[Exclude(name="isToggle",kind="property")]
@@ -28,14 +30,32 @@ package feathers.controls
 	 * @see http://wiki.starling-framework.org/feathers/check
 	 * @see ToggleSwitch
 	 */
-	public class Check extends Button
+	public class Check extends ToggleButton
 	{
+		/**
+		 * The default <code>IStyleProvider</code> for all <code>Check</code>
+		 * components.
+		 *
+		 * @default null
+		 * @see feathers.core.FeathersControl#styleProvider
+		 */
+		public static var globalStyleProvider:IStyleProvider;
+
 		/**
 		 * Constructor.
 		 */
 		public function Check()
 		{
+			super();
 			super.isToggle = true;
+		}
+
+		/**
+		 * @private
+		 */
+		override protected function get defaultStyleProvider():IStyleProvider
+		{
+			return Check.globalStyleProvider;
 		}
 
 		/**

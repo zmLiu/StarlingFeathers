@@ -15,6 +15,7 @@ package feathers.controls
 	import feathers.core.PropertyProxy;
 	import feathers.data.ListCollection;
 	import feathers.layout.VerticalLayout;
+	import feathers.skins.IStyleProvider;
 
 	import starling.display.DisplayObject;
 	import starling.events.Event;
@@ -31,6 +32,21 @@ package feathers.controls
 	 * the event object will contain the item from the <code>ButtonGroup</code>
 	 * data provider for the button that is triggered. If no button is
 	 * triggered, then the <code>data</code> property will be <code>null</code>.
+	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>null</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
 	 *
 	 * @eventType starling.events.Event.CLOSE
 	 */
@@ -63,23 +79,23 @@ package feathers.controls
 	public class Alert extends Panel
 	{
 		/**
-		 * The default value added to the <code>nameList</code> of the header.
+		 * The default value added to the <code>styleNameList</code> of the header.
 		 *
-		 * @see feathers.core.IFeathersControl#nameList
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		public static const DEFAULT_CHILD_NAME_HEADER:String = "feathers-alert-header";
 
 		/**
-		 * The default value added to the <code>nameList</code> of the button group.
+		 * The default value added to the <code>styleNameList</code> of the button group.
 		 *
-		 * @see feathers.core.IFeathersControl#nameList
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		public static const DEFAULT_CHILD_NAME_BUTTON_GROUP:String = "feathers-alert-button-group";
 
 		/**
-		 * The default value added to the <code>nameList</code> of the message.
+		 * The default value added to the <code>styleNameList</code> of the message.
 		 *
-		 * @see feathers.core.IFeathersControl#nameList
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		public static const DEFAULT_CHILD_NAME_MESSAGE:String = "feathers-alert-message";
 
@@ -131,6 +147,15 @@ package feathers.controls
 		 * @see #show()
 		 */
 		public static var overlayFactory:Function;
+
+		/**
+		 * The default <code>IStyleProvider</code> for all <code>Alert</code>
+		 * components.
+		 *
+		 * @default null
+		 * @see feathers.core.FeathersControl#styleProvider
+		 */
+		public static var globalStyleProvider:IStyleProvider;
 
 		/**
 		 * The default factory that creates alerts when <code>Alert.show()</code>
@@ -208,13 +233,13 @@ package feathers.controls
 		}
 
 		/**
-		 * The value added to the <code>nameList</code> of the alert's message
-		 * text renderer. This variable is <code>protected</code> so that
-		 * sub-classes can customize the message name in their constructors
+		 * The value added to the <code>styleNameList</code> of the alert's
+		 * message text renderer. This variable is <code>protected</code> so
+		 * that sub-classes can customize the message name in their constructors
 		 * instead of using the default name defined by
 		 * <code>DEFAULT_CHILD_NAME_MESSAGE</code>.
 		 *
-		 * @see feathers.core.IFeathersControl#nameList
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		protected var messageName:String = DEFAULT_CHILD_NAME_MESSAGE;
 
@@ -238,6 +263,14 @@ package feathers.controls
 		 * <p>For internal use in subclasses.</p>
 		 */
 		protected var messageTextRenderer:ITextRenderer;
+
+		/**
+		 * @private
+		 */
+		override protected function get defaultStyleProvider():IStyleProvider
+		{
+			return Alert.globalStyleProvider;
+		}
 
 		/**
 		 * @private
@@ -571,13 +604,12 @@ package feathers.controls
 		 * different skins than the default style:</p>
 		 *
 		 * <listing version="3.0">
-		 * setInitializerForClass( ButtonGroup, customButtonGroupInitializer, "my-custom-button-group");</listing>
+		 * getStyleProviderForClass( ButtonGroup ).setFunctionForStyleName( "my-custom-button-group", setCustomButtonGroupStyles );</listing>
 		 *
 		 * @default null
 		 *
 		 * @see #DEFAULT_CHILD_NAME_BUTTON_GROUP
-		 * @see feathers.core.FeathersControl#nameList
-		 * @see feathers.core.DisplayListWatcher
+		 * @see feathers.core.FeathersControl#styleNameList
 		 * @see #buttonGroupFactory
 		 * @see #buttonGroupProperties
 		 */
@@ -688,8 +720,8 @@ package feathers.controls
 		 */
 		override protected function autoSizeIfNeeded():Boolean
 		{
-			const needsWidth:Boolean = isNaN(this.explicitWidth);
-			const needsHeight:Boolean = isNaN(this.explicitHeight);
+			var needsWidth:Boolean = this.explicitWidth !== this.explicitWidth; //isNaN
+			var needsHeight:Boolean = this.explicitHeight !== this.explicitHeight; //isNaN
 			if(!needsWidth && !needsHeight)
 			{
 				return false;
@@ -700,8 +732,8 @@ package feathers.controls
 				IValidating(this._icon).validate();
 			}
 
-			const oldHeaderWidth:Number = this.header.width;
-			const oldHeaderHeight:Number = this.header.height;
+			var oldHeaderWidth:Number = this.header.width;
+			var oldHeaderHeight:Number = this.header.height;
 			this.header.width = this.explicitWidth;
 			this.header.maxWidth = this._maxWidth;
 			this.header.height = NaN;
@@ -709,8 +741,8 @@ package feathers.controls
 
 			if(this.footer)
 			{
-				const oldFooterWidth:Number = this.footer.width;
-				const oldFooterHeight:Number = this.footer.height;
+				var oldFooterWidth:Number = this.footer.width;
+				var oldFooterHeight:Number = this.footer.height;
 				this.footer.width = this.explicitWidth;
 				this.footer.maxWidth = this._maxWidth;
 				this.footer.height = NaN;
@@ -722,16 +754,20 @@ package feathers.controls
 			if(needsWidth)
 			{
 				newWidth = this._viewPort.width + this._rightViewPortOffset + this._leftViewPortOffset;
-				if(this._icon && !isNaN(this._icon.width))
+				if(this._icon)
 				{
-					newWidth += this._icon.width + this._gap;
+					var iconWidth:Number = this._icon.width;
+					if(iconWidth === iconWidth) //!isNaN
+					{
+						newWidth += this._icon.width + this._gap;
+					}
 				}
 				newWidth = Math.max(newWidth, this.header.width);
 				if(this.footer)
 				{
 					newWidth = Math.max(newWidth, this.footer.width);
 				}
-				if(!isNaN(this.originalBackgroundWidth))
+				if(this.originalBackgroundWidth === this.originalBackgroundWidth) //!isNaN
 				{
 					newWidth = Math.max(newWidth, this.originalBackgroundWidth);
 				}
@@ -739,12 +775,16 @@ package feathers.controls
 			if(needsHeight)
 			{
 				newHeight = this._viewPort.height;
-				if(this._icon && !isNaN(this._icon.height))
+				if(this._icon)
 				{
-					newHeight = Math.max(newHeight, this._icon.height);
+					var iconHeight:Number = this._icon.height;
+					if(iconHeight === iconHeight) //!isNaN
+					{
+						newHeight = Math.max(newHeight, this._icon.height);
+					}
 				}
 				newHeight += this._bottomViewPortOffset + this._topViewPortOffset
-				if(!isNaN(this.originalBackgroundHeight))
+				if(this.originalBackgroundHeight === this.originalBackgroundHeight) //!isNaN
 				{
 					newHeight = Math.max(newHeight, this.originalBackgroundHeight);
 				}
@@ -827,10 +867,10 @@ package feathers.controls
 				this.messageTextRenderer = null;
 			}
 
-			const factory:Function = this._messageFactory != null ? this._messageFactory : FeathersControl.defaultTextRendererFactory;
+			var factory:Function = this._messageFactory != null ? this._messageFactory : FeathersControl.defaultTextRendererFactory;
 			this.messageTextRenderer = ITextRenderer(factory());
-			const uiTextRenderer:IFeathersControl = IFeathersControl(this.messageTextRenderer);
-			uiTextRenderer.nameList.add(this.messageName);
+			var uiTextRenderer:IFeathersControl = IFeathersControl(this.messageTextRenderer);
+			uiTextRenderer.styleNameList.add(this.messageName);
 			uiTextRenderer.touchable = false;
 			this.addChild(DisplayObject(this.messageTextRenderer));
 		}
@@ -858,14 +898,10 @@ package feathers.controls
 		 */
 		protected function refreshMessageStyles():void
 		{
-			const displayMessageRenderer:DisplayObject = DisplayObject(this.messageTextRenderer);
 			for(var propertyName:String in this._messageProperties)
 			{
-				if(displayMessageRenderer.hasOwnProperty(propertyName))
-				{
-					var propertyValue:Object = this._messageProperties[propertyName];
-					displayMessageRenderer[propertyName] = propertyValue;
-				}
+				var propertyValue:Object = this._messageProperties[propertyName];
+				this.messageTextRenderer[propertyName] = propertyValue;
 			}
 		}
 
@@ -881,7 +917,8 @@ package feathers.controls
 				{
 					IValidating(this._icon).validate();
 				}
-				if(!isNaN(this._icon.width))
+				var iconWidth:Number = this._icon.width;
+				if(iconWidth == iconWidth) //!isNaN
 				{
 					this._leftViewPortOffset += this._icon.width + this._gap;
 				}

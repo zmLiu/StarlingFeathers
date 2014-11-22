@@ -17,6 +17,7 @@ package feathers.display
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 
+	import starling.core.RenderSupport;
 	import starling.core.Starling;
 	import starling.display.DisplayObject;
 	import starling.display.Image;
@@ -26,6 +27,26 @@ package feathers.display
 	import starling.textures.Texture;
 	import starling.textures.TextureSmoothing;
 	import starling.utils.MatrixUtil;
+
+	[Exclude(name="numChildren",kind="property")]
+	[Exclude(name="isFlattened",kind="property")]
+	[Exclude(name="addChild",kind="method")]
+	[Exclude(name="addChildAt",kind="method")]
+	[Exclude(name="broadcastEvent",kind="method")]
+	[Exclude(name="broadcastEventWith",kind="method")]
+	[Exclude(name="contains",kind="method")]
+	[Exclude(name="getChildAt",kind="method")]
+	[Exclude(name="getChildByName",kind="method")]
+	[Exclude(name="getChildIndex",kind="method")]
+	[Exclude(name="removeChild",kind="method")]
+	[Exclude(name="removeChildAt",kind="method")]
+	[Exclude(name="removeChildren",kind="method")]
+	[Exclude(name="setChildIndex",kind="method")]
+	[Exclude(name="sortChildren",kind="method")]
+	[Exclude(name="swapChildren",kind="method")]
+	[Exclude(name="swapChildrenAt",kind="method")]
+	[Exclude(name="flatten",kind="method")]
+	[Exclude(name="unflatten",kind="method")]
 
 	/**
 	 * Scales an image with nine regions to maintain the aspect ratio of the
@@ -192,7 +213,8 @@ package feathers.display
 		private var _textureScale:Number = 1;
 
 		/**
-		 * The amount to scale the texture. Useful for DPI changes.
+		 * Scales the texture dimensions during measurement. Useful for UI that
+		 * should scale based on screen density or resolution.
 		 *
 		 * <p>In the following example, the texture scale is changed:</p>
 		 *
@@ -235,7 +257,7 @@ package feathers.display
 		 *
 		 * @default starling.textures.TextureSmoothing.BILINEAR
 		 *
-		 * @see starling.textures.TextureSmoothing
+		 * @see http://doc.starling-framework.org/core/starling/textures/TextureSmoothing.html starling.textures.TextureSmoothing
 		 */
 		public function get smoothing():String
 		{
@@ -435,10 +457,13 @@ package feathers.display
 		/**
 		 * @private
 		 */
-		override public function flatten():void
+		override public function render(support:RenderSupport, parentAlpha:Number):void
 		{
-			this.validate();
-			super.flatten();
+			if(this._isInvalid)
+			{
+				this.validate();
+			}
+			super.render(support, parentAlpha);
 		}
 
 		/**
@@ -446,15 +471,18 @@ package feathers.display
 		 */
 		public function validate():void
 		{
-			if(!this._validationQueue || !this.stage || !this._isInvalid)
+			if(!this._isInvalid)
 			{
 				return;
 			}
 			if(this._isValidating)
 			{
-				//we were already validating, and something else told us to
-				//validate. that's bad.
-				this._validationQueue.addControl(this, true);
+				if(this._validationQueue)
+				{
+					//we were already validating, and something else told us to
+					//validate. that's bad.
+					this._validationQueue.addControl(this, true);
+				}
 				return;
 			}
 			this._isValidating = true;
@@ -473,25 +501,29 @@ package feathers.display
 				helperImage.smoothing = this._smoothing;
 				helperImage.color = this._color;
 
-				const grid:Rectangle = this._textures.scale9Grid;
+				var grid:Rectangle = this._textures.scale9Grid;
 				var scaledLeftWidth:Number = grid.x * this._textureScale;
-				var scaledTopHeight:Number = grid.y * this._textureScale;
 				var scaledRightWidth:Number = (this._frame.width - grid.x - grid.width) * this._textureScale;
+				var sumLeftAndRight:Number = scaledLeftWidth + scaledRightWidth;
+				if(sumLeftAndRight > this._width)
+				{
+					var distortionScale:Number = (this._width / sumLeftAndRight);
+					scaledLeftWidth *= distortionScale;
+					scaledRightWidth *= distortionScale;
+					sumLeftAndRight + scaledLeftWidth + scaledRightWidth;
+				}
+				var scaledCenterWidth:Number = this._width - sumLeftAndRight;
+				var scaledTopHeight:Number = grid.y * this._textureScale;
 				var scaledBottomHeight:Number = (this._frame.height - grid.y - grid.height) * this._textureScale;
-				const scaledCenterWidth:Number = this._width - scaledLeftWidth - scaledRightWidth;
-				const scaledMiddleHeight:Number = this._height - scaledTopHeight - scaledBottomHeight;
-				if(scaledCenterWidth < 0)
+				var sumTopAndBottom:Number = scaledTopHeight + scaledBottomHeight;
+				if(sumTopAndBottom > this._height)
 				{
-					var offset:Number = scaledCenterWidth / 2;
-					scaledLeftWidth += offset;
-					scaledRightWidth += offset;
+					distortionScale = (this._height / sumTopAndBottom);
+					scaledTopHeight *= distortionScale;
+					scaledBottomHeight *= distortionScale;
+					sumTopAndBottom = scaledTopHeight + scaledBottomHeight;
 				}
-				if(scaledMiddleHeight < 0)
-				{
-					offset = scaledMiddleHeight / 2;
-					scaledTopHeight += offset;
-					scaledBottomHeight += offset;
-				}
+				var scaledMiddleHeight:Number = this._height - sumTopAndBottom;
 
 				if(scaledTopHeight > 0)
 				{

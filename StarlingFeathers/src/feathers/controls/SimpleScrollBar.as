@@ -10,6 +10,7 @@ package feathers.controls
 	import feathers.core.FeathersControl;
 	import feathers.core.PropertyProxy;
 	import feathers.events.FeathersEventType;
+	import feathers.skins.IStyleProvider;
 	import feathers.utils.math.clamp;
 	import feathers.utils.math.roundToNearest;
 
@@ -26,6 +27,21 @@ package feathers.controls
 	/**
 	 * Dispatched when the scroll bar's value changes.
 	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>null</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
+	 *
 	 * @eventType starling.events.Event.CHANGE
 	 */
 	[Event(name="change",type="starling.events.Event")]
@@ -33,12 +49,42 @@ package feathers.controls
 	/**
 	 * Dispatched when the user starts dragging the scroll bar's thumb.
 	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>null</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
+	 *
 	 * @eventType feathers.events.FeathersEventType.BEGIN_INTERACTION
 	 */
 	[Event(name="beginInteraction",type="starling.events.Event")]
 
 	/**
 	 * Dispatched when the user stops dragging the scroll bar's thumb.
+	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>null</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
 	 *
 	 * @eventType feathers.events.FeathersEventType.END_INTERACTION
 	 */
@@ -57,17 +103,21 @@ package feathers.controls
 	 * <listing version="3.0">
 	 * list.horizontalScrollBarFactory = function():IScrollBar
 	 * {
-	 *     return new SimpleScrollBar();
+	 *     var scrollBar:SimpleScrollBar = new SimpleScrollBar();
+	 *     scrollBar.direction = SimpleScrollBar.DIRECTION_HORIZONTAL;
+	 *     return scrollBar;
 	 * };
 	 * list.verticalScrollBarFactory = function():IScrollBar
 	 * {
-	 *     return new SimpleScrollBar();
+	 *     var scrollBar:SimpleScrollBar = new SimpleScrollBar();
+	 *     scrollBar.direction = SimpleScrollBar.DIRECTION_VERTICAL;
+	 *     return scrollBar;
 	 * };</listing>
 	 *
 	 * @see http://wiki.starling-framework.org/feathers/simple-scroll-bar
 	 * @see ScrollBar
 	 */
-	public class SimpleScrollBar extends FeathersControl implements IScrollBar
+	public class SimpleScrollBar extends FeathersControl implements IDirectionalScrollBar
 	{
 		/**
 		 * @private
@@ -94,11 +144,20 @@ package feathers.controls
 		public static const DIRECTION_VERTICAL:String = "vertical";
 
 		/**
-		 * The default value added to the <code>nameList</code> of the thumb.
+		 * The default value added to the <code>styleNameList</code> of the thumb.
 		 *
-		 * @see feathers.core.IFeathersControl#nameList
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		public static const DEFAULT_CHILD_NAME_THUMB:String = "feathers-simple-scroll-bar-thumb";
+
+		/**
+		 * The default <code>IStyleProvider</code> for all <code>SimpleScrollBar</code>
+		 * components.
+		 *
+		 * @default null
+		 * @see feathers.core.FeathersControl#styleProvider
+		 */
+		public static var globalStyleProvider:IStyleProvider;
 
 		/**
 		 * @private
@@ -113,11 +172,12 @@ package feathers.controls
 		 */
 		public function SimpleScrollBar()
 		{
+			super();
 			this.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);
 		}
 
 		/**
-		 * The value added to the <code>nameList</code> of the thumb. This
+		 * The value added to the <code>styleNameList</code> of the thumb. This
 		 * variable is <code>protected</code> so that sub-classes can customize
 		 * the thumb name in their constructors instead of using the default
 		 * name defined by <code>DEFAULT_CHILD_NAME_THUMB</code>.
@@ -126,7 +186,7 @@ package feathers.controls
 		 * <code>customThumbName</code>.</p>
 		 *
 		 * @see #customThumbName
-		 * @see feathers.core.IFeathersControl#nameList
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		protected var thumbName:String = DEFAULT_CHILD_NAME_THUMB;
 
@@ -154,6 +214,14 @@ package feathers.controls
 		 * @private
 		 */
 		protected var track:Quad;
+
+		/**
+		 * @private
+		 */
+		override protected function get defaultStyleProvider():IStyleProvider
+		{
+			return SimpleScrollBar.globalStyleProvider;
+		}
 
 		/**
 		 * @private
@@ -669,13 +737,12 @@ package feathers.controls
 		 * different skins than the default style:</p>
 		 *
 		 * <listing version="3.0">
-		 * setInitializerForClass( Button, customThumbInitializer, "my-custom-thumb");</listing>
+		 * getStyleProviderForClass( Button ).setFunctionForStyleName( "my-custom-thumb", setCustomThumbStyles );</listing>
 		 *
 		 * @default null
 		 *
 		 * @see #DEFAULT_CHILD_NAME_THUMB
-		 * @see feathers.core.FeathersControl#nameList
-		 * @see feathers.core.DisplayListWatcher
+		 * @see feathers.core.FeathersControl#styleNameList
 		 * @see #thumbFactory
 		 * @see #thumbProperties
 		 */
@@ -753,7 +820,7 @@ package feathers.controls
 			}
 			if(!(value is PropertyProxy))
 			{
-				const newValue:PropertyProxy = new PropertyProxy();
+				var newValue:PropertyProxy = new PropertyProxy();
 				for(var propertyName:String in value)
 				{
 					newValue[propertyName] = value[propertyName];
@@ -821,11 +888,11 @@ package feathers.controls
 		 */
 		override protected function draw():void
 		{
-			const dataInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_DATA)
-			const stylesInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STYLES);
+			var dataInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_DATA)
+			var stylesInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STYLES);
 			var sizeInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_SIZE);
-			const stateInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STATE);
-			const thumbFactoryInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_THUMB_FACTORY);
+			var stateInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STATE);
+			var thumbFactoryInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_THUMB_FACTORY);
 
 			if(thumbFactoryInvalid)
 			{
@@ -865,23 +932,24 @@ package feathers.controls
 		 */
 		protected function autoSizeIfNeeded():Boolean
 		{
-			if(isNaN(this.thumbOriginalWidth) || isNaN(this.thumbOriginalHeight))
+			if(this.thumbOriginalWidth !== this.thumbOriginalWidth ||
+				this.thumbOriginalHeight !== this.thumbOriginalHeight) //isNaN
 			{
 				this.thumb.validate();
 				this.thumbOriginalWidth = this.thumb.width;
 				this.thumbOriginalHeight = this.thumb.height;
 			}
 
-			const needsWidth:Boolean = isNaN(this.explicitWidth);
-			const needsHeight:Boolean = isNaN(this.explicitHeight);
+			var needsWidth:Boolean = this.explicitWidth !== this.explicitWidth; //isNaN
+			var needsHeight:Boolean = this.explicitHeight !== this.explicitHeight; //isNaN
 			if(!needsWidth && !needsHeight)
 			{
 				return false;
 			}
 
-			const range:Number = this._maximum - this._minimum;
+			var range:Number = this._maximum - this._minimum;
 			//we're just going to make something up in this case
-			const adjustedPageStep:Number = this._page == 0 ? range / 10 : this._page;
+			var adjustedPageStep:Number = this._page == 0 ? range / 10 : this._page;
 			var newWidth:Number = this.explicitWidth;
 			var newHeight:Number = this.explicitHeight;
 			if(needsWidth)
@@ -904,7 +972,11 @@ package feathers.controls
 						}
 						else
 						{
-							newWidth = Math.max(this.thumbOriginalWidth, this.thumbOriginalWidth * range / adjustedPageStep);
+							newWidth = this.thumbOriginalWidth * range / adjustedPageStep;
+							if(newWidth < this.thumbOriginalWidth)
+							{
+								newWidth = this.thumbOriginalWidth;
+							}
 						}
 					}
 				}
@@ -926,7 +998,11 @@ package feathers.controls
 						}
 						else
 						{
-							newHeight = Math.max(this.thumbOriginalHeight, this.thumbOriginalHeight * range / adjustedPageStep);
+							newHeight = this.thumbOriginalHeight * range / adjustedPageStep;
+							if(newHeight < this.thumbOriginalHeight)
+							{
+								newHeight = this.thumbOriginalHeight;
+							}
 						}
 					}
 				}
@@ -958,10 +1034,10 @@ package feathers.controls
 				this.thumb = null;
 			}
 
-			const factory:Function = this._thumbFactory != null ? this._thumbFactory : defaultThumbFactory;
-			const thumbName:String = this._customThumbName != null ? this._customThumbName : this.thumbName;
+			var factory:Function = this._thumbFactory != null ? this._thumbFactory : defaultThumbFactory;
+			var thumbName:String = this._customThumbName != null ? this._customThumbName : this.thumbName;
 			this.thumb = Button(factory());
-			this.thumb.nameList.add(thumbName);
+			this.thumb.styleNameList.add(thumbName);
 			this.thumb.isFocusEnabled = false;
 			this.thumb.keepDownStateOnRollOut = true;
 			this.thumb.addEventListener(TouchEvent.TOUCH, thumb_touchHandler);
@@ -975,11 +1051,8 @@ package feathers.controls
 		{
 			for(var propertyName:String in this._thumbProperties)
 			{
-				if(this.thumb.hasOwnProperty(propertyName))
-				{
-					var propertyValue:Object = this._thumbProperties[propertyName];
-					this.thumb[propertyName] = propertyValue;
-				}
+				var propertyValue:Object = this._thumbProperties[propertyName];
+				this.thumb[propertyName] = propertyValue;
 			}
 		}
 
@@ -991,7 +1064,7 @@ package feathers.controls
 			this.track.width = this.actualWidth;
 			this.track.height = this.actualHeight;
 
-			const range:Number = this._maximum - this._minimum;
+			var range:Number = this._maximum - this._minimum;
 			this.thumb.visible = range > 0;
 			if(!this.thumb.visible)
 			{
@@ -1001,9 +1074,17 @@ package feathers.controls
 			//this will auto-size the thumb, if needed
 			this.thumb.validate();
 
-			const contentWidth:Number = this.actualWidth - this._paddingLeft - this._paddingRight;
-			const contentHeight:Number = this.actualHeight - this._paddingTop - this._paddingBottom;
-			const adjustedPageStep:Number = Math.min(range, this._page == 0 ? range : this._page);
+			var contentWidth:Number = this.actualWidth - this._paddingLeft - this._paddingRight;
+			var contentHeight:Number = this.actualHeight - this._paddingTop - this._paddingBottom;
+			var adjustedPageStep:Number = this._page;
+			if(this._page == 0)
+			{
+				adjustedPageStep = range;
+			}
+			else if(range < adjustedPageStep)
+			{
+				adjustedPageStep = range;
+			}
 			var valueOffset:Number = 0;
 			if(this._value < this._minimum)
 			{
@@ -1016,7 +1097,7 @@ package feathers.controls
 			if(this._direction == DIRECTION_VERTICAL)
 			{
 				this.thumb.width = this.thumbOriginalWidth;
-				const thumbMinHeight:Number = this.thumb.minHeight > 0 ? this.thumb.minHeight : this.thumbOriginalHeight;
+				var thumbMinHeight:Number = this.thumb.minHeight > 0 ? this.thumb.minHeight : this.thumbOriginalHeight;
 				var thumbHeight:Number = contentHeight * adjustedPageStep / range;
 				var heightOffset:Number = contentHeight - thumbHeight;
 				if(heightOffset > thumbHeight)
@@ -1031,7 +1112,7 @@ package feathers.controls
 				}
 				this.thumb.height = thumbHeight;
 				this.thumb.x = this._paddingLeft + (this.actualWidth - this._paddingLeft - this._paddingRight - this.thumb.width) / 2;
-				const trackScrollableHeight:Number = contentHeight - this.thumb.height;
+				var trackScrollableHeight:Number = contentHeight - this.thumb.height;
 				var thumbY:Number = trackScrollableHeight * (this._value - this._minimum) / range;
 				if(thumbY > trackScrollableHeight)
 				{
@@ -1045,7 +1126,7 @@ package feathers.controls
 			}
 			else //horizontal
 			{
-				const thumbMinWidth:Number = this.thumb.minWidth > 0 ? this.thumb.minWidth : this.thumbOriginalWidth;
+				var thumbMinWidth:Number = this.thumb.minWidth > 0 ? this.thumb.minWidth : this.thumbOriginalWidth;
 				var thumbWidth:Number = contentWidth * adjustedPageStep / range;
 				var widthOffset:Number = contentWidth - thumbWidth;
 				if(widthOffset > thumbWidth)
@@ -1060,7 +1141,7 @@ package feathers.controls
 				}
 				this.thumb.width = thumbWidth;
 				this.thumb.height = this.thumbOriginalHeight;
-				const trackScrollableWidth:Number = contentWidth - this.thumb.width;
+				var trackScrollableWidth:Number = contentWidth - this.thumb.width;
 				var thumbX:Number = trackScrollableWidth * (this._value - this._minimum) / range;
 				if(thumbX > trackScrollableWidth)
 				{
@@ -1083,20 +1164,26 @@ package feathers.controls
 		 */
 		protected function locationToValue(location:Point):Number
 		{
-			var percentage:Number;
+			var percentage:Number = 0;
 			if(this._direction == DIRECTION_VERTICAL)
 			{
-				const trackScrollableHeight:Number = this.actualHeight - this.thumb.height - this._paddingTop - this._paddingBottom;
-				const yOffset:Number = location.y - this._touchStartY - this._paddingTop;
-				const yPosition:Number = Math.min(Math.max(0, this._thumbStartY + yOffset), trackScrollableHeight);
-				percentage = yPosition / trackScrollableHeight;
+				var trackScrollableHeight:Number = this.actualHeight - this.thumb.height - this._paddingTop - this._paddingBottom;
+				if(trackScrollableHeight > 0)
+				{
+					var yOffset:Number = location.y - this._touchStartY - this._paddingTop;
+					var yPosition:Number = Math.min(Math.max(0, this._thumbStartY + yOffset), trackScrollableHeight);
+					percentage = yPosition / trackScrollableHeight;
+				}
 			}
 			else //horizontal
 			{
-				const trackScrollableWidth:Number = this.actualWidth - this.thumb.width - this._paddingLeft - this._paddingRight;
-				const xOffset:Number = location.x - this._touchStartX - this._paddingLeft;
-				const xPosition:Number = Math.min(Math.max(0, this._thumbStartX + xOffset), trackScrollableWidth);
-				percentage = xPosition / trackScrollableWidth;
+				var trackScrollableWidth:Number = this.actualWidth - this.thumb.width - this._paddingLeft - this._paddingRight;
+				if(trackScrollableWidth > 0)
+				{
+					var xOffset:Number = location.x - this._touchStartX - this._paddingLeft;
+					var xPosition:Number = Math.min(Math.max(0, this._thumbStartX + xOffset), trackScrollableWidth);
+					percentage = xPosition / trackScrollableWidth;
+				}
 			}
 
 			return this._minimum + percentage * (this._maximum - this._minimum);

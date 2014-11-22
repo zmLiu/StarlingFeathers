@@ -7,7 +7,7 @@ accordance with the terms of the accompanying license agreement.
 */
 package feathers.controls
 {
-	import feathers.system.DeviceCapabilities;
+	import feathers.skins.IStyleProvider;
 	import feathers.utils.display.getDisplayObjectDepthFromStage;
 
 	import flash.events.KeyboardEvent;
@@ -55,9 +55,9 @@ package feathers.controls
 	public class PanelScreen extends Panel implements IScreen
 	{
 		/**
-		 * The default value added to the <code>nameList</code> of the header.
+		 * The default value added to the <code>styleNameList</code> of the header.
 		 *
-		 * @see feathers.core.IFeathersControl#nameList
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		public static const DEFAULT_CHILD_NAME_HEADER:String = "feathers-panel-screen-header";
 
@@ -142,6 +142,29 @@ package feathers.controls
 		public static const INTERACTION_MODE_TOUCH_AND_SCROLL_BARS:String = "touchAndScrollBars";
 
 		/**
+		 * @copy feathers.controls.Scroller#DECELERATION_RATE_NORMAL
+		 *
+		 * @see feathers.controls.Scroller#decelerationRate
+		 */
+		public static const DECELERATION_RATE_NORMAL:Number = 0.998;
+
+		/**
+		 * @copy feathers.controls.Scroller#DECELERATION_RATE_FAST
+		 *
+		 * @see feathers.controls.Scroller#decelerationRate
+		 */
+		public static const DECELERATION_RATE_FAST:Number = 0.99;
+
+		/**
+		 * The default <code>IStyleProvider</code> for all <code>PanelScreen</code>
+		 * components.
+		 *
+		 * @default null
+		 * @see feathers.core.FeathersControl#styleProvider
+		 */
+		public static var globalStyleProvider:IStyleProvider;
+
+		/**
 		 * Constructor.
 		 */
 		public function PanelScreen()
@@ -149,8 +172,14 @@ package feathers.controls
 			this.addEventListener(Event.ADDED_TO_STAGE, panelScreen_addedToStageHandler);
 			super();
 			this.headerName = DEFAULT_CHILD_NAME_HEADER;
-			this.originalDPI = DeviceCapabilities.dpi;
-			this.clipContent = false;
+		}
+
+		/**
+		 * @private
+		 */
+		override protected function get defaultStyleProvider():IStyleProvider
+		{
+			return PanelScreen.globalStyleProvider;
 		}
 
 		/**
@@ -193,65 +222,6 @@ package feathers.controls
 		public function set owner(value:ScreenNavigator):void
 		{
 			this._owner = value;
-		}
-
-		/**
-		 * @private
-		 */
-		protected var _originalDPI:int = 0;
-
-		/**
-		 * The original intended DPI of the application. This value cannot be
-		 * automatically detected and it must be set manually.
-		 *
-		 * <p>In the following example, the original DPI is customized:</p>
-		 *
-		 * <listing version="3.0">
-		 * this.originalDPI = 326; //iPhone with Retina Display</listing>
-		 *
-		 * @see #dpiScale
-		 * @see feathers.system.DeviceCapabilities#dpi
-		 */
-		public function get originalDPI():int
-		{
-			return this._originalDPI;
-		}
-
-		/**
-		 * @private
-		 */
-		public function set originalDPI(value:int):void
-		{
-			if(this._originalDPI == value)
-			{
-				return;
-			}
-			this._originalDPI = value;
-			this._dpiScale = DeviceCapabilities.dpi / this._originalDPI;
-			this.invalidate(INVALIDATION_FLAG_SIZE);
-		}
-
-		/**
-		 * @private
-		 */
-		protected var _dpiScale:Number = 1;
-
-		/**
-		 * Uses <code>originalDPI</code> and <code>DeviceCapabilities.dpi</code>
-		 * to calculate a scale value to allow all content to be the same
-		 * physical size (in inches). Using this value will have a much larger
-		 * effect on the layout of the content, but it can ensure that
-		 * interactive items won't be scaled too small to affect the accuracy
-		 * of touches. Likewise, it won't scale items to become ridiculously
-		 * physically large. Most useful when targeting many different platforms
-		 * with the same code.
-		 *
-		 * @see #originalDPI
-		 * @see feathers.system.DeviceCapabilities#dpi
-		 */
-		protected function get dpiScale():Number
-		{
-			return this._dpiScale;
 		}
 
 		/**

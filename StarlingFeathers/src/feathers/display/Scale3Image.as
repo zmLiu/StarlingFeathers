@@ -17,6 +17,7 @@ package feathers.display
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 
+	import starling.core.RenderSupport;
 	import starling.core.Starling;
 	import starling.display.DisplayObject;
 	import starling.display.Image;
@@ -26,6 +27,26 @@ package feathers.display
 	import starling.textures.Texture;
 	import starling.textures.TextureSmoothing;
 	import starling.utils.MatrixUtil;
+
+	[Exclude(name="numChildren",kind="property")]
+	[Exclude(name="isFlattened",kind="property")]
+	[Exclude(name="addChild",kind="method")]
+	[Exclude(name="addChildAt",kind="method")]
+	[Exclude(name="broadcastEvent",kind="method")]
+	[Exclude(name="broadcastEventWith",kind="method")]
+	[Exclude(name="contains",kind="method")]
+	[Exclude(name="getChildAt",kind="method")]
+	[Exclude(name="getChildByName",kind="method")]
+	[Exclude(name="getChildIndex",kind="method")]
+	[Exclude(name="removeChild",kind="method")]
+	[Exclude(name="removeChildAt",kind="method")]
+	[Exclude(name="removeChildren",kind="method")]
+	[Exclude(name="setChildIndex",kind="method")]
+	[Exclude(name="sortChildren",kind="method")]
+	[Exclude(name="swapChildren",kind="method")]
+	[Exclude(name="swapChildrenAt",kind="method")]
+	[Exclude(name="flatten",kind="method")]
+	[Exclude(name="unflatten",kind="method")]
 
 	/**
 	 * Scales an image like a "pill" shape with three regions, either
@@ -83,7 +104,7 @@ package feathers.display
 		 * @private
 		 */
 		private var _layoutChanged:Boolean = true;
-		
+
 		/**
 		 * @private
 		 */
@@ -192,7 +213,8 @@ package feathers.display
 		private var _textureScale:Number = 1;
 
 		/**
-		 * The amount to scale the texture. Useful for DPI changes.
+		 * Scales the texture dimensions during measurement. Useful for UI that
+		 * should scale based on screen density or resolution.
 		 *
 		 * <p>In the following example, the texture scale is changed:</p>
 		 *
@@ -235,7 +257,7 @@ package feathers.display
 		 *
 		 * @default starling.textures.TextureSmoothing.BILINEAR
 		 *
-		 * @see starling.textures.TextureSmoothing
+		 * @see http://doc.starling-framework.org/core/starling/textures/TextureSmoothing.html starling.textures.TextureSmoothing
 		 */
 		public function get smoothing():String
 		{
@@ -435,10 +457,13 @@ package feathers.display
 		/**
 		 * @private
 		 */
-		override public function flatten():void
+		override public function render(support:RenderSupport, parentAlpha:Number):void
 		{
-			this.validate();
-			super.flatten();
+			if(this._isInvalid)
+			{
+				this.validate();
+			}
+			super.render(support, parentAlpha);
 		}
 
 		/**
@@ -446,15 +471,18 @@ package feathers.display
 		 */
 		public function validate():void
 		{
-			if(!this._validationQueue || !this.stage || !this._isInvalid)
+			if(!this._isInvalid)
 			{
 				return;
 			}
 			if(this._isValidating)
 			{
-				//we were already validating, and something else told us to
-				//validate. that's bad.
-				this._validationQueue.addControl(this, true);
+				if(this._validationQueue)
+				{
+					//we were already validating, and something else told us to
+					//validate. that's bad.
+					this._validationQueue.addControl(this, true);
+				}
 				return;
 			}
 			this._isValidating = true;
@@ -479,14 +507,16 @@ package feathers.display
 					var scaledOppositeEdgeSize:Number = this._width;
 					var oppositeEdgeScale:Number = scaledOppositeEdgeSize / this._frame.width;
 					var scaledFirstRegionSize:Number = this._textures.firstRegionSize * oppositeEdgeScale;
-					var scaledThirdRegionSize:Number = (this._frame.height - this._textures.firstRegionSize - this._textures.secondRegionSize) * oppositeEdgeScale;
-					var scaledSecondRegionSize:Number = this._height - scaledFirstRegionSize - scaledThirdRegionSize;
-					if(scaledSecondRegionSize < 0)
+					var scaledThirdRegionSize:Number = (this._frame.height - this._textures.firstRegionSize - this._textures.secondRegionSize) * oppositeEdgeScale;sumFirstAndThird = scaledFirstRegionSize + scaledThirdRegionSize;
+					var sumFirstAndThird:Number = scaledFirstRegionSize + scaledThirdRegionSize;
+					if(sumFirstAndThird > this._width)
 					{
-						var firstAndThirdOffset:Number = scaledSecondRegionSize / 2;
-						scaledFirstRegionSize += firstAndThirdOffset;
-						scaledThirdRegionSize += firstAndThirdOffset;
+						var distortionScale:Number = (this._width / sumFirstAndThird);
+						scaledFirstRegionSize *= distortionScale;
+						scaledThirdRegionSize *= distortionScale;
+						sumFirstAndThird = scaledFirstRegionSize + scaledThirdRegionSize;
 					}
+					var scaledSecondRegionSize:Number = this._height - sumFirstAndThird;
 
 					if(scaledOppositeEdgeSize > 0)
 					{
@@ -529,14 +559,16 @@ package feathers.display
 					scaledOppositeEdgeSize = this._height;
 					oppositeEdgeScale = scaledOppositeEdgeSize / this._frame.height;
 					scaledFirstRegionSize = this._textures.firstRegionSize * oppositeEdgeScale;
-					scaledThirdRegionSize = (this._frame.width - this._textures.firstRegionSize - this._textures.secondRegionSize) * oppositeEdgeScale;
-					scaledSecondRegionSize = this._width - scaledFirstRegionSize - scaledThirdRegionSize;
-					if(scaledSecondRegionSize < 0)
+					scaledThirdRegionSize = (this._frame.width - this._textures.firstRegionSize - this._textures.secondRegionSize) * oppositeEdgeScale;sumFirstAndThird = scaledFirstRegionSize + scaledThirdRegionSize;
+					sumFirstAndThird = scaledFirstRegionSize + scaledThirdRegionSize;
+					if(sumFirstAndThird > this._width)
 					{
-						firstAndThirdOffset = scaledSecondRegionSize / 2;
-						scaledFirstRegionSize += firstAndThirdOffset;
-						scaledThirdRegionSize += firstAndThirdOffset;
+						distortionScale = (this._width / sumFirstAndThird);
+						scaledFirstRegionSize *= distortionScale;
+						scaledThirdRegionSize *= distortionScale;
+						sumFirstAndThird = scaledFirstRegionSize + scaledThirdRegionSize;
 					}
+					scaledSecondRegionSize = this._width - sumFirstAndThird;
 
 					if(scaledOppositeEdgeSize > 0)
 					{

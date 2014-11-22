@@ -1,7 +1,7 @@
 // =================================================================================================
 //
 //	Starling Framework
-//	Copyright 2011 Gamua OG. All Rights Reserved.
+//	Copyright 2011-2014 Gamua. All Rights Reserved.
 //
 //	This program is free software. You can redistribute and/or modify it
 //	in accordance with the terms of the accompanying license agreement.
@@ -90,8 +90,8 @@ package starling.animation
             mTotalTime = Math.max(0.0001, time);
             mProgress = 0.0;
             mDelay = mRepeatDelay = 0.0;
-            mOnStart = mOnUpdate = mOnComplete = null;
-            mOnStartArgs = mOnUpdateArgs = mOnCompleteArgs = null;
+            mOnStart = mOnUpdate = mOnRepeat = mOnComplete = null;
+            mOnStartArgs = mOnUpdateArgs = mOnRepeatArgs = mOnCompleteArgs = null;
             mRoundToInt = mReverse = false;
             mRepeatCount = 1;
             mCurrentCycle = -1;
@@ -161,7 +161,7 @@ package starling.animation
             if (mCurrentCycle < 0 && previousTime <= 0 && mCurrentTime > 0)
             {
                 mCurrentCycle++;
-                if (mOnStart != null) mOnStart.apply(null, mOnStartArgs);
+                if (mOnStart != null) mOnStart.apply(this, mOnStartArgs);
             }
 
             var ratio:Number = mCurrentTime / mTotalTime;
@@ -184,7 +184,7 @@ package starling.animation
             }
 
             if (mOnUpdate != null) 
-                mOnUpdate.apply(null, mOnUpdateArgs);
+                mOnUpdate.apply(this, mOnUpdateArgs);
             
             if (previousTime < mTotalTime && mCurrentTime >= mTotalTime)
             {
@@ -193,7 +193,7 @@ package starling.animation
                     mCurrentTime = -mRepeatDelay;
                     mCurrentCycle++;
                     if (mRepeatCount > 1) mRepeatCount--;
-                    if (mOnRepeat != null) mOnRepeat.apply(null, mOnRepeatArgs);
+                    if (mOnRepeat != null) mOnRepeat.apply(this, mOnRepeatArgs);
                 }
                 else
                 {
@@ -205,7 +205,7 @@ package starling.animation
                     // add it to another juggler; so this event has to be dispatched *before*
                     // executing 'onComplete'.
                     dispatchEventWith(Event.REMOVE_FROM_JUGGLER);
-                    if (onComplete != null) onComplete.apply(null, onCompleteArgs);
+                    if (onComplete != null) onComplete.apply(this, onCompleteArgs);
                 }
             }
             

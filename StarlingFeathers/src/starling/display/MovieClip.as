@@ -1,7 +1,7 @@
 // =================================================================================================
 //
 //	Starling Framework
-//	Copyright 2011 Gamua OG. All Rights Reserved.
+//	Copyright 2011-2014 Gamua. All Rights Reserved.
 //
 //	This program is free software. You can redistribute and/or modify it
 //	in accordance with the terms of the accompanying license agreement.
@@ -12,7 +12,8 @@ package starling.display
 {
     import flash.errors.IllegalOperationError;
     import flash.media.Sound;
-    
+    import flash.media.SoundTransform;
+
     import starling.animation.IAnimatable;
     import starling.events.Event;
     import starling.textures.Texture;
@@ -47,13 +48,14 @@ package starling.display
         private var mSounds:Vector.<Sound>;
         private var mDurations:Vector.<Number>;
         private var mStartTimes:Vector.<Number>;
-        
+
         private var mDefaultFrameDuration:Number;
         private var mCurrentTime:Number;
         private var mCurrentFrame:int;
         private var mLoop:Boolean;
         private var mPlaying:Boolean;
         private var mMuted:Boolean;
+        private var mSoundTransform:SoundTransform = null;
         
         /** Creates a movie clip from the provided textures and with the specified default framerate.
          *  The movie will have the size of the first frame. */  
@@ -220,7 +222,6 @@ package starling.display
             var previousFrame:int = mCurrentFrame;
             var restTime:Number = 0.0;
             var breakAfterFrame:Boolean = false;
-            var hasCompleteListener:Boolean = hasEventListener(Event.COMPLETE); 
             var dispatchCompleteEvent:Boolean = false;
             var totalTime:Number = this.totalTime;
             
@@ -239,7 +240,7 @@ package starling.display
                 {
                     if (mCurrentFrame == finalFrame)
                     {
-                        if (mLoop && !hasCompleteListener)
+                        if (mLoop && !hasEventListener(Event.COMPLETE))
                         {
                             mCurrentTime -= totalTime;
                             mCurrentFrame = 0;
@@ -248,7 +249,7 @@ package starling.display
                         {
                             breakAfterFrame = true;
                             restTime = mCurrentTime - totalTime;
-                            dispatchCompleteEvent = hasCompleteListener;
+                            dispatchCompleteEvent = true;
                             mCurrentFrame = finalFrame;
                             mCurrentTime = totalTime;
                         }
@@ -259,13 +260,13 @@ package starling.display
                     }
                     
                     var sound:Sound = mSounds[mCurrentFrame];
-                    if (sound && !mMuted) sound.play();
+                    if (sound && !mMuted) sound.play(0, 0, mSoundTransform);
                     if (breakAfterFrame) break;
                 }
                 
                 // special case when we reach *exactly* the total time.
                 if (mCurrentFrame == finalFrame && mCurrentTime == totalTime)
-                    dispatchCompleteEvent = hasCompleteListener;
+                    dispatchCompleteEvent = true;
             }
             
             if (mCurrentFrame != previousFrame)
@@ -302,6 +303,10 @@ package starling.display
         public function get muted():Boolean { return mMuted; }
         public function set muted(value:Boolean):void { mMuted = value; }
 
+        /** The SoundTransform object used for playback of all frame sounds. @default null */
+        public function get soundTransform():SoundTransform { return mSoundTransform; }
+        public function set soundTransform(value:SoundTransform):void { mSoundTransform = value; }
+
         /** The index of the frame that is currently displayed. */
         public function get currentFrame():int { return mCurrentFrame; }
         public function set currentFrame(value:int):void
@@ -330,11 +335,8 @@ package starling.display
             mDefaultFrameDuration = newFrameDuration;
             
             for (var i:int=0; i<numFrames; ++i) 
-            {
-                var duration:Number = mDurations[i] * acceleration;
-                mDurations[i] = duration;
-            }
-            
+                mDurations[i] *= acceleration;
+
             updateStartTimes();
         }
         

@@ -14,6 +14,7 @@ package feathers.controls
 	import feathers.layout.LayoutBoundsResult;
 	import feathers.layout.VerticalLayout;
 	import feathers.layout.ViewPortBounds;
+	import feathers.skins.IStyleProvider;
 
 	import starling.display.DisplayObject;
 	import starling.events.Event;
@@ -37,6 +38,22 @@ package feathers.controls
 	 * {
 	 *    trace( "The button with label \"" + data.label + "\" was triggered." );
 	 * }</listing>
+	 *
+	 * <p>The properties of the event object have the following values:</p>
+	 * <table class="innertable">
+	 * <tr><th>Property</th><th>Value</th></tr>
+	 * <tr><td><code>bubbles</code></td><td>false</td></tr>
+	 * <tr><td><code>currentTarget</code></td><td>The Object that defines the
+	 *   event listener that handles the event. For example, if you use
+	 *   <code>myButton.addEventListener()</code> to register an event listener,
+	 *   myButton is the value of the <code>currentTarget</code>.</td></tr>
+	 * <tr><td><code>data</code></td><td>The item associated with the button
+	 *   that was triggered.</td></tr>
+	 * <tr><td><code>target</code></td><td>The Object that dispatched the event;
+	 *   it is not always the Object listening for the event. Use the
+	 *   <code>currentTarget</code> property to always access the Object
+	 *   listening for the event.</td></tr>
+	 * </table>
 	 *
 	 * @eventType starling.events.Event.TRIGGERED
 	 */
@@ -62,6 +79,15 @@ package feathers.controls
 	 */
 	public class ButtonGroup extends FeathersControl
 	{
+		/**
+		 * The default <code>IStyleProvider</code> for all <code>ButtonGroup</code>
+		 * components.
+		 *
+		 * @default null
+		 * @see feathers.core.FeathersControl#styleProvider
+		 */
+		public static var globalStyleProvider:IStyleProvider;
+
 		/**
 		 * @private
 		 */
@@ -186,9 +212,9 @@ package feathers.controls
 		public static const VERTICAL_ALIGN_JUSTIFY:String = "justify";
 
 		/**
-		 * The default value added to the <code>nameList</code> of the buttons.
+		 * The default value added to the <code>styleNameList</code> of the buttons.
 		 *
-		 * @see feathers.core.IFeathersControl#nameList
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		public static const DEFAULT_CHILD_NAME_BUTTON:String = "feathers-button-group-button";
 
@@ -205,10 +231,11 @@ package feathers.controls
 		 */
 		public function ButtonGroup()
 		{
+			super();
 		}
 
 		/**
-		 * The value added to the <code>nameList</code> of the buttons. This
+		 * The value added to the <code>styleNameList</code> of the buttons. This
 		 * variable is <code>protected</code> so that sub-classes can customize
 		 * the button name in their constructors instead of using the default
 		 * name defined by <code>DEFAULT_CHILD_NAME_BUTTON</code>.
@@ -217,29 +244,29 @@ package feathers.controls
 		 * <code>customButtonName</code>.</p>
 		 *
 		 * @see #customButtonName
-		 * @see feathers.core.IFeathersControl#nameList
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		protected var buttonName:String = DEFAULT_CHILD_NAME_BUTTON;
 
 		/**
-		 * The value added to the <code>nameList</code> of the first button.
+		 * The value added to the <code>styleNameList</code> of the first button.
 		 *
 		 * <p>To customize the first button name without subclassing, see
 		 * <code>customFirstButtonName</code>.</p>
 		 *
 		 * @see #customFirstButtonName
-		 * @see feathers.core.IFeathersControl#nameList
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		protected var firstButtonName:String = DEFAULT_CHILD_NAME_BUTTON;
 
 		/**
-		 * The value added to the <code>nameList</code> of the last button.
+		 * The value added to the <code>styleNameList</code> of the last button.
 		 *
 		 * <p>To customize the last button name without subclassing, see
 		 * <code>customLastButtonName</code>.</p>
 		 *
 		 * @see #customLastButtonName
-		 * @see feathers.core.IFeathersControl#nameList
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		protected var lastButtonName:String = DEFAULT_CHILD_NAME_BUTTON;
 
@@ -281,6 +308,14 @@ package feathers.controls
 		/**
 		 * @private
 		 */
+		override protected function get defaultStyleProvider():IStyleProvider
+		{
+			return ButtonGroup.globalStyleProvider;
+		}
+
+		/**
+		 * @private
+		 */
 		protected var _dataProvider:ListCollection;
 
 		/**
@@ -311,8 +346,8 @@ package feathers.controls
 		 *     <li>selectedDownIcon</li>
 		 *     <li>selectedHoverIcon</li>
 		 *     <li>selectedDisabledIcon</li>
-		 *     <li>isSelected</li>
-		 *     <li>isToggle</li>
+		 *     <li>isSelected (only supported by <code>ToggleButton</code>)</li>
+		 *     <li>isToggle (only supported by <code>ToggleButton</code>)</li>
 		 *     <li>isEnabled</li>
 		 * </ul>
 		 *
@@ -320,8 +355,12 @@ package feathers.controls
 		 *
 		 * <ul>
 		 *     <li>Event.TRIGGERED</li>
-		 *     <li>Event.CHANGE</li>
+		 *     <li>Event.CHANGE (only supported by <code>ToggleButton</code>)</li>
 		 * </ul>
+		 *
+		 * <p>To use properties and events that are only supported by
+		 * <code>ToggleButton</code>, you must provide a <code>buttonFactory</code>
+		 * that returns a <code>ToggleButton</code> instead of a <code>Button</code>.</p>
 		 *
 		 * <p>You can pass a function to the <code>buttonInitializer</code>
 		 * property that can provide custom logic to interpret each item in the
@@ -475,7 +514,7 @@ package feathers.controls
 		 *
 		 * @see #VERTICAL_ALIGN_TOP
 		 * @see #VERTICAL_ALIGN_MIDDLE
-		 * @see #VERTICAL_ALIGN_RIGHT
+		 * @see #VERTICAL_ALIGN_BOTTOM
 		 * @see #VERTICAL_ALIGN_JUSTIFY
 		 */
 		public function get verticalAlign():String
@@ -1042,14 +1081,12 @@ package feathers.controls
 		 * different skins than the default style:</p>
 		 *
 		 * <listing version="3.0">
-		 * setInitializerForClass( Button, customButtonInitializer, "my-custom-button");</listing>
+		 * getStyleProviderForClass( Button ).setFunctionForStyleName( "my-custom-button", setCustomButtonStyles );</listing>
 		 *
 		 * @default null
 		 *
 		 * @see #DEFAULT_CHILD_NAME_BUTTON
-		 * @see feathers.core.FeathersControl#nameList
-		 * @see feathers.core.DisplayListWatcher
-		 * @see http://wiki.starling-framework.org/feathers/custom-themes
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		public function get customButtonName():String
 		{
@@ -1087,13 +1124,11 @@ package feathers.controls
 		 * different skins than the default style:</p>
 		 *
 		 * <listing version="3.0">
-		 * setInitializerForClass( Button, customFirstButtonInitializer, "my-custom-first-button");</listing>
+		 * getStyleProviderForClass( Button ).setFunctionForStyleName( "my-custom-first-button", setCustomFirstButtonStyles );</listing>
 		 *
 		 * @default null
 		 *
-		 * @see feathers.core.FeathersControl#nameList
-		 * @see feathers.core.DisplayListWatcher
-		 * @see http://wiki.starling-framework.org/feathers/custom-themes
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		public function get customFirstButtonName():String
 		{
@@ -1131,13 +1166,11 @@ package feathers.controls
 		 * different skins than the default style:</p>
 		 *
 		 * <listing version="3.0">
-		 * setInitializerForClass( Button, customLastButtonInitializer, "my-custom-last-button");</listing>
+		 * getStyleProviderForClass( Button ).setFunctionForStyleName( "my-custom-last-button", setCustomLastButtonStyles );</listing>
 		 *
 		 * @default null
 		 *
-		 * @see feathers.core.FeathersControl#nameList
-		 * @see feathers.core.DisplayListWatcher
-		 * @see http://wiki.starling-framework.org/feathers/custom-themes
+		 * @see feathers.core.FeathersControl#styleNameList
 		 */
 		public function get customLastButtonName():String
 		{
@@ -1217,7 +1250,7 @@ package feathers.controls
 			}
 			if(!(value is PropertyProxy))
 			{
-				const newValue:PropertyProxy = new PropertyProxy();
+				var newValue:PropertyProxy = new PropertyProxy();
 				for(var propertyName:String in value)
 				{
 					newValue[propertyName] = value[propertyName];
@@ -1250,10 +1283,10 @@ package feathers.controls
 		 */
 		override protected function draw():void
 		{
-			const dataInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_DATA);
-			const stylesInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STYLES);
-			const stateInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STATE);
-			const buttonFactoryInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_BUTTON_FACTORY);
+			var dataInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_DATA);
+			var stylesInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STYLES);
+			var stateInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STATE);
+			var buttonFactoryInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_BUTTON_FACTORY);
 			var sizeInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_SIZE);
 
 			if(dataInvalid || stateInvalid || buttonFactoryInvalid)
@@ -1284,7 +1317,7 @@ package feathers.controls
 		 */
 		protected function commitEnabled():void
 		{
-			const buttonCount:int = this.activeButtons.length;
+			var buttonCount:int = this.activeButtons.length;
 			for(var i:int = 0; i < buttonCount; i++)
 			{
 				var button:Button = this.activeButtons[i];
@@ -1297,15 +1330,12 @@ package feathers.controls
 		 */
 		protected function refreshButtonStyles():void
 		{
-			for each(var button:Button in this.activeButtons)
+			for(var propertyName:String in this._buttonProperties)
 			{
-				for(var propertyName:String in this._buttonProperties)
+				var propertyValue:Object = this._buttonProperties[propertyName];
+				for each(var button:Button in this.activeButtons)
 				{
-					var propertyValue:Object = this._buttonProperties[propertyName];
-					if(button.hasOwnProperty(propertyName))
-					{
-						button[propertyName] = propertyValue;
-					}
+					button[propertyName] = propertyValue;
 				}
 			}
 		}
@@ -1454,8 +1484,8 @@ package feathers.controls
 			this.activeLastButton = null;
 
 			var pushIndex:int = 0;
-			const itemCount:int = this._dataProvider ? this._dataProvider.length : 0;
-			const lastItemIndex:int = itemCount - 1;
+			var itemCount:int = this._dataProvider ? this._dataProvider.length : 0;
+			var lastItemIndex:int = itemCount - 1;
 			for(var i:int = 0; i < itemCount; i++)
 			{
 				var item:Object = this._dataProvider.getItemAt(i);
@@ -1483,7 +1513,7 @@ package feathers.controls
 		 */
 		protected function clearInactiveButtons():void
 		{
-			const itemCount:int = this.inactiveButtons.length;
+			var itemCount:int = this.inactiveButtons.length;
 			for(var i:int = 0; i < itemCount; i++)
 			{
 				var button:Button = this.inactiveButtons.shift();
@@ -1521,15 +1551,15 @@ package feathers.controls
 				button = Button(factory());
 				if(this._customFirstButtonName)
 				{
-					button.nameList.add(this._customFirstButtonName);
+					button.styleNameList.add(this._customFirstButtonName);
 				}
 				else if(this._customButtonName)
 				{
-					button.nameList.add(this._customButtonName);
+					button.styleNameList.add(this._customButtonName);
 				}
 				else
 				{
-					button.nameList.add(this.firstButtonName);
+					button.styleNameList.add(this.firstButtonName);
 				}
 				this.addChild(button);
 			}
@@ -1562,15 +1592,15 @@ package feathers.controls
 				button = Button(factory());
 				if(this._customLastButtonName)
 				{
-					button.nameList.add(this._customLastButtonName);
+					button.styleNameList.add(this._customLastButtonName);
 				}
 				else if(this._customButtonName)
 				{
-					button.nameList.add(this._customButtonName);
+					button.styleNameList.add(this._customButtonName);
 				}
 				else
 				{
-					button.nameList.add(this.lastButtonName);
+					button.styleNameList.add(this.lastButtonName);
 				}
 				this.addChild(button);
 			}
@@ -1597,11 +1627,11 @@ package feathers.controls
 				var button:Button = this._buttonFactory();
 				if(this._customButtonName)
 				{
-					button.nameList.add(this._customButtonName);
+					button.styleNameList.add(this._customButtonName);
 				}
 				else
 				{
-					button.nameList.add(this.buttonName);
+					button.styleNameList.add(this.buttonName);
 				}
 				this.addChild(button);
 			}
