@@ -40,6 +40,15 @@ package lzm.starling.swf.display
 		
 		private var _autoUpdate:Boolean = true;
 		
+		/**
+		 * 影片剪辑
+		 * @param frames 帧信息
+		 * @param labels 标签信息
+		 * @param displayObjects 显示对象
+		 * @param ownerSwf 所属SWF
+		 * @param frameEvents 帧事件
+		 * 
+		 */		
 		public function SwfMovieClip(frames:Array,labels:Array,displayObjects:Object,ownerSwf:Swf,frameEvents:Object = null){
 			super();
 			
@@ -57,7 +66,10 @@ package lzm.starling.swf.display
 			
 			play();
 		}
-		
+		/**
+		 * 实现ISwfAnimotion的更新方法
+		 * 
+		 */		
 		public function update():void{
 			if (!_isPlay) return;
 			
@@ -83,6 +95,7 @@ package lzm.starling.swf.display
 		
 		
 		private var __frameInfos:Array;
+		/** 设置/获取 当前帧数 */
 		public function set currentFrame(frame:int):void{
 			clearChild();
 			
@@ -210,16 +223,30 @@ package lzm.starling.swf.display
 			}
 		}
 		
+		/**
+		 * 移动当前帧位置并停止播放
+		 * @param frame  帧数或标签,使用的是帧数则从该帧起至总帧数的播放范围,使用的是标签则播放范围是该标签所属的.
+		 * @param stopChild  是否停止子动画
+		 * */	
 		public function gotoAndStop(frame:Object,stopChild:Boolean = true):void{
 			goTo(frame);
 			stop(stopChild);
 		}
 		
+		/**
+		 * 移动当前帧位置并开始播放
+		 * @param frame	 帧数或标签,使用的是帧数则从该帧起至总帧数的播放范围,使用的是标签则播放范围是该标签所属的.
+		 * @param rePlayChildMovie  子动画是否重新播放
+		 * */	
 		public function gotoAndPlay(frame:Object,rePlayChildMovie:Boolean = false):void{
 			goTo(frame);
 			play(rePlayChildMovie);
 		}
 		
+		/**
+		 *  移动到起始帧,并确定播放范围
+		 * @param frame 帧或标签
+		 * */
 		private function goTo(frame:*):void{
 			if((frame is String)){
 				var labelData:Array = getLabelData(frame);
@@ -233,6 +260,11 @@ package lzm.starling.swf.display
 			currentFrame = _currentFrame;
 		}
 		
+		/**
+		 * 获取标签信息 
+		 * @param label 标签名
+		 * @return 返回[标签名,起始帧数,结束帧数]
+		 * */		
 		private function getLabelData(label:String):Array{
 			var length:int = _labels.length;
 			var labelData:Array;
