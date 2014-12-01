@@ -317,8 +317,7 @@ package lzm.starling.swf
 		public function createS9Image(name:String,data:Array=null):SwfScale9Image{
 			var scale9Data:Array = _swfDatas[dataKey_Scale9][name];
 			var texture:Texture = _assets.getTexture(name);
-			var s9Texture:Scale9Textures = new Scale9Textures(texture,new Rectangle(scale9Data[0],scale9Data[1],scale9Data[2],scale9Data[3]));
-			var s9image:SwfScale9Image = new SwfScale9Image(s9Texture,1);
+			var s9image:SwfScale9Image = new SwfScale9Image(texture,new Rectangle(scale9Data[0],scale9Data[1],scale9Data[2],scale9Data[3]));
 			
 			if(data != null){
 				s9image.width = data[10];

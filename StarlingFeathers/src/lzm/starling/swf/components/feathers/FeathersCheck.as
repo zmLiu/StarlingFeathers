@@ -8,6 +8,7 @@ package lzm.starling.swf.components.feathers
 	import feathers.skins.SmartDisplayObjectStateValueSelector;
 	
 	import lzm.starling.swf.components.ISwfComponent;
+	import lzm.starling.swf.display.SwfScale9Image;
 	import lzm.starling.swf.display.SwfSprite;
 	
 	import starling.display.Image;
@@ -21,20 +22,20 @@ package lzm.starling.swf.components.feathers
 		}
 		
 		public function initialization(componetContent:SwfSprite):void{
-			var _defaultSkin:Scale9Image = componetContent.getScale9Image("_defaultSkin");
+			var _defaultSkin:SwfScale9Image = componetContent.getScale9Image("_defaultSkin");
 			var _defaultSelectedSkin:Image = componetContent.getImage("_defaultSelectedSkin");
-			var _downSkin:Scale9Image = componetContent.getScale9Image("_downSkin");
+			var _downSkin:SwfScale9Image = componetContent.getScale9Image("_downSkin");
 			var _downSelectedSkin:Image = componetContent.getImage("_downSelectedSkin");
-			var _disabledSkin:Scale9Image = componetContent.getScale9Image("_disabledSkin");
+			var _disabledSkin:SwfScale9Image = componetContent.getScale9Image("_disabledSkin");
 			var _disabledSelectedSkin:Image = componetContent.getImage("_disabledSelectedSkin");
 			
 			var _labelTextField:TextField = componetContent.getTextField("_labelTextField");
 			
 			var iconSelector:SmartDisplayObjectStateValueSelector = new SmartDisplayObjectStateValueSelector();
-			iconSelector.defaultValue = _defaultSkin.textures;
+			iconSelector.defaultValue = _defaultSkin.texture;
 			iconSelector.defaultSelectedValue = _defaultSelectedSkin.texture;
-			iconSelector.setValueForState(_downSkin.textures, Button.STATE_DOWN, false);
-			iconSelector.setValueForState(_disabledSkin.textures, Button.STATE_DISABLED, false);
+			iconSelector.setValueForState(_downSkin.texture, Button.STATE_DOWN, false);
+			iconSelector.setValueForState(_disabledSkin.texture, Button.STATE_DISABLED, false);
 			iconSelector.setValueForState(_downSelectedSkin.texture, Button.STATE_DOWN, true);
 			iconSelector.setValueForState(_disabledSelectedSkin.texture, Button.STATE_DISABLED, true);
 			
