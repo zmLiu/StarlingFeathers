@@ -535,6 +535,5 @@ package starling.display
 			//			mChildren.splice(0,length);
 			mChildren = new <DisplayObject>[];
 		}
-		
     }
 }

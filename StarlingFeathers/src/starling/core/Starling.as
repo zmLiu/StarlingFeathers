@@ -181,7 +181,7 @@ package starling.core
     public class Starling extends EventDispatcher
     {
         /** The version of the Starling framework. */
-        public static const VERSION:String = "1.6";
+        public static const VERSION:String = "1.6.1";
         
         /** The key for the shader programs stored in 'contextData' */
         private static const PROGRAM_DATA_NAME:String = "Starling.programs"; 
@@ -217,7 +217,7 @@ package starling.core
         private var mNativeStageContentScaleFactor:Number;
 
         private static var sCurrent:Starling;
-        private static var sHandleLostContext:Boolean;
+        private static var sHandleLostContext:Boolean = true;
         private static var sContextData:Dictionary = new Dictionary(true);
         private static var sAll:Vector.<Starling> = new <Starling>[];
         
@@ -360,7 +360,7 @@ package starling.core
             var currentProfile:String;
             
             if (profile == "auto")
-                profiles = ["standard", "baselineExtended", "baseline", "baselineConstrained"];
+                profiles = ["standard", "standardConstrained", "baselineExtended", "baseline", "baselineConstrained"];
             else if (profile is String)
                 profiles = [profile as String];
             else if (profile is Array)
@@ -492,7 +492,6 @@ package starling.core
             
             makeCurrent();
             updateViewPort();
-            updateNativeOverlay();
             mSupport.nextFrame();
             
             var scaleX:Number = mViewPort.width  / mStage.stageWidth;
@@ -675,7 +674,7 @@ package starling.core
         
         private function onEnterFrame(event:Event):void
         {
-            // On mobile, the native display list is only updated on stage3D draw calls. 
+            // On mobile, the native display list is only updated on stage3D draw calls.
             // Thus, we render even when Starling is paused.
             
             if (!mShareContext)
@@ -683,6 +682,8 @@ package starling.core
                 if (mStarted) nextFrame();
                 else if (mRendering) render();
             }
+
+            updateNativeOverlay();
         }
         
         private function onKey(event:KeyboardEvent):void
