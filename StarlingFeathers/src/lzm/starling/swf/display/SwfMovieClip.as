@@ -180,6 +180,10 @@ package lzm.starling.swf.display
 		public function play(rePlayChildMovie:Boolean = false):void{
 			_isPlay = true;
 			
+			if(_currentFrame >= _endFrame){
+				_currentFrame = _startFrame;
+			}
+			
 			if(_autoUpdate) _ownerSwf.swfUpdateManager.addSwfAnimation(this);
 			
 			if(!rePlayChildMovie) return;
