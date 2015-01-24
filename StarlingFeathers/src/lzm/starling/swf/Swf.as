@@ -41,6 +41,7 @@ package lzm.starling.swf
 		public static const dataKey_ShapeImg:String = "shapeImg";
 		public static const dataKey_Component:String = "comp";
 		public static const dataKey_Particle:String = "particle";
+		public static const dataKey_BDClip:String = "bdc";
 		
 		public static const ANGLE_TO_RADIAN:Number = Math.PI / 180;
 		
@@ -66,7 +67,8 @@ package lzm.starling.swf
 			"s9":createS9Image,
 			"shapeImg":createShapeImage,
 			"comp":createComponent,
-			"particle":createParticle
+			"particle":createParticle,
+			"bdc":createMovieClip
 		};
 		
 		private var _assets:AssetManager;
@@ -206,7 +208,10 @@ package lzm.starling.swf
 		 * 是否有某个MovieClip
 		 * */
 		public function hasMovieClip(name:String):Boolean{
-			return _swfDatas[dataKey_MovieClip][name] != null;
+			if (_swfDatas[dataKey_MovieClip][name] != null)
+				return true;
+
+			return _swfDatas[dataKey_BDClip][name] != null;
 		}
 		
 		/**
@@ -214,6 +219,9 @@ package lzm.starling.swf
 		 * */
 		public function createMovieClip(name:String,data:Array=null):SwfMovieClip{
 			var movieClipData:Object = _swfDatas[dataKey_MovieClip][name];
+			// TODO
+			if (movieClipData == null)
+				movieClipData = _swfDatas[dataKey_BDClip][name];
 			var objectCountData:Object = movieClipData["objCount"];
 			var displayObjects:Object = {};
 			var displayObjectArray:Array;
