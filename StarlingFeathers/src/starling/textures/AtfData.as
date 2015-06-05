@@ -34,14 +34,13 @@ package starling.textures
             var format:uint = data.readUnsignedByte();
             switch (format & 0x7f)
             {
-                case  0:
-                case  1: mFormat = Context3DTextureFormat.BGRA; break;
-                case 12:
-                case  2:
-                case  3: mFormat = Context3DTextureFormat.COMPRESSED; break;
-                case 13:
-                case  4:
-                case  5: mFormat = "compressedAlpha"; break; // explicit string for compatibility
+                case 0:
+                case 1: mFormat = Context3DTextureFormat.BGRA; break;
+                case 2:
+                case 3: mFormat = Context3DTextureFormat.COMPRESSED; break;
+                case 4:
+                case 5: mFormat = "compressedAlpha"; break; // explicit string to stay compatible 
+                                                            // with older versions
                 default: throw new Error("Invalid ATF format");
             }
             

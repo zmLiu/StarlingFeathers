@@ -2,6 +2,7 @@
 <flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
   <includeClasses>
     <classEntry path="lzm.starling.gestures.SwipeGestures"/>
+    <classEntry path="lzm.starling.swf.blendmode.SwfBlendMode"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

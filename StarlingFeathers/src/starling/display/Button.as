@@ -55,14 +55,11 @@ package starling.display
         private var mOverlay:Sprite;
         
         private var mScaleWhenDown:Number;
-        private var mScaleWhenOver:Number;
-        private var mAlphaWhenDown:Number;
         private var mAlphaWhenDisabled:Number;
         private var mUseHandCursor:Boolean;
         private var mEnabled:Boolean;
         private var mState:String;
-        private var mTriggerBounds:Rectangle;
-
+        
         /** Creates a button with a set of state-textures and (optionally) some text.
          *  Any state that is left 'null' will display the up-state texture. Beware that all
          *  state textures should have the same dimensions. */
@@ -79,11 +76,10 @@ package starling.display
             mState = ButtonState.UP;
             mBody = new Image(upState);
             mScaleWhenDown = downState ? 1.0 : 0.9;
-            mScaleWhenOver = mAlphaWhenDown = 1.0;
             mAlphaWhenDisabled = disabledState ? 1.0: 0.5;
             mEnabled = true;
             mUseHandCursor = true;
-            mTextBounds = new Rectangle(0, 0, mBody.width, mBody.height);
+            mTextBounds = new Rectangle(0, 0, upState.width, upState.height);            
             
             mContents = new Sprite();
             mContents.addChild(mBody);
@@ -140,8 +136,7 @@ package starling.display
                 MouseCursor.BUTTON : MouseCursor.AUTO;
             
             var touch:Touch = event.getTouch(this);
-            var isWithinBounds:Boolean;
-
+            
             if (!mEnabled)
             {
                 return;
@@ -156,30 +151,24 @@ package starling.display
             }
             else if (touch.phase == TouchPhase.BEGAN && mState != ButtonState.DOWN)
             {
-                mTriggerBounds = getBounds(stage, mTriggerBounds);
-                mTriggerBounds.inflate(MAX_DRAG_DIST, MAX_DRAG_DIST);
-
                 state = ButtonState.DOWN;
             }
-            else if (touch.phase == TouchPhase.MOVED)
+            else if (touch.phase == TouchPhase.MOVED && mState == ButtonState.DOWN)
             {
-                isWithinBounds = mTriggerBounds.contains(touch.globalX, touch.globalY);
-
-                if (mState == ButtonState.DOWN && !isWithinBounds)
+                // reset button when user dragged too far away after pushing
+                var buttonRect:Rectangle = getBounds(stage);
+                if (touch.globalX < buttonRect.x - MAX_DRAG_DIST ||
+                    touch.globalY < buttonRect.y - MAX_DRAG_DIST ||
+                    touch.globalX > buttonRect.x + buttonRect.width + MAX_DRAG_DIST ||
+                    touch.globalY > buttonRect.y + buttonRect.height + MAX_DRAG_DIST)
                 {
-                    // reset button when finger is moved too far away ...
                     state = ButtonState.UP;
-                }
-                else if (mState == ButtonState.UP && isWithinBounds)
-                {
-                    // ... and reactivate when the finger moves back into the bounds.
-                    state = ButtonState.DOWN;
                 }
             }
             else if (touch.phase == TouchPhase.ENDED && mState == ButtonState.DOWN)
             {
                 state = ButtonState.UP;
-                if (!touch.cancelled) dispatchEventWith(Event.TRIGGERED, true);
+                dispatchEventWith(Event.TRIGGERED, true);
             }
         }
         
@@ -189,30 +178,27 @@ package starling.display
         public function set state(value:String):void
         {
             mState = value;
-            mContents.x = mContents.y = 0;
-            mContents.scaleX = mContents.scaleY = mContents.alpha = 1.0;
+            mContents.scaleX = mContents.scaleY = 1.0;
 
             switch (mState)
             {
                 case ButtonState.DOWN:
                     setStateTexture(mDownState);
-                    mContents.alpha = mAlphaWhenDown;
-                    mContents.scaleX = mContents.scaleY = mScaleWhenDown;
-                    mContents.x = (1.0 - mScaleWhenDown) / 2.0 * mBody.width;
-                    mContents.y = (1.0 - mScaleWhenDown) / 2.0 * mBody.height;
+                    mContents.scaleX = mContents.scaleY = scaleWhenDown;
+                    mContents.x = (1.0 - scaleWhenDown) / 2.0 * mBody.width;
+                    mContents.y = (1.0 - scaleWhenDown) / 2.0 * mBody.height;
                     break;
                 case ButtonState.UP:
                     setStateTexture(mUpState);
+                    mContents.x = mContents.y = 0;
                     break;
                 case ButtonState.OVER:
                     setStateTexture(mOverState);
-                    mContents.scaleX = mContents.scaleY = mScaleWhenOver;
-                    mContents.x = (1.0 - mScaleWhenOver) / 2.0 * mBody.width;
-                    mContents.y = (1.0 - mScaleWhenOver) / 2.0 * mBody.height;
+                    mContents.x = mContents.y = 0;
                     break;
                 case ButtonState.DISABLED:
                     setStateTexture(mDisabledState);
-                    mContents.alpha = mAlphaWhenDisabled;
+                    mContents.x = mContents.y = 0;
                     break;
                 default:
                     throw new ArgumentError("Invalid button state: " + mState);
@@ -229,15 +215,7 @@ package starling.display
          *  remains unscaled. */
         public function get scaleWhenDown():Number { return mScaleWhenDown; }
         public function set scaleWhenDown(value:Number):void { mScaleWhenDown = value; }
-
-        /** The scale factor of the button while the mouse cursor hovers over it. @default 1.0 */
-        public function get scaleWhenOver():Number { return mScaleWhenOver; }
-        public function set scaleWhenOver(value:Number):void { mScaleWhenOver = value; }
-
-        /** The alpha value of the button on touch. @default 1.0 */
-        public function get alphaWhenDown():Number { return mAlphaWhenDown; }
-        public function set alphaWhenDown(value:Number):void { mAlphaWhenDown = value; }
-
+        
         /** The alpha value of the button when it is disabled. @default 0.5 */
         public function get alphaWhenDisabled():Number { return mAlphaWhenDisabled; }
         public function set alphaWhenDisabled(value:Number):void { mAlphaWhenDisabled = value; }
@@ -249,6 +227,7 @@ package starling.display
             if (mEnabled != value)
             {
                 mEnabled = value;
+                mContents.alpha = value ? 1.0 : mAlphaWhenDisabled;
                 state = value ? ButtonState.UP : ButtonState.DISABLED;
             }
         }

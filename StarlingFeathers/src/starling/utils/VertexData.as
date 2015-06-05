@@ -63,6 +63,7 @@ package starling.utils
         /** Helper object. */
         private static var sHelperPoint:Point = new Point();
         private static var sHelperPoint3D:Vector3D = new Vector3D();
+        private static var sHelperRect:Rectangle = new Rectangle();
         
         /** Create a new VertexData object with a specified number of vertices. */
         public function VertexData(numVertices:int, premultipliedAlpha:Boolean=false)

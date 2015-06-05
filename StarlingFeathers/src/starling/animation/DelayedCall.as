@@ -54,10 +54,7 @@ package starling.animation
         public function advanceTime(time:Number):void
         {
             var previousTime:Number = mCurrentTime;
-            mCurrentTime += time;
-
-            if (mCurrentTime > mTotalTime)
-                mCurrentTime = mTotalTime;
+            mCurrentTime = Math.min(mTotalTime, mCurrentTime + time);
             
             if (previousTime < mTotalTime && mCurrentTime >= mTotalTime)
             {                
@@ -81,14 +78,6 @@ package starling.animation
                     call.apply(null, args);
                 }
             }
-        }
-
-        /** Advances the delayed call so that it is executed right away. If 'repeatCount' is
-          * anything else than '1', this method will complete only the current iteration. */
-        public function complete():void
-        {
-            var restTime:Number = mTotalTime - mCurrentTime;
-            if (restTime > 0) advanceTime(restTime);
         }
         
         /** Indicates if enough time has passed, and the call has already been executed. */
