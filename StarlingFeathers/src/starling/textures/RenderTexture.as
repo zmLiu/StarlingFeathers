@@ -201,6 +201,7 @@ package starling.textures
         private function render(object:DisplayObject, matrix:Matrix=null, alpha:Number=1.0):void
         {
             var filter:FragmentFilter = object.filter;
+            var mask:DisplayObject = object.mask;
 
             mSupport.loadIdentity();
             mSupport.blendMode = object.blendMode == BlendMode.AUTO ?
@@ -209,8 +210,12 @@ package starling.textures
             if (matrix) mSupport.prependMatrix(matrix);
             else        mSupport.transformMatrix(object);
 
+            if (mask)   mSupport.pushMask(mask);
+
             if (filter) filter.render(object, mSupport, alpha);
             else        object.render(mSupport, alpha);
+
+            if (mask)   mSupport.popMask();
         }
         
         private function renderBundled(renderBlock:Function, object:DisplayObject=null,
@@ -220,7 +225,7 @@ package starling.textures
             var context:Context3D = Starling.context;
             if (context == null) throw new MissingContextError();
             if (!Starling.current.contextValid) return;
-            
+
             // switch buffers
             if (isDoubleBuffered)
             {
@@ -229,6 +234,8 @@ package starling.textures
                 mBufferTexture = tmpTexture;
                 mHelperImage.texture = mBufferTexture;
             }
+
+            var previousRenderTarget:Texture = mSupport.renderTarget;
             
             // limit drawing to relevant area
             sClipRect.setTo(0, 0, mActiveTexture.width, mActiveTexture.height);
@@ -255,7 +262,7 @@ package starling.textures
                 mDrawing = false;
                 mSupport.finishQuadBatch();
                 mSupport.nextFrame();
-                mSupport.renderTarget = null;
+                mSupport.renderTarget = previousRenderTarget;
                 mSupport.popClipRect();
             }
         }
@@ -264,13 +271,12 @@ package starling.textures
          *  arguments to restore full transparency. */
         public function clear(rgb:uint=0, alpha:Number=0.0):void
         {
-            var context:Context3D = Starling.context;
-            if (context == null) throw new MissingContextError();
             if (!Starling.current.contextValid) return;
-            
+            var previousRenderTarget:Texture = mSupport.renderTarget;
+
             mSupport.renderTarget = mActiveTexture;
             mSupport.clear(rgb, alpha);
-            mSupport.renderTarget = null;
+            mSupport.renderTarget = previousRenderTarget;
             mBufferReady = true;
         }
         

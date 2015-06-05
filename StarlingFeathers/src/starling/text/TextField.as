@@ -20,7 +20,7 @@ package starling.text
     import flash.text.AntiAliasType;
     import flash.text.TextFormat;
     import flash.utils.Dictionary;
-    
+
     import starling.core.RenderSupport;
     import starling.core.Starling;
     import starling.display.DisplayObject;
@@ -90,7 +90,7 @@ package starling.text
     {
         // the name container with the registered bitmap fonts
         private static const BITMAP_FONT_DATA_NAME:String = "starling.display.TextField.BitmapFonts";
-        
+
         // the texture format that is used for TTF rendering
         private static var sDefaultTextureFormat:String =
             "BGRA_PACKED" in Context3DTextureFormat ? "bgraPacked4444" : "bgra";
@@ -107,9 +107,9 @@ package starling.text
         private var mAutoScale:Boolean;
         private var mAutoSize:String;
         private var mKerning:Boolean;
+        private var mLeading:Number;
         private var mNativeFilters:Array;
         private var mRequiresRedraw:Boolean;
-        private var mIsRenderedText:Boolean;
         private var mIsHtmlText:Boolean;
         private var mTextBounds:Rectangle;
         private var mBatchable:Boolean;
@@ -135,6 +135,7 @@ package starling.text
             mVAlign = VAlign.CENTER;
             mBorder = null;
             mKerning = true;
+            mLeading = 0.0;
             mBold = bold;
             mAutoSize = TextFieldAutoSize.NONE;
             mHitArea = new Rectangle(0, 0, width, height);
@@ -170,9 +171,9 @@ package starling.text
         {
             if (mRequiresRedraw)
             {
-                if (mIsRenderedText) createRenderedContents();
-                else                 createComposedContents();
-                
+                if (getBitmapFont(mFontName)) createComposedContents();
+                else                          createRenderedContents();
+
                 updateBorder();
                 mRequiresRedraw = false;
             }
@@ -195,7 +196,21 @@ package starling.text
             var scale:Number = Starling.contentScaleFactor;
             var bitmapData:BitmapData = renderText(scale, mTextBounds);
             var format:String = sDefaultTextureFormat;
+            var maxTextureSize:int = Texture.maxSize;
+            var shrinkHelper:Number = 0;
             
+            // re-render when size of rendered bitmap overflows 'maxTextureSize'
+            while (bitmapData.width > maxTextureSize || bitmapData.height > maxTextureSize)
+            {
+                scale *= Math.min(
+                    (maxTextureSize - shrinkHelper) / bitmapData.width,
+                    (maxTextureSize - shrinkHelper) / bitmapData.height
+                );
+                bitmapData.dispose();
+                bitmapData = renderText(scale, mTextBounds);
+                shrinkHelper += 1;
+            }
+
             mHitArea.width  = bitmapData.width  / scale;
             mHitArea.height = bitmapData.height / scale;
             
@@ -206,7 +221,7 @@ package starling.text
                     mTextBounds = new Rectangle();
 
                 bitmapData = renderText(scale, mTextBounds);
-                texture.root.uploadBitmapData(renderText(scale, mTextBounds));
+                texture.root.uploadBitmapData(bitmapData);
                 bitmapData.dispose();
                 bitmapData = null;
             };
@@ -256,11 +271,12 @@ package starling.text
                 height = int.MAX_VALUE;
                 vAlign = VAlign.TOP;
             }
-            
-            var textFormat:TextFormat = new TextFormat(mFontName, 
+
+            var textFormat:TextFormat = new TextFormat(mFontName,
                 mFontSize * scale, mColor, mBold, mItalic, mUnderline, null, null, hAlign);
             textFormat.kerning = mKerning;
-            
+            textFormat.leading = mLeading;
+
             sNativeTextField.defaultTextFormat = textFormat;
             sNativeTextField.width = width;
             sNativeTextField.height = height;
@@ -436,8 +452,8 @@ package starling.text
                 vAlign = VAlign.TOP;
             }
             
-            bitmapFont.fillQuadBatch(mQuadBatch,
-                width, height, mText, mFontSize, mColor, hAlign, vAlign, mAutoScale, mKerning);
+            bitmapFont.fillQuadBatch(mQuadBatch, width, height, mText,
+                    mFontSize, mColor, hAlign, vAlign, mAutoScale, mKerning, mLeading);
             
             mQuadBatch.batchable = mBatchable;
             
@@ -514,7 +530,7 @@ package starling.text
         public override function hitTest(localPoint:Point, forTouch:Boolean=false):DisplayObject
         {
             if (forTouch && (!visible || !touchable)) return null;
-            else if (mHitArea.containsPoint(localPoint)) return this;
+            else if (mHitArea.containsPoint(localPoint) && hitTestMask(localPoint)) return this;
             else return null;
         }
 
@@ -559,7 +575,6 @@ package starling.text
                 
                 mFontName = value;
                 mRequiresRedraw = true;
-                mIsRenderedText = getBitmapFont(value) == null;
             }
         }
         
@@ -743,6 +758,17 @@ package starling.text
                 mRequiresRedraw = true;
             }
         }
+
+        /** The amount of vertical space (called 'leading') between lines. @default 0 */
+        public function get leading():Number { return mLeading; }
+        public function set leading(value:Number):void
+        {
+            if (mLeading != value)
+            {
+                mLeading = value;
+                mRequiresRedraw = true;
+            }
+        }
         
         /** The Context3D texture format that is used for rendering of all TrueType texts.
          *  The default (<pre>Context3DTextureFormat.BGRA_PACKED</pre>) provides a good
@@ -761,14 +787,14 @@ package starling.text
         public static function registerBitmapFont(bitmapFont:BitmapFont, name:String=null):String
         {
             if (name == null) name = bitmapFont.name;
-            bitmapFonts[name.toLowerCase()] = bitmapFont;
+            bitmapFonts[convertToLowerCase(name)] = bitmapFont;
             return name;
         }
         
         /** Unregisters the bitmap font and, optionally, disposes it. */
         public static function unregisterBitmapFont(name:String, dispose:Boolean=true):void
         {
-            name = name.toLowerCase();
+            name = convertToLowerCase(name);
             
             if (dispose && bitmapFonts[name] != undefined)
                 bitmapFonts[name].dispose();
@@ -780,7 +806,7 @@ package starling.text
          *  The name is not case sensitive. */
         public static function getBitmapFont(name:String):BitmapFont
         {
-            return bitmapFonts[name.toLowerCase()];
+            return bitmapFonts[convertToLowerCase(name)];
         }
         
         /** Stores the currently available bitmap fonts. Since a bitmap font will only work
@@ -796,6 +822,21 @@ package starling.text
             }
             
             return fonts;
+        }
+
+        // optimization for 'toLowerCase' calls
+
+        private static var sStringCache:Dictionary = new Dictionary();
+
+        private static function convertToLowerCase(string:String):String
+        {
+            var result:String = sStringCache[string];
+            if (result == null)
+            {
+                result = string.toLowerCase();
+                sStringCache[string] = result;
+            }
+            return result;
         }
     }
 }
