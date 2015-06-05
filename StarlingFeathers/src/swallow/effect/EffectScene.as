@@ -144,8 +144,8 @@ package swallow.effect
 		/**
 		 * 指定一个遮罩
 		 */
-		public function get mask():Rectangle { return mMask };
-		public function set mask(value:Rectangle):void { mMask = value };
+		public function get mask_():Rectangle { return mMask };
+		public function set mask_(value:Rectangle):void { mMask = value };
 		
 	}
 

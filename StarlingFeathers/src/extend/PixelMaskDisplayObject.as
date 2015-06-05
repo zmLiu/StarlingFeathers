@@ -79,7 +79,7 @@ package extend
 			refreshRenderTextures(null);
 		}
 		
-		public function set mask(mask:DisplayObject) : void
+		public function set mask_(mask:DisplayObject) : void
 		{
 			
 			// clean up existing mask if there is one

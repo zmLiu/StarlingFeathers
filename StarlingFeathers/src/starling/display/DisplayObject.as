@@ -132,28 +132,31 @@ package starling.display
         
 		public var mX:Number;
 		public var mY:Number;
-        private var mPivotX:Number;
-        private var mPivotY:Number;
+		private var mPivotX:Number;
+		private var mPivotY:Number;
 		public var mScaleX:Number;
 		public var mScaleY:Number;
 		public var mSkewX:Number;
 		public var mSkewY:Number;
 		public var mRotation:Number;
 		public var mAlpha:Number;
-        private var mVisible:Boolean;
-        private var mTouchable:Boolean;
-        private var mBlendMode:String;
+		private var mVisible:Boolean;
+		private var mTouchable:Boolean;
+		private var mBlendMode:String;
 		public var mName:String;
-        private var mUseHandCursor:Boolean;
+		private var mUseHandCursor:Boolean;
 		public var mParent:DisplayObjectContainer;  
-        private var mTransformationMatrix:Matrix;
-        private var mTransformationMatrix3D:Matrix3D;
+		private var mTransformationMatrix:Matrix;
+		private var mTransformationMatrix3D:Matrix3D;
 		public var mOrientationChanged:Boolean;
-        private var mFilter:FragmentFilter;
-        private var mIs3D:Boolean;
+		private var mFilter:FragmentFilter;
+		private var mIs3D:Boolean;
+        private var mMask:DisplayObject;
+        private var mIsMask:Boolean;
         
         /** Helper objects. */
         private static var sAncestors:Vector.<DisplayObject> = new <DisplayObject>[];
+        private static var sHelperPoint:Point = new Point();
         private static var sHelperPoint3D:Vector3D = new Vector3D();
         private static var sHelperRect:Rectangle = new Rectangle();
         private static var sHelperMatrix:Matrix  = new Matrix();
@@ -179,11 +182,13 @@ package starling.display
         }
         
         /** Disposes all resources of the display object. 
-          * GPU buffers are released, event listeners are removed, filters are disposed. */
+          * GPU buffers are released, event listeners are removed, filters and masks are disposed. */
         public function dispose():void
         {
             if (mFilter) mFilter.dispose();
+            if (mMask) mMask.dispose();
             removeEventListeners();
+            mask = null; // revert 'isMask' property, just to be sure.
         }
         
         /** Removes the object from its parent, if it has one, and optionally disposes it. */
@@ -285,12 +290,35 @@ package starling.display
         {
             // on a touch test, invisible or untouchable objects cause the test to fail
             if (forTouch && (!mVisible || !mTouchable)) return null;
+
+            // if we've got a mask and the hit occurs outside, fail
+            if (mMask && !hitTestMask(localPoint)) return null;
             
             // otherwise, check bounding box
             if (getBounds(this, sHelperRect).containsPoint(localPoint)) return this;
             else return null;
         }
-        
+
+        /** Checks if a certain point is inside the display object's mask. If there is no mask,
+         *  this method always returns <code>true</code> (because having no mask is equivalent
+         *  to having one that's infinitely big). */
+        public function hitTestMask(localPoint:Point):Boolean
+        {
+            if (mMask)
+            {
+                if (mMask.stage) getTransformationMatrix(mMask, sHelperMatrixAlt);
+                else
+                {
+                    sHelperMatrixAlt.copyFrom(mMask.transformationMatrix);
+                    sHelperMatrixAlt.invert();
+                }
+
+                MatrixUtil.transformPoint(sHelperMatrixAlt, localPoint, sHelperPoint);
+                return mMask.hitTest(sHelperPoint, true) != null;
+            }
+            else return true;
+        }
+
         /** Transforms a point from the local coordinate system to global (stage) coordinates.
          *  If you pass a 'resultPoint', the result will be stored in this point instead of 
          *  creating a new object. */
@@ -336,11 +364,12 @@ package starling.display
             throw new AbstractMethodError();
         }
         
-        /** Indicates if an object occupies any visible area. (Which is the case when its 'alpha', 
-         *  'scaleX' and 'scaleY' values are not zero, and its 'visible' property is enabled.) */
+        /** Indicates if an object occupies any visible area. This is the case when its 'alpha',
+         *  'scaleX' and 'scaleY' values are not zero, its 'visible' property is enabled, and
+         *  if it is not currently used as a mask for another display object. */
         public function get hasVisibleArea():Boolean
         {
-            return mAlpha != 0.0 && mVisible && mScaleX != 0.0 && mScaleY != 0.0;
+            return mAlpha != 0.0 && mVisible && !mIsMask && mScaleX != 0.0 && mScaleY != 0.0;
         }
         
         /** Moves the pivot point to a certain position within the local coordinate system
@@ -492,6 +521,12 @@ package starling.display
         internal function setIs3D(value:Boolean):void
         {
             mIs3D = value;
+        }
+
+        /** @private */
+        internal function get isMask():Boolean
+        {
+            return mIsMask;
         }
 
         // helpers
@@ -650,7 +685,7 @@ package starling.display
             
             return mTransformationMatrix; 
         }
-        
+
         public function set transformationMatrix(matrix:Matrix):void
         {
             const PI_Q:Number = Math.PI / 4.0;
@@ -894,7 +929,39 @@ package starling.display
          *  (since you might want to reuse it). */
         public function get filter():FragmentFilter { return mFilter; }
         public function set filter(value:FragmentFilter):void { mFilter = value; }
-        
+
+        /** The display object that acts as a mask for the current object.
+         *  Assign <code>null</code> to remove it.
+         *
+         *  <p>A pixel of the masked display object will only be drawn if it is within one of the
+         *  mask's polygons. Texture pixels and alpha values of the mask are not taken into
+         *  account. The mask object itself is never visible.</p>
+         *
+         *  <p>If the mask is part of the display list, masking will occur at exactly the
+         *  location it occupies on the stage. If it is not, the mask will be placed in the local
+         *  coordinate system of the target object (as if it was one of its children).</p>
+         *
+         *  <p>For rectangular masks, you can use simple quads; for other forms (like circles
+         *  or arbitrary shapes) it is recommended to use a 'Canvas' instance.</p>
+         *
+         *  <p>Beware that a mask will cause at least two additional draw calls: one to draw the
+         *  mask to the stencil buffer and one to erase it.</p>
+         *
+         *  @see Canvas
+         *  @default null
+         */
+        public function get mask():DisplayObject { return mMask; }
+        public function set mask(value:DisplayObject):void
+        {
+            if (mMask != value)
+            {
+                if (mMask) mMask.mIsMask = false;
+                if (value) value.mIsMask = true;
+
+                mMask = value;
+            }
+        }
+
         /** The display object container that contains this display object. */
         public function get parent():DisplayObjectContainer { return mParent; }
         
