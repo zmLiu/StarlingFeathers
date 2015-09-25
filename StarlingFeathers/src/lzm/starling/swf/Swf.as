@@ -211,9 +211,9 @@ package lzm.starling.swf
 			if (_swfDatas[dataKey_MovieClip][name] != null)
 				return true;
 			
-			if(_swfDatas[dataKey_BDClip] == null){
-				return false;
-			}
+//			if(_swfDatas[dataKey_BDClip] == null){
+//				return false;
+//			}
 
 			return _swfDatas[dataKey_BDClip][name] != null;
 		}
